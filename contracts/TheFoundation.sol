@@ -5,7 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 
-contract TheDateFoundation is PaymentSplitter {
+contract TheFoundation is PaymentSplitter {
+
     event ERC20PaymentReleased(address to, uint256 amount, address currency);
     
     mapping(address => uint256) private _totalReleasedERC20;
@@ -14,10 +15,10 @@ contract TheDateFoundation is PaymentSplitter {
     modifier validERC20(address currency) {
         if (ERC165Checker.supportsERC165(currency)) {
             require(ERC165Checker.supportsInterface(currency, type(IERC20).interfaceId),
-                "TheDateFoundation: not a valid ERC20");
+                "not a valid ERC20");
         } else {
             require(IERC20(currency).totalSupply() >= 0,
-                "TheDateFoundation: not a valid ERC20");
+                "not a valid ERC20");
         }
         _;
     }
@@ -46,7 +47,7 @@ contract TheDateFoundation is PaymentSplitter {
     function releaseERC20(address payable account, address currency) 
         public validERC20(currency) 
     {
-        require(super.shares(account) > 0, "TheDateFoundation: account has no shares");
+        require(super.shares(account) > 0, "Account has no shares");
 
         IERC20 tokenContract = IERC20(currency);
 
@@ -54,12 +55,12 @@ contract TheDateFoundation is PaymentSplitter {
         uint256 payment = (totalReceived * super.shares(account)) / super.totalShares()
             - _releasedERC20[account][currency];
 
-        require(payment > 0, "TheDateFoundation: account is not due payment");
+        require(payment > 0, "Account is not due payment");
 
         bool approval = tokenContract.approve(address(this), payment);
-        require(approval, "TheDateFoundation: ERC20 does not approve the payment");
+        require(approval, "ERC20 does not approve the payment");
         bool success = tokenContract.transferFrom(address(this), account, payment);
-        require(success, "TheDateFoundation: transfer is not successful");
+        require(success, "ERC20 transfer is not successful");
 
         _releasedERC20[account][currency] += payment;
         _totalReleasedERC20[currency] += payment;
