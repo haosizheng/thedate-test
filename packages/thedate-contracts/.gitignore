@@ -1,3 +1,18 @@
+#Hardhat files
+abis
+cache
+artifacts
+factories
+typechain
+coverage
+coverage.json
+bin
+generated
+deployments/hardhat
+deployments/localhost
+data
+build
+
 # Logs
 logs
 *.log
@@ -109,7 +124,6 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
-.vscode
 
 # yarn v2
 .yarn/cache

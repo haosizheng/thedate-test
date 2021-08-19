@@ -1,0 +1,18 @@
+type TheDate @entity {
+  id: ID!
+  owner: Bytes!
+  date: String!
+  note: String!
+}
+
+type TheNote @entity {
+  id: ID!
+  owner: Bytes!
+  note: String!
+}
+
+type TheNotePOB @entity {
+  id: ID!
+  owner: Bytes!
+  note: String!
+}
