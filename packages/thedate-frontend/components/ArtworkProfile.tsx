@@ -11,7 +11,7 @@ export default function ArtworkProfile({tokenId}: ArtworkProfileProps) {
   return (
     <>
       <div className="hero -mt-20">
-        <div className="hero-content h-screen w-screen">
+        <div className="hero-content h-full w-screen">
             <ArtworkModelViewer tokenId={tokenId} />
         </div>
       </div>
