@@ -1,20 +1,27 @@
 import Link from 'next/link';
+import ArtworkImageViewer from "./ArtworkImageViewer";
+import ArtworkCatalogue from "./ArtworkCatalogue";
+import ArtworkModelViewer from "./ArtworkModelViewer";
 
-export default function ArtworkProfile() {
+interface ArtworkProfileProps {
+  tokenId: number;
+}
+
+export default function ArtworkProfile({tokenId}: ArtworkProfileProps) {
   return (
-    <div className="hero py-20">
-      <div className="hero-content flex flex-wrap flex-row space-x-4">
-        <div className="flex-none h-96 w-96">
-
-        </div> 
-        <div className="flow-grow"> 
-          <div>
-            <p>Note: {artwork.note}</p>
-            <p>Owner: {artwork.owner}</p>
-            <p>Last Price: {artwork.price}</p>
+    <>
+      <div className="hero -mt-20">
+        <div className="hero-content h-screen w-screen">
+            <ArtworkModelViewer tokenId={tokenId} />
+        </div>
+      </div>
+      <div className="hero">
+        <div className="hero-content">
+          <div className="text-xs">
+            <ArtworkCatalogue tokenId={tokenId} />
           </div>
-        </div> 
-      </div> 
+        </div>
     </div>
+   </>
   );
 }

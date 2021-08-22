@@ -21,6 +21,7 @@ export default function Wallet() {
       <div>
         {active ? (
           <div className="text-xs">
+            Connected:
             <a className="link"
               {...{
                 href: formatEtherscanLink("Account", [chainId, account]),

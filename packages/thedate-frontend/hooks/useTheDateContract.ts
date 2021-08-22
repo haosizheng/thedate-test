@@ -8,8 +8,6 @@ import deployments from '@thefoundation/thedate-contracts/deployments/exports.js
 
 export default function useTheDateContract() {
   const { library, active, account, chainId } =  useWeb3React<Web3Provider>();
-  
-  
 
   return useMemo(
     () => !!library && !!chainId && (<any>deployments)[chainId!]

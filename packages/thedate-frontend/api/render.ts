@@ -3,8 +3,6 @@ import chrome from "chrome-aws-lambda";
 import puppeteer from "puppeteer";
 import { create, globSource } from "ipfs-http-client";
 
-const ipfs = create()
-
 const getAbsoluteURL = (path: string) => {
   if (process.env.NODE_ENV === 'development') {
     return `http://localhost:3000${path}`

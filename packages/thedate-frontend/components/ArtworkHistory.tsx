@@ -10,11 +10,10 @@ import useBlockNumber from "../hooks/useBlockNumber";
 import useTheDateBidHistory from "../hooks/useTheDateBidHistory"; 
 import useEtherPrice from "../hooks/useEtherPrice"; 
 import { useEffect, useState, memo, useRef, useDebugValue } from "react";
-import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, toPriceFormat } from '../utils/ethers';
+import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, toPriceFormat, SECONDS_IN_A_DAY} from '../utils/ethers';
 import { useRendersCount, useAsync } from "react-use";  
 import { formatUnits, commify, formatEther } from "@ethersproject/units";
 
-const SECONDS_IN_A_DAY = 86400;
 
 interface ArtworkHistoryItem {
   tokenId: number;

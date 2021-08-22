@@ -18,12 +18,10 @@ import Wallet from './Wallet';
 import Countdown from "react-countdown";
 
 import { TheDate__factory, TheDate } from '@thefoundation/contracts/typechain';
-import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, blockTimestampToDate } from '../utils/ethers';
+import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, blockTimestampToDate, SECONDS_IN_A_DAY } from '../utils/ethers';
 
 import { useAsync } from "react-use";
 import ArtworkBidHistory from './ArtworkBidHistory';
-
-const SECONDS_IN_A_DAY = 86400;
 
 export default function Auction() {
   const { library, chainId, account, active, error} = useWeb3React<Web3Provider>();
