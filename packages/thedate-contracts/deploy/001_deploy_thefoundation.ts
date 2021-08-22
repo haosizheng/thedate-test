@@ -12,7 +12,6 @@ const FOUNDATION_SHARES: number[] = [500000, 500000];
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
-
   const { deployer } = await getNamedAccounts();
 
   await deploy("TheFoundation", {
@@ -23,4 +22,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 export default func;
 
-func.tags = ["TheFoundation"];
+func.tags = ["Contract"];

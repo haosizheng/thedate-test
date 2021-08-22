@@ -1,14 +1,11 @@
-import Account from './Account';
-import ETHBalance from './ETHBalance';
-
 export default function Header() {
   return (
-    <div className="hero bg-transparent">
-      <div className="text-center content-center my-12">
-        <span className="text-sm uppercase">
-          The Date
+    <header className="hero py-20">
+      <div className="hero-content text-center">
+        <span className="text-sm">
+          <b>The Date</b>
         </span>
       </div> 
-    </div>
+    </header>
   );
 }

@@ -12,6 +12,7 @@ import "@nomiclabs/hardhat-etherscan";
 import "hardhat-gas-reporter";
 import "hardhat-abi-exporter";
 import "hardhat-deploy";
+import "hardhat-deploy-ethers";
 import "solidity-coverage";
 import "hardhat-contract-sizer";
 
@@ -111,8 +112,9 @@ const config: HardhatUserConfig = {
   },
   gasReporter: {
     currency: "USD",
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
     gasPrice: 100,
-    // enabled: process.env.REPORT_GAS ? true : false,
+    enabled: process.env.REPORT_GAS ? true : false,
   },
   typechain: {
     outDir: "typechain",

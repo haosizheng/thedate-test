@@ -18,7 +18,7 @@ export default function handler(
     name: `${tokenId}`,
     description: 'The date is the cool project', 
     image: 'ipfs://QmTy8w65yBXgyfG2ZBg5TrfB2hPjrDQH3RCQFJGkARStJb',
-    animation_url: '',
-    external_url: ''
+    animation_url: 'ipfs://QmTy8w65yBXgyfG2ZBg5TrfB2hPjrDQH3RCQFJGkARStJb',
+    external_url: 'http://'
   })
 }

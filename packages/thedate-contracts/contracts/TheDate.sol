@@ -10,9 +10,9 @@ import "@thefoundation/core-contracts/contracts/MintedByAuction.sol";
 import "@thefoundation/core-contracts/contracts/WithFoundation.sol";
 
 contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty, MintedByAuction {
-    uint256 private _noteSizeLimit = 120;
+    uint256 private _noteSizeLimit = 100;
     uint256 private _erasePrice = 1 ether;
-    uint256 private _engravePrice = 0.001 ether;
+    uint256 private _engravePrice = 0.01 ether;
 
     constructor(address payable foundation_)
         ERC721("TheDate", "DATE")
@@ -69,7 +69,6 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
     }
 
     // The Date Art
-
     modifier onlyOwner(uint256 tokenId) {
         require(ownerOf(tokenId) == msg.sender, "Caller should be the owner of the artwork.");
         _;
@@ -81,8 +80,8 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
     }
 
     event ArtworkMinted(uint256 indexed tokenId);
-    event ArtworkNoteEngraved(uint256 indexed tokenId, string note);
-    event ArtworkNoteErased(uint256 indexed tokenId);
+    event ArtworkNoteEngraved(uint256 indexed tokenId, address indexed owner, string note);
+    event ArtworkNoteErased(uint256 indexed tokenId, address indexed owner);
 
     struct TheDateArtwork {
         uint256 date;
@@ -106,7 +105,7 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
 
         artworks[tokenId].note = note;
 
-        emit ArtworkNoteEngraved(tokenId, note);
+        emit ArtworkNoteEngraved(tokenId, ownerOf(tokenId), note);
     }
 
     function eraseArtworkNote(uint256 tokenId) public payable onlyOwner(tokenId) {
@@ -115,7 +114,7 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
 
         artworks[tokenId].note = "";
 
-        emit ArtworkNoteErased(tokenId);
+        emit ArtworkNoteErased(tokenId, ownerOf(tokenId));
     }
 
     // Default functions

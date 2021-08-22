@@ -3,6 +3,15 @@ import chai from "chai";
 import { solidity } from "ethereum-waffle";
 import { TheFoundation, TheFoundation__factory, TheSecret, TheSecret__factory } from "../typechain";
 import type { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+//import * as snarkjs from "snarkjs";
+//var snarkjs = require("snarkjs");
+// @ts-ignore
+import * as snarkjs from "snarkjs";
+
+//import * as wasmsnark from "wasmsnark";
+import * as path from "path";
+
+//const snarkjs = require("snarkjs");
 
 type Address = string;
 const expect = chai.expect;
@@ -36,6 +45,13 @@ context("TheSecret", () => {
 
     // Deploy the main contract
     mainContract = await (await new TheSecret__factory(deployer).deploy(foundationContract.address)).deployed();
+
+    // Load Circus
+    //JSON.parse(fs.readFileSync("build/init.r1cs", "utf8"))
+ 
+    //snarkjs.Circuit();
+
+//    console.log(snarkjs.SnarkjsProof);
   });
 
   describe("WithRoyalty", async () => {
@@ -59,45 +75,36 @@ context("TheSecret", () => {
       await mainContract.setFixedPrice(ethers.utils.parseEther("0.1"));
       const userNote = "I love you.";
 
-      // Exception case that the bid is lower than fixed price
-      await expect(
-        mainContract.connect(user1).payToMint(userNote, { value: ethers.utils.parseEther("0.01") }),
-      ).to.be.revertedWith("Should pay >= fixed price");
+      let proofInput = { a: 3, b: 11 };
+      const wasm = path.resolve("./build/init.wasm");
+      const zkey = path.resolve("./build/init.zkey");
+      const { proof, publicSignals } = await snarkjs.groth16.fullProve(proofInput, wasm, zkey);
+      console.log(snarkjs.groth16);
+      console.log(snarkjs.zKey);
 
-      // The first bid is placed by User1
-      const noteId = ethers.constants.One;
-      await expect(mainContract.connect(user1).payToMint(userNote, { value: ethers.utils.parseEther("0.1") }))
-        .emit(mainContract, "ArtworkMinted")
-        .withArgs(noteId);
+      snarkjs.groth16
+      snarkjs.zKey 
+      
+      const verfication_key = await snarkjs.zKey.exportVerificationKey(zkey);
+      expect(await snarkjs.groth16.verify(verfication_key, publicSignals, proof)).to.eq(true);
+      console.log(publicSignals);
+      console.log(snarkjs.groth16.exportSolidityCallData(proof, publicSignals));
+     // snarkjs.zKey.exportSolidityVerifier()
+      
+//      snarkjs.groth16.fullProve(
+        //snarkjs.groth16.fullProve
 
-      // Exception case that the bid is lower than fixed price of pob
-      await expect(
-        pobContract.connect(user1).payToMint(noteId, { value: ethers.utils.parseEther("0.001") }),
-      ).to.be.revertedWith("Should pay >= fixed price");
+      // // Exception case that the bid is lower than fixed price
+      // await expect(
+      //   mainContract.connect(user1).payToMint(userNote, { value: ethers.utils.parseEther("0.01") }),
+      // ).to.be.revertedWith("Should pay >= fixed price");
 
-      // The first pob
-      const pobId1 = ethers.constants.WeiPerEther.add(ethers.constants.One);
-      await expect(pobContract.connect(user1).payToMint(noteId, { value: ethers.utils.parseEther("0.01") }))
-        .to.emit(pobContract, "Transfer")
-        .withArgs(ethers.constants.AddressZero, user1.address, pobId1);
-      const [noteId1, rank1] = await pobContract.pobs(pobId1);
-      expect(noteId1).to.eq(noteId);
-      expect(rank1).to.eq(ethers.constants.One);
-      expect(await pobContract.ownerOf(pobId1)).to.eq(user1.address);
+      // // The first bid is placed by User1
+      // const noteId = ethers.constants.One;
+      // await expect(mainContract.connect(user1).payToMint(userNote, { value: ethers.utils.parseEther("0.1") }))
+      //   .emit(mainContract, "ArtworkMinted")
+      //   .withArgs(noteId);
 
-      // // The second pob
-      const pobId2 = ethers.constants.WeiPerEther.add(ethers.constants.Two);
-      await expect(pobContract.connect(user2).payToMint(noteId, { value: ethers.utils.parseEther("0.01") }))
-        .to.emit(pobContract, "Transfer")
-        .withArgs(ethers.constants.AddressZero, user2.address, pobId2);
-      const [noteId2, rank2] = await pobContract.pobs(pobId2);
-      expect(noteId2).to.eq(noteId);
-      expect(rank2).to.eq(ethers.constants.Two);
-      expect(await pobContract.ownerOf(pobId2)).to.eq(user2.address);
-
-      expect(await pobContract.numberOfPobs(noteId)).to.eq(2);
-      expect(await pobContract.pobIdsByNoteId(noteId, 0)).to.eq(pobId1);
-      expect(await pobContract.pobIdsByNoteId(noteId, 1)).to.eq(pobId2);
     });
   });
 });

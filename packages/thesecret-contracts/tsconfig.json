@@ -5,6 +5,8 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
+    "allowJs": true,
+    "checkJs": false,
     "resolveJsonModule": true
   },
   "include": ["./scripts", "./test", "./deploy"],

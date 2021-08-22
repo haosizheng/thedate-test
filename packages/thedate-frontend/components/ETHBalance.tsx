@@ -9,7 +9,6 @@ export default function ETHBalance() {
   const { account } = useWeb3React<Web3Provider>();
   const { data: balance } = useETHBalance(account);
 
-
   return (
     <>Ξ{balance ? parseBalance(balance): "0.00"} </>
   );

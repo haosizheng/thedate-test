@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./IWithFoundation.sol";
 
 abstract contract MintedByAuction is AccessControl, ReentrancyGuard, ERC721Holder, IWithFoundation {
@@ -107,7 +108,7 @@ abstract contract MintedByAuction is AccessControl, ReentrancyGuard, ERC721Holde
             "Only winner or admin can claim the item."
         );
 
-        _getFoundationAddress().transfer(_highestBid[tokenId]);
+        Address.sendValue(_getFoundationAddress(), _highestBid[tokenId]);
         _transfer(address(this), _highestBidder[tokenId], tokenId);
 
         emit AuctionEnded(tokenId, _highestBidder[tokenId], _highestBid[tokenId]);
@@ -117,7 +118,7 @@ abstract contract MintedByAuction is AccessControl, ReentrancyGuard, ERC721Holde
         require(_pendingReturns[msg.sender] > 0, "No pending returns.");
 
         uint256 amount = _pendingReturns[msg.sender];
-        payable(msg.sender).transfer(amount);
+        Address.sendValue(payable(msg.sender), amount);
         _pendingReturns[msg.sender] -= amount;
 
         emit FundWithdrew(msg.sender, amount);

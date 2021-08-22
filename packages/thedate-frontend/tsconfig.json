@@ -19,6 +19,6 @@
     "noEmit": true,
     "jsx": "preserve"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/.ArtworkCatalogue.tsx", "components/.Account.tsx"],
   "exclude": ["node_modules", "cypress"]
 }

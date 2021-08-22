@@ -1,8 +1,14 @@
 import { formatUnits } from "@ethersproject/units";
 import type { BigNumberish } from "@ethersproject/bignumber";
+import { ETHERSCAN_PREFIXES } from './chains'
+import dateFormat from 'dateformat';
 
 export function blockTimestampToUTC(timestamp: number) {
-  return new Date(timestamp * 1000).toUTCString();
+  return dateFormat(new Date(timestamp * 1000), "UTC:mmm d yyyy HH:MM:ss Z");
+}
+
+export function blockTimestampToDate(timestamp: number) {
+  return dateFormat(new Date(timestamp * 1000), "mmm d yyyy");
 }
 
 export function shortenHex(hex?: string | null, length = 4) {
@@ -10,17 +16,14 @@ export function shortenHex(hex?: string | null, length = 4) {
   return `${hex.substring(0, length + 2)}...${hex.substring(hex.length - length)}`;
 }
 
-const ETHERSCAN_PREFIXES: Record<number, string> = {
-  1: "",
-  3: "ropsten.",
-  4: "rinkeby.",
-  5: "goerli.",
-  42: "kovan.",
-  31337: "hardhat."
-};
+export const toPriceFormat = (price: number) =>
+  price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+export const parseBalance = (balance: BigNumberish, decimals = 18, decimalsToDisplay = 3) =>
+  Number(formatUnits(balance, decimals)).toFixed(decimalsToDisplay);
 
 export function formatEtherscanLink(
-  type?: "Account" | "Transaction",
+  type?: "Account" | "Transaction" | "Token",
   data?: [number | undefined, string | null | undefined]
 ) {
   if (!type || !data) {
@@ -30,15 +33,21 @@ export function formatEtherscanLink(
   if (!chainId || !addressOrHash) {
     return "";
   }
+  let linkType: string;
+
   switch (type) {
     case "Account": {
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/address/${addressOrHash}`;
+      linkType = "address";
+      break;
     }
     case "Transaction": {
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/tx/${addressOrHash}`;
+      linkType = "tx";
+      break;
+    }
+    case "Token": {
+      linkType = "token";
+      break;
     }
   }
+  return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/${linkType}/${addressOrHash}`;
 }
-
-export const parseBalance = (balance: BigNumberish, decimals = 18, decimalsToDisplay = 3) =>
-  Number(formatUnits(balance, decimals)).toFixed(decimalsToDisplay);

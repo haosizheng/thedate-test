@@ -2,17 +2,21 @@
 import type { Web3Provider } from "@ethersproject/providers";
 import useSWR from "swr";
 import {useWeb3React} from "@web3-react/core";
-import { TheDate__factory, TheDate } from '@thefoundation/contracts/typechain';
 import { useMemo } from "react";
+import { TheDate__factory, TheDate } from '@thefoundation/thedate-contracts/typechain';
+import deployments from '@thefoundation/thedate-contracts/deployments/exports.json';
 
-export default function useTheDateContract(withSigner = false) {
-  const { library, account } =  useWeb3React<Web3Provider>();
+export default function useTheDateContract() {
+  const { library, active, account, chainId } =  useWeb3React<Web3Provider>();
+  
+  
+
   return useMemo(
-    () => !!library 
+    () => !!library && !!chainId && (<any>deployments)[chainId!]
       ? 
-        TheDate__factory.connect(process.env.THEDATE_ADDRESS!, 
-          withSigner && account ? library.getSigner(account).connectUnchecked() : library) 
+        TheDate__factory.connect((<any>deployments)[chainId!].hardhat.contracts.TheDate.address, 
+          (!!account ? library.getSigner(account).connectUnchecked() : library)) 
       : undefined, 
-    [library, account, withSigner]
+    [library, account, chainId]
   );
 }

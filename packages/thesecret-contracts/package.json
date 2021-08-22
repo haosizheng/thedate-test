@@ -52,9 +52,11 @@
     "ts-node": "^10.0.0",
     "typechain": "^5.0.0",
     "typescript": "^4.3.2",
+    "wasmsnark": "^0.0.10",
     "yarn-upgrade-all": "^0.5.4"
   },
   "dependencies": {
-    "circomlib": "^0.5.3"
+    "circomlib": "^0.5.3",
+    "snarkjs": "^0.4.6"
   }
 }

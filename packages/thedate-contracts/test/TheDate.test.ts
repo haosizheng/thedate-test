@@ -4,7 +4,6 @@ import { solidity } from "ethereum-waffle";
 import { TheFoundation__factory, TheFoundation, TheDate__factory, TheDate } from "../typechain";
 import type { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber } from "@ethersproject/bignumber";
-import exp from "constants";
 
 type Address = string;
 const expect = chai.expect;
@@ -115,7 +114,7 @@ context("TheDate contract", () => {
         mainContract.connect(user1).engraveArtworkNote(tokenId, userNote, { value: ethers.utils.parseEther("0.001") }),
       )
         .emit(mainContract, "ArtworkNoteEngraved")
-        .withArgs(tokenId, userNote);
+        .withArgs(tokenId, user1.address, userNote);
       expect(await mainContract.artworks(tokenId)).has.property("note", userNote);
 
       // Exception case that user 1 engraves his artwork's note twice.
@@ -136,7 +135,7 @@ context("TheDate contract", () => {
       // User 1 erases the note of his artwork.
       await expect(mainContract.connect(user1).eraseArtworkNote(tokenId, { value: ethers.utils.parseEther("1.0") }))
         .emit(mainContract, "ArtworkNoteErased")
-        .withArgs(tokenId);
+        .withArgs(tokenId, user1.address);
       expect(await mainContract.artworks(tokenId)).has.property("note", "");
 
       // Exception case that user 1 erases his artwork's note twice.

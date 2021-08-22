@@ -1,46 +1,46 @@
-import React from 'react'
-import { Web3ReactProvider } from '@web3-react/core'
-import { Web3Provider } from '@ethersproject/providers'
+import React, { useEffect, useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
-import { InjectedConnector } from '@web3-react/injected-connector'
+import { injected, walletconnect } from '../utils/web3-connectors';
+import useENSName from "../hooks/useENSName";
+import useEagerConnect from "../hooks/useEagerConnect";
+import { formatEtherscanLink, shortenHex } from "../utils/ethers";
+import { Web3Provider, Network } from '@ethersproject/providers';
+import { getPackedSettings } from 'http2';
 
-export const injectedConnector = new InjectedConnector({
-  supportedChainIds: [
-    1, // Mainet
-    3, // Ropsten
-    4, // Rinkeby
-    5, // Goerli
-    42, // Kovan
-  ],
-})
+export default function Wallet() {
+  const { library, chainId, error, account, activate, active  } = useWeb3React<Web3Provider>();
 
-function getLibrary(provider: any): Web3Provider {
-  const library = new Web3Provider(provider)
-  library.pollingInterval = 12000
-  return library
-}
-
-export const Wallet = () => {
-  const { chainId, account, activate, active } = useWeb3React<Web3Provider>()
-
-  const onClick = () => {
-    activate(injectedConnector)
+  const ensName = useENSName(account);
+  const triedToEagerConnect = useEagerConnect();
+  
+  if (error) {
+    return null;
   }
 
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
       <div>
-        <div>ChainId: {chainId}</div>
-        <div>Account: {account}</div>
         {active ? (
-          <div>✅ </div>
+          <div className="text-xs">
+            <a className="link"
+              {...{
+                href: formatEtherscanLink("Account", [chainId, account]),
+                target: "_blank",
+                rel: "noopener noreferrer",
+              }}>
+              {ensName || `${shortenHex(account, 4)}`}
+            </a>
+          </div>
         ) : (
-          <button type="button" onClick={onClick}>
-            Connect
-          </button>
+          <div className="text-xs">
+            <button type="button" onClick={() => { activate(injected) }} >
+              <p className="link">Metamask</p>
+            </button>
+            &nbsp; | &nbsp; 
+            <button className="link underline" type="button" onClick={() => { activate(walletconnect) }} >
+              Wallet Connect
+            </button>
+          </div>
         )}
       </div> 
-    </Web3ReactProvider>
   )
 }
-

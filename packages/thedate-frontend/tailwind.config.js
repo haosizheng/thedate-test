@@ -23,7 +23,6 @@ module.exports = {
     themes: [
       {
         'mytheme': {                          /* your theme name */
-          "fontFamily": '"Roboto Mono"',
           "primary": "#ff7598",
           "primary-focus": "#ff5784",
           "primary-content": "#000000",
