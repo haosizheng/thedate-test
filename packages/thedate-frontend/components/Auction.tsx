@@ -9,7 +9,6 @@ import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useEtherPrice from '@/hooks/useEtherPrice';
 import useBlockNumber from '@/hooks/useBlockNumber';
 import useTheDateContract from '@/hooks/useTheDateContract';
-import Wallet from './Wallet';
 import Countdown from "react-countdown";
 import { SECONDS_IN_A_DAY, tokenIdToDateString } from "@/utils/thedate"
 import { parseBalance } from '@/utils/ethers';
@@ -29,6 +28,7 @@ export default function Auction() {
   const [ highestBid, setHighestBid] = useState<BigNumber>(null!);
   const [ reservePrice, setReservePrice] = useState<BigNumber>(null!);
   const [ minBidIncrementPermyriad, setMinBidIncrementPermyriad] = useState<BigNumber>(null!);
+  const [ bidPrice, setBidPrice] = useState<BigNumber>(null!);
 
   useAsync(async () => {
     if (!library || !TheDate || !blockNumber) {
@@ -55,8 +55,13 @@ export default function Auction() {
   }, [library, TheDate, blockNumber]);
 
   const errorMessageRef = useRef<HTMLDivElement>(null!);
+  const bidPriceRef = useRef<HTMLInputElement>(null!);
 
   const clickToAuction = () => {
+    // const bidPrice = bidPriceRef.current ?
+    // ethers.utils.parseEther(bidPriceRef.current.conte)
+    // const typeInBidPrice = Number.parseFloat(bidPriceRef.current?.textContent);
+
     TheDate?.placeBid(tokenId!, {value: minBidPrice }).then(
       (reason) => {
         if (errorMessageRef.current) {
@@ -72,58 +77,72 @@ export default function Auction() {
     )
   };
 
+  const bidPriceOnChange = (event: React.FormEvent<HTMLInputElement>) => {
+    
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  }
+
   return (
     <>
       <div className="hero">
         <div className="hero-content h-96 w-full">
-          { tokenId ? <ArtworkModelViewer tokenId={tokenId} /> : "Loading..." }
+          { tokenId ? <ArtworkModelViewer tokenId={tokenId} noteString="Character Counter is a 100% free online character count calculator that's simple to use. " /> : "Loading..." }
         </div>
       </div>
       <div className="hero">
         <div className="hero-content py-16 leading-10 max-w-prose text-left flex-col flex">
-          <p className="mb-44">
+          <p className="">
             One and only one <Link href="/about"><a className="link"><b>The Date</b></a></Link> artwork of Today - { tokenIdToDateString(tokenId) } - is 
             available to mint into Ethernum network immutably in {" "}
             <Countdown intervalDelay={1000} 
-              date={new Date(tokenId * (SECONDS_IN_A_DAY + 1) * 1000)}
-              renderer={ ({ hours, minutes, seconds, completed }) => {
+              date={new Date((tokenId + 1) * SECONDS_IN_A_DAY * 1000)}
+              renderer={ ({ formatted, completed }) => {
                 if (completed) {
                   // Render a completed state
                   return <span>Auction ended!</span>;
                 } else {
                   // Render a countdown
-                  return <span>{hours}:{minutes}:{seconds}</span>;
+                  return <span>{formatted.hours}:{formatted.minutes}:{formatted.seconds}</span>;
                 }
               }} 
             />
             .
           </p>
-
-          <p className="">
-            Auction to win the date. 
-          </p>
+            
           {/* <p>Why?  <Link href="/about"><a className="link">About The Date art project</a></Link></p> */}
-
-          <p className="">
-            { reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. </> }
-            { highestBid && highestBid.gt(0) && minBidIncrementPermyriad && <>Current highest bid is Ξ{parseBalance(highestBid)}. 
-              Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>}
-          </p>
+          <br></br>
 
           {!account ?
             <p>
-              Connect your Wallet to start bidding. 
+              Connect your Wallet below to enable bidding. 
             </p>
           : 
             <p>
-              Place your bid with 
-            Ξ<input type="text" 
-              className="bg-transparent focus:outline-none focus:border-none underline " 
-              value={parseBalance(minBidPrice)} 
-              onChange={() => {return true;}} pattern="^-?[0-9]\d*\.?\d*$"/>
-              <a onClick={clickToAuction} className="hover:link" > to own the date. </a>
+              <form onSubmit={handleSubmit}>
+                Auction to own the date. Place your bid with 
+              Ξ<input type="text" 
+                ref={ bidPriceRef }
+                className="bg-transparent hover:border focus:border  border-none border-black w-20 " 
+                pattern="^[0-9]\d*\.?\d*$"
+                value={parseBalance(minBidPrice)}
+                onChange= { bidPriceOnChange } 
+                placeholder={parseBalance(minBidPrice)} />
+                <br/>
+                <a onClick={clickToAuction} className="hover:link" > Bid! </a>
+              </form>
             </p>
           }
+
+          <p className="text-xs">
+            { reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. </> }
+            { minBidIncrementPermyriad && <>Current highest bid is Ξ{parseBalance(highestBid)}. 
+              Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>}
+          </p>
+
+          
           <div className="text-xs" ref={errorMessageRef}></div>
         </div>
       </div>

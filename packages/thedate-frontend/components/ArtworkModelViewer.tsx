@@ -30,7 +30,7 @@ function CreateCanvasTexture(date: string, note: string = "", backgroundColor: s
   }
 
   ctx.fillStyle = textColor;
-  ctx.font = 160 + 'px Roboto mono';
+  ctx.font = 200 + 'px Roboto mono';
   ctx.fillText(date, 1800, 1840)
 
   ctx.font = 54 + 'px Roboto mono';
@@ -106,12 +106,12 @@ function Environment({ background = false }) {
   return null
 }
 
-export default function ArtworkModelViewer({ tokenId, noteString = "", autoRotate = true}: 
-  { tokenId: number, noteString?: string, autoRotate?: boolean }) {
+export default function ArtworkModelViewer({ tokenId, noteString = "", autoRotate = true, fov = 20}: 
+  { tokenId: number, noteString?: string, autoRotate?: boolean, fov?: number }) {
   const [ready, set] = useState(false)
 
   return (
-    <Canvas dpr={[1, 2]} shadows camera={{ position: [5, 1, 8], fov: 50 }}>
+    <Canvas dpr={[1, 2]} shadows camera={{ position: [5, 1, 8], fov: fov }}>
       <ambientLight intensity={0.6} />
 
       <directionalLight position={[2.5, 3, 3]} intensity={0.5} />
@@ -126,11 +126,13 @@ export default function ArtworkModelViewer({ tokenId, noteString = "", autoRotat
 
       <Suspense fallback={<Html>Loading..</Html>}>
         <Environment />
-        <Artwork dateString={tokenIdToDateString(tokenId)} noteString={noteString ? noteString : ""} />
+        <Artwork dateString={tokenIdToDateString(tokenId)} 
+          noteString={noteString ? noteString : ""} />
       </Suspense>
 
-      <OrbitControls autoRotate={autoRotate} enablePan={false} enableZoom={false} minPolarAngle={Math.PI/2 - Math.PI/10} 
-        maxPolarAngle={Math.PI/2} />
+      <OrbitControls autoRotate={autoRotate} 
+        enablePan={false} enableZoom={true} minDistance={8} maxDistance={10} minPolarAngle={Math.PI/2 - Math.PI/10} 
+        maxPolarAngle={Math.PI/2 +  Math.PI/10} />
     </Canvas>
   )
 }

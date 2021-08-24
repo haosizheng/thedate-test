@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=16"
+    "node": ">=14"
   },
   "dependencies": {
     "@apollo/client": "^3.4.8",
@@ -12,8 +12,10 @@
     "@ethersproject/providers": "^5.1.2",
     "@ethersproject/units": "^5.1.0",
     "@ethersproject/wallet": "^5.1.0",
+    "@fontsource/roboto-mono": "^4.5.0",
     "@hooks/render-count": "^0.1.0",
     "@metamask/onboarding": "^1.0.0",
+    "@netlify/functions": "^0.7.2",
     "@react-three/cannon": "^2.6.1",
     "@react-three/drei": "^7.4.0",
     "@react-three/fiber": "^7.0.6",
@@ -33,6 +35,8 @@
     "ipfs-http-client": "^52.0.1",
     "load-bmfont": "^1.4.1",
     "next": "^11.1.0",
+    "puppeteer": "^10.2.0",
+    "puppeteer-screen-recorder": "^1.1.11",
     "react": "^17.0.2",
     "react-countdown": "^2.3.2",
     "react-device-detect": "^1.17.0",

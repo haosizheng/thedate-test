@@ -43,7 +43,11 @@ export default function Gallery({ owner }: { owner?: string }) {
     <>
     <div className="hero">
       <div className="hero-content">
-        <p>Gallery of {shortenHex(owner)}</p>
+        { owner ? 
+          <p>Gallery of {shortenHex(owner)}</p>
+          :
+          <p>Gallery of all The Date </p>
+        }
       </div>
     </div>
     <div className="hero">

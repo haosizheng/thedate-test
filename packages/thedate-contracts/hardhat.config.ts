@@ -15,6 +15,8 @@ import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import "solidity-coverage";
 import "hardhat-contract-sizer";
+import "./tasks/accounts";
+import "./tasks/pass-a-day";
 
 const chainIds = {
   ganache: 1337,
@@ -31,15 +33,7 @@ const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY || "";
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (args, hre) => {
-  const accounts = await hre.ethers.getSigners();
 
-  for (const account of accounts) {
-    console.log(await account.getAddress(), " ", (await account.getBalance()).toString());
-  }
-});
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = "https://" + network + ".infura.io/v3/" + INFURA_API_KEY;

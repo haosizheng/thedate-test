@@ -3,8 +3,9 @@ import useActiveWeb3React from "./useActiveWeb3React";
 import useTheDateContract from "./useTheDateContract";
 import { useMemo, useState } from "react";
 import { useAsync } from "react-use";  
-import { tokenIdToDateString } from "@/utils/thedate";
-import { ethers } from "ethers";  
+import { SECONDS_IN_A_DAY, tokenIdToDateString } from "@/utils/thedate";
+import { BigNumber, ethers } from "ethers";  
+import useBlockNumber from "./useBlockNumber";
 
 export default function useTheDateArtwork(tokenId: number) {
   const { library, chainId, account } = useActiveWeb3React();
@@ -13,6 +14,9 @@ export default function useTheDateArtwork(tokenId: number) {
   const [dateString, setDateString] = useState<string>(null!);
   const [noteString, setNoteString] = useState<string>(null!);
   const [exists, setExists] = useState<boolean>(false);
+  const [highestBidder, setHighestBidder] = useState<string>(null!);
+  const [highestBid, setHighestBid] = useState<BigNumber>(null!);
+  const [auctionEnded, setAuctionEnded] = useState<boolean>(null!);
 
   const engraveNote = async (newNoteString: string) => {
     if (!library || !TheDate || !account || !owner || owner != account || !exists 
@@ -46,17 +50,28 @@ export default function useTheDateArtwork(tokenId: number) {
     const owner_ = await TheDate.ownerOf(tokenId);
 
     setOwner(owner_);
-    console.log(owner_);
     const artwork_ = await TheDate.artworks(tokenId);
+    
+    const { bidder: bidder_, amount: amount_ } = await TheDate.getHighestBid(tokenId);
+
+    setHighestBidder(bidder_);
+    setHighestBid(amount_);
     setDateString(tokenIdToDateString(artwork_.date.toNumber()));
     setNoteString(artwork_.note);
+
     if (owner_ && owner_ !== ethers.constants.AddressZero) {
       setExists(true);
     } else {
       setExists(false);
     }
+    
+    const blockTimestamp = (await library.getBlock(library.blockNumber)).timestamp;
+
+    setAuctionEnded(blockTimestamp > (tokenId + 1) * SECONDS_IN_A_DAY);
+
   }, [library, chainId, TheDate]);
 
-  return useMemo(() => ({exists, tokenId, owner, dateString, noteString, engraveNote, eraseNote}), 
-    [dateString, exists, noteString, owner, tokenId]);
+  return useMemo(() => ({exists, tokenId, owner, dateString, noteString, auctionEnded,
+    highestBidder, highestBid, engraveNote, eraseNote, claimArtwork}), 
+    [dateString, exists, noteString, owner, auctionEnded, highestBidder, highestBid, tokenId]);
 }

@@ -8,23 +8,28 @@ export default async function render(req: NextApiRequest, res: NextApiResponse) 
     query: { tokenId }
   } = req
 
-  if (!tokenId) return res.status(400).end(`No model provided`)
+  if (!tokenId) 
+    return res.status(400).end(`No model provided`)
 
   let browser
 
-  if (process.env.NODE_ENV === 'production') {
-    browser = await puppeteer.launch({
-      args: chrome.args,
-      defaultViewport: chrome.defaultViewport,
-      executablePath: await chrome.executablePath,
-      headless: chrome.headless,
-      ignoreHTTPSErrors: true
-    })
-  } else {
-    browser = await puppeteer.launch({
-      headless: true
-    })
-  }
+  // if (process.env.NODE_ENV === 'production') {
+    // browser = await puppeteer.launch({
+    //   args: chrome.args,
+    //   defaultViewport: chrome.defaultViewport,
+    //   executablePath: await chrome.executablePath,
+    //   headless: true,
+    //   ignoreHTTPSErrors: true
+    // })
+  // } else {
+  //   browser = await puppeteer.launch({
+  //     headless: true
+  //   })
+  // }
+
+  browser = await puppeteer.launch({
+    headless: true
+  })
 
   const page = await browser.newPage()
   await page.setViewport({ width: 512, height: 512 })

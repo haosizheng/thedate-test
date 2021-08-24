@@ -8,6 +8,7 @@ import { blockTimestampToUTC } from '@/utils/thedate';
 import { useAsync } from "react-use";  
 import { formatEther } from "@ethersproject/units";
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
+import Link from "next/link";
 
 interface BidHistoryItem {
   tokenId: number;
@@ -55,16 +56,18 @@ export default function ArtworkBidHistory({ tokenId }: { tokenId: number }) {
       </thead>
       <tbody>
           {bidHistory && bidHistory.map((x, i) => (
-            <tr key="{i}" className={ i > 0 ? "line-through" : ""}>
+            <tr key={i} className={ i > 0 ? "line-through" : ""}>
               <td>
                 <a className="hover:link" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                   { blockTimestampToUTC(x.timestamp) }
                 </a>
               </td>
               <td>
-                <a className="hover:link" href={formatEtherscanLink("Account", [chainId, x.bidder])}>
+                <Link href={`/gallery/${x.bidder}`}>
+                  <a className="hover:link">
                   { shortenHex(x.bidder) }
                 </a>
+                </Link>
               </td>
               <td>
                 Ξ{ parseBalance(x.amount) } { 

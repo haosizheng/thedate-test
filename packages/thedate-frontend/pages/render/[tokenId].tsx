@@ -18,9 +18,8 @@ export default function ArtworkRenderingPage() {
 
   return (
     <>
-      <Meta /> 
       <div className="static absolute inset-0	h-96 w-96 bg-neutral">
-        <ArtworkModelViewer tokenId={ tokenId } />
+        <ArtworkModelViewer tokenId={ tokenId } autoRotate={ false } fov={ 40 } />
       </div>
     </>
   );

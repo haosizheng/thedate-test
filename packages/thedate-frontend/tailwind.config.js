@@ -6,13 +6,16 @@ module.exports = {
   ],
   plugins: [
     require('daisyui')
-    //require('@tailwindcss/typography')
   ],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {},
   },
-  variants: {},
+  variants: {
+    extend: {
+      borderStyle: ['hover', 'focus'],
+    }
+  },
   daisyui: {
     styled: true,
     themes: true,

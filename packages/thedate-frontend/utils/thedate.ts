@@ -11,5 +11,5 @@ export function blockTimestampToDate(timestamp: number) {
 }
 
 export function tokenIdToDateString(tokenId: number) {
-  return dateFormat(new Date(tokenId * SECONDS_IN_A_DAY * 1000), "mmm d yyyy");
+  return dateFormat(new Date(tokenId * SECONDS_IN_A_DAY * 1000), "mmm d yyyy").toUpperCase();
 }

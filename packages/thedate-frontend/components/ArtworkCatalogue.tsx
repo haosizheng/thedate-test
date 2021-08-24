@@ -5,12 +5,14 @@ import { useState, useRef } from "react";
 import { shortenHex } from "@/utils/ethers";
 import { useAsync } from "react-use";
 import Link from "next/link";
+import { SECONDS_IN_A_DAY } from "@/utils/thedate";
 import useTheDateContract from "@/hooks/useTheDateContract";
 
 export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
   const {library, account} = useActiveWeb3React();
   const TheDate = useTheDateContract();
-  const {exists, owner, dateString, noteString, engraveNote, eraseNote } = useTheDateArtwork(tokenId);
+  const {exists, owner, dateString, noteString, highestBidder, auctionEnded,
+    engraveNote, eraseNote, claimArtwork } = useTheDateArtwork(tokenId);
   const noteInputBox = useRef<HTMLInputElement>(null!);
   
   const onClickEngrave = () => {
@@ -18,7 +20,7 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
       engraveNote(noteInputBox.current.textContent);
     }
   };
-
+  
   return (
     !exists ?
       <div>
@@ -26,12 +28,13 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
       </div>
     : (
       <div>
-        <p>
+        { !!dateString && <p>
           Date:{" "}
-          <Link href={`/artwork/${tokenId}`}>
-            <a className="hover:link">{dateString}</a>
-          </Link>
-        </p>
+            <Link href={`/artwork/${tokenId}`}>
+              <a className="hover:link">{dateString}</a>
+            </Link>
+          </p>
+        }
         <p>
           Note: {noteString ? `"${noteString}"` : "(unset)"}
           {account === owner && editable && !noteString && noteString != "" && (
@@ -45,17 +48,28 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
           )}
         </p>
         <br/>
+        { !!owner &&
         <p>
+          
           Owner:{" "}
-          { account === TheDate?.address && editable && 
-            <button className="link" onClick={claimArtwork}>Claim your artwork here as you won the auction.</button>
-          }
-          <Link href={`/gallery/${owner}`}>
-            <a className="hover:link" >
-              {shortenHex(owner)} { account === owner && " (you)" }
-            </a>
-          </Link>
+          { owner === TheDate?.address ? (
+              !auctionEnded ? 
+                <>Auction not ended yet</>
+              : (editable && highestBidder === account) ? 
+                <button className="link" onClick={claimArtwork}>Claim your artwork</button>
+              : <Link href={`/artwork/${tokenId}`}>
+                  <a className="link">Not claimed yet</a>
+                </Link>
+            )
+            :
+            <Link href={`/gallery/${owner}`}>
+              <a className="hover:link" >
+                {shortenHex(owner)} { account === owner && " (you)" }
+              </a>
+            </Link>
+        }
         </p>
+        }
         <p>Token ID: {" "}
           <Link href={`/artwork/${tokenId}`}>
             <a className="hover:link">#{tokenId}</a>
