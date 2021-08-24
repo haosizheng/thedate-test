@@ -4,8 +4,8 @@ export default function Header() {
   return (
     <header className="hero py-20">
       <div className="hero-content text-center">
-        <span className="cool">
-          <Link href="/"><a className=""><b>The Date</b></a></Link>
+        <span className="font-mono text-xl text-gray-800">
+          <Link href="/"><a className=""><b>THE DATE</b></a></Link>
         </span>
       </div> 
     </header>

@@ -56,7 +56,7 @@ export default function ArtworkBidHistory({ tokenId }: { tokenId: number }) {
       </thead>
       <tbody>
           {bidHistory && bidHistory.map((x, i) => (
-            <tr key={i} className={ i > 0 ? "line-through" : ""}>
+            <tr key={i} className={ i > 0 ? "line-through text-gray-400" : ""}>
               <td>
                 <a className="hover:link" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                   { blockTimestampToUTC(x.timestamp) }
