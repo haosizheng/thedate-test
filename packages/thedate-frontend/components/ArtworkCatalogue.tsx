@@ -7,7 +7,7 @@ import { useAsync } from "react-use";
 import Link from "next/link";
 import useTheDateContract from "@/hooks/useTheDateContract";
 
-export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number; editable?: boolean}) {
+export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
   const {library, account} = useActiveWeb3React();
   const TheDate = useTheDateContract();
   const {exists, owner, dateString, noteString, engraveNote, eraseNote } = useTheDateArtwork(tokenId);

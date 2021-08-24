@@ -1,21 +1,14 @@
-import type { Web3Provider } from "@ethersproject/providers";
 
-import useSWR from "swr";
-import { useWeb3React } from "@web3-react/core";
-import { TheDate__factory, TheDate } from "@thefoundation/contracts/typechain";
-import { BigNumberish, BigNumber, ethers } from "ethers";
-import useTheDateContract from "../hooks/useTheDateContract";
-import useCurrentBlock from "../hooks/useCurrentBlock";
-import useBlockNumber from "../hooks/useBlockNumber";
-import useEtherPrice from "../hooks/useEtherPrice";
-import { useEffect, useState, memo, useRef, useDebugValue } from "react";
-import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, toPriceFormat } from "../utils/ethers";
-import { useRendersCount, useAsync } from "react-use";
+import { useState } from "react";
+import { useAsync } from "react-use";
+import { ethers } from "ethers";
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
+import useTheDateContract from "@/hooks/useTheDateContract";
+import { shortenHex } from "@/utils/ethers";
 import ArtworkImageViewer from "./ArtworkImageViewer";
 import ArtworkCatalogue from "./ArtworkCatalogue";
-import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 
-export default function Gallery({ owner }: { owner?: string | string[] | undefined }) {
+export default function Gallery({ owner }: { owner?: string }) {
   const { library, chainId, account, active } = useActiveWeb3React();
   const TheDate = useTheDateContract();
   const [tokenIdList, setTokenIdList] = useState<number[]>([]);

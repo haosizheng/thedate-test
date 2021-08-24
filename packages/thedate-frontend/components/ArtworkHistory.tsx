@@ -17,7 +17,7 @@ interface ArtworkHistoryItem {
   timestamp: number;
 }
 
-export default function ArtworkHistory() {
+export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
   const { library, chainId } = useActiveWeb3React();
   const TheDate = useTheDateContract();  
   const { data : blockNumber} = useBlockNumber();
