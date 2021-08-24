@@ -1,16 +1,14 @@
-import type { EtherscanProvider } from "@ethersproject/providers";
+import { EtherscanProvider } from "@ethersproject/providers";
 import useKeepSWRDataLiveAsBlocksArrive from "./useKeepSWRDataLiveAsBlocksArrive";
-import { useWeb3React } from "@web3-react/core";
-import { ethers } from "ethers";
-
 import useSWR from "swr";
+import { useMemo } from "react";
 
 export default function useEtherPrice() {
-
-  let etherscanProvider = new ethers.providers.EtherscanProvider("homestead");
+  const etherscanProvider = useMemo(() => new EtherscanProvider("homestead"), []);
   const shouldFetch = !!etherscanProvider;
 
-  const result = useSWR(shouldFetch ? ["EtherPrice"] : null, 
+  const result = useSWR(
+    shouldFetch ? ["EtherPrice"] : null, 
     async () => {
       return etherscanProvider.getEtherPrice()
     }, {

@@ -1,10 +1,6 @@
 import Image from 'next/image';
 
-export interface ArtworkImageViewerProps {
-  tokenId: number;
-}
-
-export default function ArtworkImageViewer({ tokenId }: ArtworkImageViewerProps) {
+export default function ArtworkImageViewer({ tokenId }: {tokenId: number}) {
   return (
     <div>
       {/* <Image src={`/api/renders/${tokenId}`} alt="artwork" /> */}

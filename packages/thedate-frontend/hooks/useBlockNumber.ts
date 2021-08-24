@@ -1,12 +1,12 @@
-import type { Web3Provider } from "@ethersproject/providers";
 import useSWR from "swr";
-import { useWeb3React } from "@web3-react/core";
+import useActiveWeb3React from "./useActiveWeb3React";
 
 export default function useBlockNumber() {
-  const { library } = useWeb3React<Web3Provider>();
+  const { library } = useActiveWeb3React();
   const shouldFetch = !!library;
 
-  return useSWR(shouldFetch ? ["BlockNumber"] : null, 
+  return useSWR(
+    shouldFetch ? ["BlockNumber"] : null, 
     async () => {
       return library?.getBlockNumber();
     }, {

@@ -1,7 +1,7 @@
 import Account from './.Account';
 import ETHBalance from './ETHBalance';
 import Link from "next/link";
-import TheDateNewArtwork from "./TheDateNewArtwork";
+import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
 
 import type { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
@@ -12,7 +12,6 @@ import { ethers } from "ethers";
 import { useEffect, useState, useRef, useCallback } from 'react';
 import useEtherPrice from '../hooks/useEtherPrice';
 import useBlockNumber from '../hooks/useBlockNumber';
-import useTheDateBidHistory from '../hooks/useTheDateBidHistory';
 import useTheDateContract from '../hooks/useTheDateContract';
 import Wallet from './Wallet';
 import Countdown from "react-countdown";
@@ -22,29 +21,32 @@ import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, blo
 
 import { useAsync } from "react-use";
 import ArtworkBidHistory from './ArtworkBidHistory';
+import ArtworkModelViewer from './ArtworkModelViewer';
 
 export default function Auction() {
-  const { library, chainId, account, active, error} = useWeb3React<Web3Provider>();
+  const { library, chainId, account, active, error} = useActiveWeb3React();
+  
   const TheDate = useTheDateContract();  
+
   const { data : blockNumber} = useBlockNumber();
   const { data: etherPrice } = useEtherPrice();
   const [ tokenId, setTokenId ] = useState<number>(0);
-  const [ timestamp, setTimestamp ] = useState<number>(null!);
+  const [ blockTimestamp, setBlockTimestamp ] = useState<number>(null!);
+
   const [ minBidPrice, setMinBidPrice ] = useState<BigNumber>(ethers.constants.Zero);
   const [ highestBidder, setHighestBidder] = useState<string>(null!);
   const [ highestBid, setHighestBid] = useState<BigNumber>(null!);
   const [ reversePrice, setReversePrice] = useState<BigNumber>(null!);
-
   const [ minBidIncrementPermyriad, setMinBidIncrementPermyriad] = useState<BigNumber>(null!);
 
   useAsync(async () => {
-    if (!library || !TheDate) {
+    if (!library || !TheDate || !blockNumber) {
       return;
     }
-    const timestamp_ = (await library.getBlock(blockNumber!)).timestamp;
-    const tokenId_ = BigNumber.from(timestamp).div(SECONDS_IN_A_DAY).toNumber();
+    const timestamp_ = (await library.getBlock(blockNumber)).timestamp;
+    const tokenId_ = BigNumber.from(timestamp_).div(SECONDS_IN_A_DAY).toNumber();
     setTokenId(tokenId_);
-    setTimestamp(timestamp_);
+    setBlockTimestamp(timestamp_);
 
     const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId);
     const reservePrice_ = await TheDate.getAuctionReservePrice();
@@ -55,14 +57,15 @@ export default function Auction() {
     } else {
       setMinBidPrice(highestBid_.mul(minBidIncrementPermyriad_.add(10000)).div(10000));
     }
+
     setHighestBid(highestBid_);
     setHighestBidder(highestBidder_);
     setMinBidIncrementPermyriad(minBidIncrementPermyriad_);
     setReversePrice(reservePrice_);
-
-  }, [library, blockNumber]);
+  }, [library, TheDate, blockNumber]);
 
   const errorMessageRef = useRef<HTMLDivElement>(null!);
+
   const clickToAuction = () => {
     TheDate?.placeBid(tokenId!, {value: minBidPrice }).then(
       (reason) => {
@@ -83,7 +86,7 @@ export default function Auction() {
     <>
       <div className="hero">
         <div className="hero-content h-96 w-full">
-         <TheDateNewArtwork />
+          { blockTimestamp ? <ArtworkModelViewer date={blockTimestampToDate(blockTimestamp)} note="" /> }
         </div>
       </div>
       <div className="hero">

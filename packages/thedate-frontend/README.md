@@ -63,4 +63,5 @@ Netify / Vercel
   1.2 ArtworkCatague(tokenId)
 
 
-  
+TODO:
+1. thedate-contracts only not thefoundation. 

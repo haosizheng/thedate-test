@@ -1,7 +1,6 @@
-import type { Web3Provider } from "@ethersproject/providers";
 import useSWR from "swr";
 import useKeepSWRDataLiveAsBlocksArrive from "./useKeepSWRDataLiveAsBlocksArrive";
-import {useWeb3React} from "@web3-react/core";
+import { useWeb3React } from "@web3-react/core";
 
 export default function useETHBalance(address?: string | null, suspense = false) {
   const { library, chainId } = useWeb3React();

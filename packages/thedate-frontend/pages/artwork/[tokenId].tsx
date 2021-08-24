@@ -1,15 +1,24 @@
-import ArtworkProfile from "../../components/ArtworkProfile";
 import { useRouter } from 'next/router'
-import Layout from "../../components/Layout";
+import ArtworkProfile from "@/components/ArtworkProfile";
+import Layout from "@/components/Layout";
+import ErrorPage from 'next/error'
 
 export default function ArtworkPage() {
   const router = useRouter()
-  const { tokenId } = router.query
+  const { tokenId : tokenIdQuery } = router.query
+  const tokenId = typeof tokenIdQuery === "string" ? Number(tokenIdQuery) : undefined;
+
+  if (!tokenId || !Number.isInteger(tokenId)) {
+    return (
+      <Layout>
+        <div className="hero">Error - Wrong Token ID</div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      {typeof(tokenId) === 'string' && 
-      <ArtworkProfile tokenId={Number.parseInt(tokenId)} />}
+      <ArtworkProfile tokenId={tokenId} />
     </Layout>
   );
 }

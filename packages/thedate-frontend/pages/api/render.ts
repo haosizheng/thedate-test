@@ -3,19 +3,12 @@ import chrome from "chrome-aws-lambda";
 import puppeteer from "puppeteer";
 import { create, globSource } from "ipfs-http-client";
 
-const getAbsoluteURL = (path: string) => {
-  if (process.env.NODE_ENV === 'development') {
-    return `http://localhost:3000${path}`
-  }
-  return `https://${process.env.VERCEL_URL}${path}`
-}
-
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function render(req: NextApiRequest, res: NextApiResponse) {
   let {
-    query: { model }
+    query: { tokenId }
   } = req
 
-  if (!model) return res.status(400).end(`No model provided`)
+  if (!tokenId) return res.status(400).end(`No model provided`)
 
   let browser
 
@@ -35,7 +28,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const page = await browser.newPage()
   await page.setViewport({ width: 512, height: 512 })
-  await page.goto(getAbsoluteURL(`?model=${model}`))
+  await page.goto(`${process.env.NEXT_PUBLIC_BASE_URL}/render/${tokenId}`)
   await page.waitForFunction('window.status === "ready"')
 
   const data = await page.screenshot({

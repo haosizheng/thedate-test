@@ -1,27 +1,33 @@
-import Link from 'next/link';
 import ArtworkImageViewer from "./ArtworkImageViewer";
 import ArtworkCatalogue from "./ArtworkCatalogue";
 import ArtworkModelViewer from "./ArtworkModelViewer";
+import useTheDateArtwork from "@/hooks/useTheDateArtwork";
+import { tokenIdToDateString } from "@/utils/thedate";
 
-interface ArtworkProfileProps {
-  tokenId: number;
-}
+export default function ArtworkProfile({tokenId}: {tokenId: number}) {
+  const {exists, owner, dateString, noteString, engraveNote, eraseNote} = useTheDateArtwork(tokenId);
 
-export default function ArtworkProfile({tokenId}: ArtworkProfileProps) {
   return (
-    <>
-      <div className="hero -mt-20">
-        <div className="hero-content h-full w-screen">
-            <ArtworkModelViewer tokenId={tokenId} />
-        </div>
-      </div>
+    !exists ? 
       <div className="hero">
         <div className="hero-content">
-          <div className="text-xs">
-            <ArtworkCatalogue tokenId={tokenId} />
+          Artwork {tokenId} does not exists.
+        </div>
+      </div>
+    : 
+      <>
+        <div className="hero">
+          <div className="hero-content h-full w-screen">
+            <ArtworkModelViewer tokenId={tokenId} noteString={noteString} />
           </div>
         </div>
-    </div>
-   </>
+        <div className="hero">
+          <div className="hero-content">
+            <div className="text-sm">
+              <ArtworkCatalogue tokenId={tokenId} editable />
+            </div>
+          </div>
+        </div>
+      </>
   );
 }

@@ -1,45 +1,38 @@
-import React, { useEffect, useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
-import { injected, walletconnect } from '../utils/web3-connectors';
-import useENSName from "../hooks/useENSName";
-import useEagerConnect from "../hooks/useEagerConnect";
-import { formatEtherscanLink, shortenHex } from "../utils/ethers";
-import { Web3Provider, Network } from '@ethersproject/providers';
-import { getPackedSettings } from 'http2';
+import { injected, walletconnect } from '@/utils/connectors';
+import useENSName from "@/hooks/useENSName";
+import { shortenHex } from "@/utils/ethers";
+import Link from "next/link";
 
 export default function Wallet() {
-  const { library, chainId, error, account, activate, active  } = useWeb3React<Web3Provider>();
-
+  const { library, chainId, error, account, activate, active } = useWeb3React();
   const ensName = useENSName(account);
-  const triedToEagerConnect = useEagerConnect();
   
   if (error) {
-    return null;
+    console.log(error);
   }
 
   return (
       <div>
         {active ? (
-          <div className="text-xs">
-            Connected:
-            <a className="link"
-              {...{
-                href: formatEtherscanLink("Account", [chainId, account]),
-                target: "_blank",
-                rel: "noopener noreferrer",
-              }}>
-              {ensName || `${shortenHex(account, 4)}`}
-            </a>
+          <div>
+            Connected as {" "}
+            <Link href={`/gallery/${account}`}>
+              <a className="hover:link">
+                {ensName || `${shortenHex(account, 4)}`}
+              </a>
+            </Link>
           </div>
         ) : (
-          <div className="text-xs">
-            <button type="button" onClick={() => { activate(injected) }} >
-              <p className="link">Metamask</p>
+          <div>
+            Connect via {" "}
+            <button type="button" className="link" onClick={() => { activate(injected) }} >
+              Metamask
             </button>
-            &nbsp; | &nbsp; 
+            {/* {" "} or {" "}
             <button className="link underline" type="button" onClick={() => { activate(walletconnect) }} >
               Wallet Connect
-            </button>
+            </button> */}
           </div>
         )}
       </div> 

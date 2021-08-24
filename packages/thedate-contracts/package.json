@@ -2,18 +2,18 @@
   "name": "@thefoundation/thedate-contracts",
   "version": "0.0.1",
   "description": "",
+  "main": "index.ts",
   "scripts": {
-    "compile": "npx hardhat compile",
+    "compile": "npx hardhat compile && npx hardhat typechain",
     "test": "npx hardhat test",
     "format": "npx prettier --write .",
     "lint": "npx eslint .",
     "coverage": "npx hardhat coverage",
-    "deploy:hardhat": "npx hardhat deploy --network hardhat --write true",
-    "deploy:rinkeby": "npx hardhat deploy --network rinkeby --write true",
-    "deploy:mainnet": "npx hardhat deploy --network mainnet --write true",
-    "export-deployment": "npx hardhat export --export-all deployments/exports.json",
-    "hardhat:node": "npx hardhat node --show-accounts",
-    "hardhat:node:fork-mainnet": "npx hardhat node --show-accounts --fork https://eth-mainnet.alchemyapi.io/v2/oojMfZkYjgc64EeNl3uQCgnesgLiojvu"
+    "deploy:hardhat": "npx hardhat deploy --network hardhat --write true ",
+    "deploy:rinkeby": "npx hardhat deploy --network rinkeby --write true --export deployments/rinkeby/index.json",
+    "deploy:mainnet": "npx hardhat deploy --network mainnet --write true --export deployments/mainnet/index.json",
+    "hardhat:node": "npx hardhat node --show-accounts --export deployments/localhost/index.json",
+    "hardhat:node:fork-mainnet": "npx hardhat node --show-accounts --export deployments/localhost/index.json --fork https://eth-mainnet.alchemyapi.io/v2/oojMfZkYjgc64EeNl3uQCgnesgLiojvu"
   },
   "author": "",
   "license": "MIT",
@@ -44,6 +44,7 @@
     "hardhat-abi-exporter": "^2.2.1",
     "hardhat-contract-sizer": "^2.0.3",
     "hardhat-deploy": "^0.8.11",
+    "hardhat-deploy-ethers": "^0.3.0-beta.10",
     "hardhat-gas-reporter": "^1.0.4",
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "^1.0.0-beta.17",
@@ -55,7 +56,7 @@
     "typechain": "^5.0.0",
     "typescript": "^4.3.2",
     "yarn-upgrade-all": "^0.5.4",
-    "hardhat-deploy-ethers": "^0.3.0-beta.10"
+    "glob": "^7.1.7"
   },
   "dependencies": {
   }

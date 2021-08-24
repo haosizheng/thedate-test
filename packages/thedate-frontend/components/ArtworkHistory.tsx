@@ -1,19 +1,11 @@
-import type { Web3Provider } from "@ethersproject/providers";
-
-import useSWR from "swr";
-import {useWeb3React} from "@web3-react/core";
-import { TheDate__factory, TheDate } from '@thefoundation/contracts/typechain';
-import { BigNumberish, BigNumber, ethers } from "ethers";
-import useTheDateContract from "../hooks/useTheDateContract"; 
-import useCurrentBlock from "../hooks/useCurrentBlock"; 
-import useBlockNumber from "../hooks/useBlockNumber"; 
-import useTheDateBidHistory from "../hooks/useTheDateBidHistory"; 
-import useEtherPrice from "../hooks/useEtherPrice"; 
-import { useEffect, useState, memo, useRef, useDebugValue } from "react";
-import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, toPriceFormat, SECONDS_IN_A_DAY} from '../utils/ethers';
+import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
+import { BigNumber } from "ethers";
+import useTheDateContract from "@/hooks/useTheDateContract"; 
+import useBlockNumber from "@/hooks/useBlockNumber"; 
+import useEtherPrice from "@/hooks/useEtherPrice"; 
+import { useState } from "react";
+import { shortenHex, formatEtherscanLink, blockTimestampToUTC, SECONDS_IN_A_DAY} from '@/utils/ethers';
 import { useRendersCount, useAsync } from "react-use";  
-import { formatUnits, commify, formatEther } from "@ethersproject/units";
-
 
 interface ArtworkHistoryItem {
   tokenId: number;
@@ -26,7 +18,7 @@ interface ArtworkHistoryItem {
 }
 
 export default function ArtworkHistory() {
-  const { library, chainId } = useWeb3React<Web3Provider>();
+  const { library, chainId } = useActiveWeb3React();
   const TheDate = useTheDateContract();  
   const { data : blockNumber} = useBlockNumber();
   const { data: etherPrice } = useEtherPrice();

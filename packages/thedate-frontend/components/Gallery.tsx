@@ -7,35 +7,27 @@ import { BigNumberish, BigNumber, ethers } from "ethers";
 import useTheDateContract from "../hooks/useTheDateContract";
 import useCurrentBlock from "../hooks/useCurrentBlock";
 import useBlockNumber from "../hooks/useBlockNumber";
-import useTheDateBidHistory from "../hooks/useTheDateBidHistory";
 import useEtherPrice from "../hooks/useEtherPrice";
 import { useEffect, useState, memo, useRef, useDebugValue } from "react";
 import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, toPriceFormat } from "../utils/ethers";
 import { useRendersCount, useAsync } from "react-use";
-import { formatUnits, commify, formatEther } from "@ethersproject/units";
 import ArtworkImageViewer from "./ArtworkImageViewer";
 import ArtworkCatalogue from "./ArtworkCatalogue";
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 
-export interface GalleryProps {
-  owner: string | string[] | undefined;
-}
-
-export default function Gallery({ owner }: GalleryProps) {
-  const { library, chainId, account, active } = useWeb3React<Web3Provider>();
+export default function Gallery({ owner }: { owner?: string | string[] | undefined }) {
+  const { library, chainId, account, active } = useActiveWeb3React();
   const TheDate = useTheDateContract();
   const [tokenIdList, setTokenIdList] = useState<number[]>([]);
 
   const range = (start: number, end: number, length = end - start) => Array.from({ length }, (_, i) => start + i);
 
-
   useAsync(async () => {
     if (!library || !TheDate) {
       return;
     }
-    console.log(library);
-
     let tokenIdList_: number[] = [];
-    if (typeof owner == "string" && ethers.utils.isAddress(owner)) {
+    if (!!owner && typeof owner == "string" && ethers.utils.isAddress(owner)) {
       const tokenNum_ = (await TheDate.balanceOf(owner)).toNumber();
       if (tokenNum_ == 0) {
         return;
@@ -52,22 +44,29 @@ export default function Gallery({ owner }: GalleryProps) {
     }
 
     setTokenIdList(tokenIdList_);
-    console.log(tokenIdList_);
-    
   }, [library, TheDate]);
 
   return (
-    <div className="container flex flex-col">
+    <>
+    <div className="hero">
+      <div className="hero-content">
+        <p>Gallery of {shortenHex(owner)}</p>
+      </div>
+    </div>
+    <div className="hero">
+      <div className="hero-content">
       {tokenIdList.map(tokenId => (
-        <div key={tokenId} className="flex flex-row">
-          <div className="flex-none">
+        <div key={tokenId} className="flex flex-col">
+          <div className="flex-none" key={tokenId}>
             <ArtworkImageViewer tokenId={tokenId} />
           </div>
-          <div className="flex-grow">
+          <div className="flex-grow ">
             <ArtworkCatalogue tokenId={tokenId} />
           </div>
         </div>
       ))}
+      </div>
     </div>
+    </>
   );
 }

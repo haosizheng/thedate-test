@@ -1,12 +1,11 @@
 import Link from 'next/link';
 import Wallet from './Wallet';
-
 export default function Footer() {
   return (
     <footer className="hero py-20">
-       <div className="hero-content text-xs text-center">
+       <div className="hero-content text-sm text-center">
         <ul>
-          <li><Wallet/></li>
+          <li className="mb-5"><Wallet/></li>
           <li><Link href="/about"><a className="link">About</a></Link></li>
           <li><Link href="/"><a className="link">Auction</a></Link></li>
           <li><Link href="/gallery"><a className="link">Gallery</a></Link></li>

@@ -1,11 +1,12 @@
 const { join } = require('path');
-require("dotenv").config({ path: "../../.env" });
-
 const workspace = join(__dirname, '..');
 
 module.exports = {
   env: {
-    THEDATE_ADDRESS: process.env.THEDATE_ADDRESS,
+    ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
+    NETWORK_CHAIN_ID: process.env.NETWORK_CHAIN_ID,
+    INFURA_KEY: process.env.INFURA_KEY,
+    WALLETCONNECT_BRIDGE_URL: process.env.WALLETCONNECT_BRIDGE_URL,
   },
   webpack: (config, options) => {
     /** Allows import modules from packages in workspace. */

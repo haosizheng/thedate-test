@@ -10,9 +10,9 @@ import "@thefoundation/core-contracts/contracts/MintedByAuction.sol";
 import "@thefoundation/core-contracts/contracts/WithFoundation.sol";
 
 contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty, MintedByAuction {
-    uint256 private _noteSizeLimit = 100;
-    uint256 private _erasePrice = 1 ether;
-    uint256 private _engravePrice = 0.00 ether;
+    uint256 public _noteSizeLimit = 100;
+    uint256 public _erasePrice = 1 ether;
+    uint256 public _engravePrice = 0 ether;
 
     constructor(address payable foundation_)
         ERC721("TheDate", "DATE")

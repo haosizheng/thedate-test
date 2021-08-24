@@ -3,8 +3,9 @@ import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { OrbitControls, Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 
-import { ImageLoader, Vector2 } from 'three'
+import { ImageLoader, Vector2, CubeTexture } from 'three'
 import { HDRCubeTextureLoader } from 'three/examples/jsm/loaders/HDRCubeTextureLoader'
+import { tokenIdToDateString } from "@/utils/thedate";
 
 function CreateCanvasTexture(date: string, note: string = "", backgroundColor: string, 
   textColor: string, useRoughness: boolean = false) 
@@ -19,13 +20,13 @@ function CreateCanvasTexture(date: string, note: string = "", backgroundColor: s
   ctx.textAlign = 'center';
   ctx.fill();
 
-  const img1 = useLoader(ImageLoader, '/noise-medium3.png');
+  const noiseImg = useLoader(ImageLoader, '/noise-medium3.png');
 
   if (useRoughness) {
-    ctx.drawImage(img1, 0, 0, canvas.width / 2, canvas.height / 2);
-    ctx.drawImage(img1, canvas.width / 2, 0, canvas.width / 2, canvas.height / 2);
-    ctx.drawImage(img1, 0, canvas.height / 2, canvas.width / 2, canvas.height / 2);
-    ctx.drawImage(img1, canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2);
+    ctx.drawImage(noiseImg, 0, 0, canvas.width / 2, canvas.height / 2);
+    ctx.drawImage(noiseImg, canvas.width / 2, 0, canvas.width / 2, canvas.height / 2);
+    ctx.drawImage(noiseImg, 0, canvas.height / 2, canvas.width / 2, canvas.height / 2);
+    ctx.drawImage(noiseImg, canvas.width / 2, canvas.height / 2, canvas.width / 2, canvas.height / 2);
   }
 
   ctx.fillStyle = textColor;
@@ -43,22 +44,12 @@ function CreateCanvasTexture(date: string, note: string = "", backgroundColor: s
   return texture;
 }
 
-interface ArtworkProps {
-  date: string;
-  note: string;
-}
-
-
-function Artwork(props: ArtworkProps) {
-
+function Artwork({dateString, noteString = ""}: {dateString: string, noteString?: string}) {
   const glft: any = useGLTF("/cube.glb");
 
-  let messageDate = props.date;
-  let messageNote = props.note;
-
-  var colorMap = CreateCanvasTexture(messageDate, messageNote, '#ffffff', '#D1D1D1')
-  var roughnessMap = CreateCanvasTexture(messageDate, messageNote, '#ffffff', '#000000', true)
-  var metalnessMap = CreateCanvasTexture(messageDate, messageNote, '#ffffff', '#D1D1D1')
+  var colorMap = CreateCanvasTexture(dateString, noteString, '#ffffff', '#D1D1D1')
+  var roughnessMap = CreateCanvasTexture(dateString, noteString, '#ffffff', '#000000', true)
+  var metalnessMap = CreateCanvasTexture(dateString, noteString, '#ffffff', '#D1D1D1')
 
   const materialProps = {
     clearcoat: 0.1,
@@ -80,7 +71,7 @@ function Artwork(props: ArtworkProps) {
   }
 
   return (
-    <group {...props}>
+    <group>
       <mesh geometry={glft.nodes.Cube.geometry} scale={[1, 1, 1]} rotation={[-Math.PI / 2, 0, 0]}>
         <meshPhysicalMaterial {...materialProps} side={THREE.FrontSide} />
       </mesh>
@@ -93,10 +84,9 @@ function Environment({ background = false }) {
 
   const [cubeMap] = useLoader(HDRCubeTextureLoader, 
     [['px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr']], (loader) => {
-    console.log('loader', loader)
     loader.setPath('/pisaHDR/')
     loader.setDataType(THREE.UnsignedByteType)
-  })
+  });
 
   useEffect(() => {
     const gen = new THREE.PMREMGenerator(gl)
@@ -116,15 +106,12 @@ function Environment({ background = false }) {
   return null
 }
 
-interface ArtworkModelViewerProps {
-  tokenId: number;
-}
-
-export default function ArtworkModelViewer({tokenId}: ArtworkModelViewerProps) {
+export default function ArtworkModelViewer({ tokenId, noteString = "", autoRotate = true}: 
+  { tokenId: number, noteString?: string, autoRotate?: boolean }) {
   const [ready, set] = useState(false)
 
   return (
-    <Canvas id="myCanvas" dpr={[1, 2]} shadows camera={{ position: [5, 1, 8], fov: 50 }}>
+    <Canvas dpr={[1, 2]} shadows camera={{ position: [5, 1, 8], fov: 50 }}>
       <ambientLight intensity={0.6} />
 
       <directionalLight position={[2.5, 3, 3]} intensity={0.5} />
@@ -139,9 +126,10 @@ export default function ArtworkModelViewer({tokenId}: ArtworkModelViewerProps) {
 
       <Suspense fallback={<Html>Loading..</Html>}>
         <Environment />
-        <Artwork date={'MAR 13 2021'} note={'The owner can engrave a unique note here'} />
+        <Artwork dateString={tokenIdToDateString(tokenId)} noteString={noteString ? noteString : ""} />
       </Suspense>
-      <OrbitControls autoRotate enablePan={false} enableZoom={false} minPolarAngle={Math.PI/2 - Math.PI/10} 
+
+      <OrbitControls autoRotate={autoRotate} enablePan={false} enableZoom={false} minPolarAngle={Math.PI/2 - Math.PI/10} 
         maxPolarAngle={Math.PI/2} />
     </Canvas>
   )

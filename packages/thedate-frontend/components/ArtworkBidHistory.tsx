@@ -1,18 +1,13 @@
-import type { Web3Provider } from "@ethersproject/providers";
-
-import useSWR from "swr";
-import {useWeb3React} from "@web3-react/core";
-import { TheDate__factory, TheDate } from '@thefoundation/contracts/typechain';
-import { BigNumberish, BigNumber, ethers } from "ethers";
-import useTheDateContract from "../hooks/useTheDateContract"; 
-import useCurrentBlock from "../hooks/useCurrentBlock"; 
-import useBlockNumber from "../hooks/useBlockNumber"; 
-import useTheDateBidHistory from "../hooks/useTheDateBidHistory"; 
-import useEtherPrice from "../hooks/useEtherPrice"; 
-import { useEffect, useState, memo, useRef, useDebugValue } from "react";
-import { parseBalance, shortenHex, formatEtherscanLink, blockTimestampToUTC, toPriceFormat, SECONDS_IN_A_DAY } from '../utils/ethers';
+import { BigNumber } from "ethers";
+import useTheDateContract from "@/hooks/useTheDateContract"; 
+import useBlockNumber from "@/hooks/useBlockNumber"; 
+import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
+import useEtherPrice from "@/hooks/useEtherPrice"; 
+import { useState } from "react";
+import { parseBalance, shortenHex, formatEtherscanLink, toPriceFormat } from '@/utils/ethers';
+import { SECONDS_IN_A_DAY, blockTimestampToUTC } from '@/utils/thedate';
 import { useRendersCount, useAsync } from "react-use";  
-import { formatUnits, commify, formatEther } from "@ethersproject/units";
+import { formatEther } from "@ethersproject/units";
 
 interface BidHistoryItem {
   tokenId: number;
@@ -24,7 +19,7 @@ interface BidHistoryItem {
 }
 
 export default function ArtworkBidHistory() {
-  const { library, chainId } = useWeb3React<Web3Provider>();
+  const { library, chainId } = useActiveWeb3React();
   const TheDate = useTheDateContract();  
   const { data : blockNumber} = useBlockNumber();
   const { data: etherPrice } = useEtherPrice();

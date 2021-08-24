@@ -22,7 +22,7 @@ dataSources:
       eventHandlers:
         - event: ArtworkMinted(indexed uint256)
           handler: handleArtworkMinted
-        - event: ArtworkNoteEngraved(indexed uint256,string)
+        - event: ArtworkNoteEngraved(indexed uint256, string)
           handler: handleArtworkNoteEngraved
       file: ./mappings/TheDate.mapping.ts
 

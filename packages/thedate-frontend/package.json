@@ -6,6 +6,7 @@
     "node": ">=16"
   },
   "dependencies": {
+    "@apollo/client": "^3.4.8",
     "@ethersproject/bignumber": "^5.1.1",
     "@ethersproject/contracts": "^5.1.1",
     "@ethersproject/providers": "^5.1.2",
@@ -20,6 +21,7 @@
     "@thefoundation/contracts": "*",
     "@web3-react/core": "latest",
     "@web3-react/injected-connector": "latest",
+    "@web3-react/network-connector": "^6.1.9",
     "@web3-react/walletconnect-connector": "latest",
     "autoprefixer": "^10.3.1",
     "chrome-aws-lambda": "^10.1.0",
@@ -33,10 +35,12 @@
     "next": "^11.1.0",
     "react": "^17.0.2",
     "react-countdown": "^2.3.2",
+    "react-device-detect": "^1.17.0",
     "react-dom": "^17.0.2",
     "react-markdown": "^7.0.0",
     "react-p5": "^1.3.19",
     "react-use": "^17.2.4",
+    "stream": "^0.0.2",
     "three": "^0.131.3",
     "twin.macro": "^2.6.2",
     "use-nft": "^0.9.0"
