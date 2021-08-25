@@ -1,25 +1,29 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 
-type Address = string;
-
-const FOUNDATION_MEMBERS: Address[] = [
-  "0xcc50cDcd9Dab7A98926B1164Ae5bb59FceFB5AF9",
-  "0x6b9A0C57f1aBE412f1a6761A9FCD40cFD1BB2CC3",
-];
-const FOUNDATION_SHARES: number[] = [500000, 500000];
-
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts } = hre;
+  const { deployments, getNamedAccounts, getChainId } = hre;
   const { deploy } = deployments;
-  const { deployer } = await getNamedAccounts();
+  const chainId = await getChainId();
 
+  const { deployer, foundationMember1, foundationMember2 } = await getNamedAccounts();
+
+  console.log("Deployer: ", deployer);
+
+  const FOUNDATION_MEMBERS: string[] = [
+    foundationMember1,
+    foundationMember2,
+  ];
+  const FOUNDATION_SHARES: number[] = [500000, 500000];
+  
   await deploy("TheFoundation", {
     from: deployer,
     args: [FOUNDATION_MEMBERS, FOUNDATION_SHARES],
-    log: true,
+    log: true
   });
 };
+
+func.tags = ["FoundationContract"];
+
 export default func;
 
-func.tags = ["Contract"];

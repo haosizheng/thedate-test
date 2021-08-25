@@ -10,10 +10,6 @@ import "@thefoundation/core-contracts/contracts/MintedByAuction.sol";
 import "@thefoundation/core-contracts/contracts/WithFoundation.sol";
 
 contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty, MintedByAuction {
-    uint256 public _noteSizeLimit = 100;
-    uint256 public _erasePrice = 1 ether;
-    uint256 public _engravePrice = 0 ether;
-
     constructor(address payable foundation_)
         ERC721("TheDate", "DATE")
         WithFoundation(foundation_)
@@ -23,6 +19,35 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
         _setupRole(DEFAULT_ADMIN_ROLE, foundation_);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         setBaseURI("https://thedate.art/api/token/");
+    }
+
+    //Parameters 
+    uint256 private _engravingPrice = 0 ether;
+    uint256 private _erasingPrice = 1 ether;
+    uint256 private _noteSizeLimit = 100;
+
+    function setNoteSizeLimit(uint256 noteSizeLimit) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _noteSizeLimit = noteSizeLimit;
+    }
+
+    function setErasingPrice(uint256 erasingPrice) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _erasingPrice = erasingPrice;
+    }
+    
+    function setEngravingPrice(uint256 engravingPrice) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _engravingPrice = engravingPrice;
+    }
+
+    function getNoteSizeLimit() public view returns (uint256)  {
+        return _noteSizeLimit;
+    }
+
+    function getErasingPrice() public view returns (uint256) {
+        return _erasingPrice;
+    }
+    
+    function getEngravingPrice() public view returns (uint256) {
+        return _engravingPrice;
     }
 
     // Base URI Setup
@@ -100,7 +125,7 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
     }
 
     function engraveArtworkNote(uint256 tokenId, string memory note) public payable onlyOwner(tokenId) validNote(note) {
-        require(msg.value >= _engravePrice, "Should pay >= engravePrice");
+        require(msg.value >= _engravingPrice, "Should pay >= engravingPrice");
         require(bytes(artworks[tokenId].note).length == 0, "Note should be empty before engraving");
 
         artworks[tokenId].note = note;
@@ -109,7 +134,7 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
     }
 
     function eraseArtworkNote(uint256 tokenId) public payable onlyOwner(tokenId) {
-        require(msg.value >= _erasePrice, "Should pay >= erasePrice");
+        require(msg.value >= _erasingPrice, "Should pay >= erasingPrice");
         require(bytes(artworks[tokenId].note).length > 0, "Note should be nonempty before erasing");
 
         artworks[tokenId].note = "";

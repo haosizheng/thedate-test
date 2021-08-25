@@ -57,6 +57,22 @@ context("TheDate contract", () => {
     });
   });
 
+  describe("Parameters", async () => {
+    it("noteSizeLimit", async () => {
+      expect(await mainContract.getEngravingPrice()).to.eq(ethers.constants.Zero);
+      expect(await mainContract.getErasingPrice()).to.eq(ethers.utils.parseEther("1.0"));
+      expect(await mainContract.getNoteSizeLimit()).to.eq(BigNumber.from(100));
+
+      await mainContract.setEngravingPrice(ethers.utils.parseEther("2.0"));
+      await mainContract.setErasingPrice(ethers.utils.parseEther("1.0"));
+      await mainContract.setNoteSizeLimit(120);
+
+      expect(await mainContract.getEngravingPrice()).to.eq(ethers.utils.parseEther("2.0"));
+      expect(await mainContract.getErasingPrice()).to.eq(ethers.utils.parseEther("1.0"));
+      expect(await mainContract.getNoteSizeLimit()).to.eq(BigNumber.from(120));
+    });
+  });
+
   describe("Artwork", async () => {
     it("Set Token URL", async () => {
       const tokenId = BigNumber.from(
@@ -70,6 +86,7 @@ context("TheDate contract", () => {
         .withArgs(tokenId, user1.address, ethers.utils.parseEther("1.0"));
 
       await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+
       expect(mainContract.tokenURI(1)).to.be.revertedWith("ERC721Metadata: URI query for nonexistent token");
 
       expect(await mainContract.tokenURI(tokenId)).to.eq("https://thedate.art/api/token/" + tokenId.toString());
@@ -85,6 +102,13 @@ context("TheDate contract", () => {
       ).div(SECONDS_IN_A_DAY);
       const userNote = "I love you.";
 
+      expect(await mainContract.getEngravingPrice()).to.eq(ethers.constants.Zero);
+      expect(await mainContract.getErasingPrice()).to.eq(ethers.utils.parseEther("1.0"));
+      expect(await mainContract.getNoteSizeLimit()).to.eq(BigNumber.from(100));
+
+      const engravingPrice = await mainContract.getEngravingPrice();
+      const erasingPrice = await mainContract.getErasingPrice();
+
       await mainContract.setAuctionReservePrice(ethers.utils.parseEther("0.1"));
       await mainContract.setAuctionMinBidIncrementPermyriad(5000); //50%
       await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.1") }))
@@ -92,7 +116,8 @@ context("TheDate contract", () => {
         .withArgs(tokenId);
 
       // Exception case that set the message before auction ends.
-      await expect(mainContract.connect(user1).engraveArtworkNote(tokenId, userNote)).to.be.revertedWith(
+      await expect(mainContract.connect(user1).engraveArtworkNote(tokenId, userNote, 
+        {value: engravingPrice})).to.be.revertedWith(
         "Caller should be the owner of the artwork.",
       );
 
@@ -105,7 +130,7 @@ context("TheDate contract", () => {
         .withArgs(mainContract.address, user1.address, tokenId);
 
       // Exception case that user 2 sets the note of his artwork.
-      await expect(mainContract.connect(user2).engraveArtworkNote(tokenId, userNote)).to.be.revertedWith(
+      await expect(mainContract.connect(user2).engraveArtworkNote(tokenId, userNote, {value: engravingPrice})).to.be.revertedWith(
         "Caller should be the owner of the artwork.",
       );
 
@@ -123,24 +148,24 @@ context("TheDate contract", () => {
       ).to.be.revertedWith("Note should be empty before engraving");
 
       // Exception case that user 2 erase the note of user1's artwork.
-      await expect(mainContract.connect(user2).eraseArtworkNote(tokenId)).to.be.revertedWith(
+      await expect(mainContract.connect(user2).eraseArtworkNote(tokenId, {value: erasingPrice})).to.be.revertedWith(
         "Caller should be the owner of the artwork.",
       );
 
       // Exception case that user 1 erases the note of his artwork with no fund.
-      await expect(mainContract.connect(user1).eraseArtworkNote(tokenId)).to.be.revertedWith(
-        "Should pay >= erasePrice",
+      await expect(mainContract.connect(user1).eraseArtworkNote(tokenId, {value: ethers.utils.parseEther("0.001")})).to.be.revertedWith(
+        "Should pay >= erasingPrice",
       );
 
       // User 1 erases the note of his artwork.
-      await expect(mainContract.connect(user1).eraseArtworkNote(tokenId, { value: ethers.utils.parseEther("1.0") }))
+      await expect(mainContract.connect(user1).eraseArtworkNote(tokenId, { value: erasingPrice}))
         .emit(mainContract, "ArtworkNoteErased")
         .withArgs(tokenId, user1.address);
       expect(await mainContract.artworks(tokenId)).has.property("note", "");
 
       // Exception case that user 1 erases his artwork's note twice.
       await expect(
-        mainContract.connect(user1).eraseArtworkNote(tokenId, { value: ethers.utils.parseEther("1.0") }),
+        mainContract.connect(user1).eraseArtworkNote(tokenId, { value: erasingPrice }),
       ).to.be.revertedWith("Note should be nonempty before erasing");
     });
   });

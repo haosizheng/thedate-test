@@ -1,53 +1,54 @@
-import { config as dotenvConfig } from "dotenv";
-import { resolve } from "path";
-dotenvConfig({ path: resolve(__dirname, "./.env") });
+import { HardhatUserConfig, NetworkUserConfig, HardhatNetworkAccountsUserConfig } from "hardhat/types";
 
-import { HardhatUserConfig, NetworkUserConfig } from "hardhat/types";
-import { task } from "hardhat/config";
 import "@typechain/hardhat";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
+import "@atixlabs/hardhat-time-n-mine";
 import "hardhat-gas-reporter";
 import "hardhat-abi-exporter";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import "solidity-coverage";
 import "hardhat-contract-sizer";
+import * as dotenv from "dotenv";
+dotenv.config();
 import "./tasks/accounts";
-import "./tasks/pass-a-day";
 
 const chainIds = {
   ganache: 1337,
-  goerli: 5,
   hardhat: 31337,
-  kovan: 42,
   mainnet: 1,
-  rinkeby: 4,
   ropsten: 3,
+  rinkeby: 4,
+  goerli: 5,
+  kovan: 42,
 };
 
 const MNEMONIC = process.env.MNEMONIC || "";
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
-const ALCHEMY_KEY = process.env.ALCHEMY_KEY || "";
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || "";
+const FORKING = process.env.FORKING || "false";
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "";
+const DEPLOYER_PUBLIC_KEY = process.env.DEPLOYER_PUBLIC_KEY || "";
+const FOUNDATION_MEMBER_1_PUBLIC_KEY = process.env.FOUNDATION_MEMBER_1_PUBLIC_KEY || "";
+const FOUNDATION_MEMBER_2_PUBLIC_KEY = process.env.FOUNDATION_MEMBER_2_PUBLIC_KEY || "";
 
-
+const TEST_ACCOUNTS = {
+  mnemonic: MNEMONIC,
+}
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
-  const url: string = "https://" + network + ".infura.io/v3/" + INFURA_API_KEY;
+  const url = `https://eth-${network}.alchemyapi.io/v2/${ALCHEMY_API_KEY}`;
   return {
-    accounts: {
-      count: 10,
-      initialIndex: 0,
-      mnemonic: MNEMONIC,
-      path: "m/44'/60'/0'/0",
-    },
+    accounts: [DEPLOYER_PRIVATE_KEY],
     chainId: chainIds[network],
     live: true,
     saveDeployments: true,
     url,
+    tags: ["staging"]
   };
 }
 
@@ -57,7 +58,21 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   namedAccounts: {
-    deployer: 0,
+    deployer: {
+      default: 0, // here this will by default take the first account as deployer
+      mainnet: `privatekey://${DEPLOYER_PRIVATE_KEY}`, 
+      rinkeby: `privatekey://${DEPLOYER_PRIVATE_KEY}`, 
+    },
+    foundationMember1: {
+      default: 1,
+      mainnet: FOUNDATION_MEMBER_1_PUBLIC_KEY, 
+      rinkeby: FOUNDATION_MEMBER_1_PUBLIC_KEY,
+    },
+    foundationMember2: {
+      default: 2,
+      mainnet: FOUNDATION_MEMBER_2_PUBLIC_KEY, 
+      rinkeby: FOUNDATION_MEMBER_2_PUBLIC_KEY,
+    }
   },
   paths: {
     deploy: "./deploy",
@@ -65,6 +80,7 @@ const config: HardhatUserConfig = {
     sources: "./contracts",
     cache: "./cache",
     artifacts: "./artifacts",
+    tests: "./test",
   },
   abiExporter: {
     path: "./abis",
@@ -74,13 +90,23 @@ const config: HardhatUserConfig = {
     spacing: 2,
   },
   networks: {
+    localhost: {
+      live: false,
+      accounts: TEST_ACCOUNTS,
+      chainId: chainIds.hardhat,
+      saveDeployments: true,
+      tags: ["test"]
+    },
     hardhat: {
-      accounts: {
-        mnemonic: MNEMONIC,
-      },
+      accounts: TEST_ACCOUNTS,
       chainId: chainIds.hardhat,
       live: false,
       saveDeployments: true,
+      tags: ["test"],
+      forking: {
+        enabled: FORKING === "true",
+        url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+      },
     },
     mainnet: createTestnetConfig("mainnet"),
     goerli: createTestnetConfig("goerli"),
@@ -95,7 +121,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 1000,
+            runs: 100,
           },
         },
       },

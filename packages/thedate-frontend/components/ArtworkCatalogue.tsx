@@ -20,7 +20,7 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
       engraveNote(noteInputBox.current.textContent);
     }
   };
-  
+
   return (
     !exists ?
       <div>
@@ -37,7 +37,7 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
         }
         <p>
           Note: {noteString ? `"${noteString}"` : "(unset)"}
-          {account === owner && editable && !noteString && noteString != "" && (
+          {account === owner && editable && !noteString && noteString !== "" && (
             <>
               <input ref={noteInputBox} type="text" placeholder="note here" />
               <button className="link" onClick={onClickEngrave}>Engrave</button>
