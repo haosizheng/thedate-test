@@ -1,11 +1,13 @@
-import { useWeb3React } from '@web3-react/core'
-import { injected, walletconnect } from '@/utils/connectors';
-import useENSName from "@/hooks/useENSName";
-import { shortenHex } from "@/utils/ethers";
 import Link from "next/link";
+import { useWeb3React } from '@web3-react/core'
+import { injected, walletconnect } from "@/utils/connectors";
+import { shortenHex } from "@/utils/ethers";
+import useENSName from "@/hooks/useENSName";
+
+import PendingReturns from "./PendingReturns";
 
 export default function Wallet() {
-  const { library, chainId, error, account, activate, active } = useWeb3React();
+  const { error, account, activate, active } = useWeb3React();
   const ensName = useENSName(account);
   
   if (error) {
@@ -22,6 +24,7 @@ export default function Wallet() {
                 {ensName || `${shortenHex(account, 4)}`}
               </a>
             </Link>
+            <PendingReturns />
           </div>
         ) : (
           <div>

@@ -23,8 +23,7 @@ export default function ArtworkBidHistory({ tokenId }: { tokenId: number }) {
 
   const { library, chainId } = useActiveWeb3React();
   const TheDate = useTheDateContract();  
-  const {exists} = useTheDateArtwork(tokenId);  
-
+  const { exists } = useTheDateArtwork(tokenId);  
   const { data: etherPrice } = useEtherPrice();
   const [ bidHistory, setBidHistory ] = useState<BidHistoryItem[]>([]);
 
@@ -71,7 +70,7 @@ export default function ArtworkBidHistory({ tokenId }: { tokenId: number }) {
               </td>
               <td>
                 Ξ{ parseBalance(x.amount) } { 
-                  etherPrice ? `(\$${toPriceFormat(Number(formatEther(x.amount)) * etherPrice)})` : "" }
+                  etherPrice !== undefined ? `(\$${toPriceFormat(Number(formatEther(x.amount)) * etherPrice)})` : "" }
               </td>
             </tr>
           ))}

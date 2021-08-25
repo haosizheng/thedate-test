@@ -51,10 +51,10 @@ export default function Gallery({ owner }: { owner?: string }) {
       </div>
     </div>
     <div className="hero">
-      <div className="hero-content">
+      <div className="hero-content grid  grid-cols-1 md:grid-cols-3 gap-10">
       {tokenIdList.map(tokenId => (
-        <div key={tokenId} className="flex flex-col">
-          <div className="flex-none" key={tokenId}>
+        <div key={tokenId} className="flow flow-col">
+          <div className="flex" key={tokenId}>
             <ArtworkImageViewer tokenId={tokenId} />
           </div>
           <div className="flex-grow ">

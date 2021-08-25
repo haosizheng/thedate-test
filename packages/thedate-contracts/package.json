@@ -16,11 +16,12 @@
     "deploy:rinkeby:reset": "npx hardhat deploy --network rinkeby --reset",
     "deploy:rinkeby": "npx hardhat deploy --network rinkeby",
     "verify:rinkeby": "npx hardhat etherscan-verify --network rinkeby --solc-input",
-    "deploy:hardhat": "npx hardhat deploy --network hardhat",
+    "deploy:hardhat": "npx hardhat deploy --network hardhat --write true",
     "deploy:mainnet": "npx hardhat deploy --network mainnet",
 
-    "hardhat:node": "npx hardhat node --show-accounts",
-    "hardhat:node:fork": "npx hardhat node --show-accounts"
+    "hardhat:node": "npx hardhat node --network hardhat --show-accounts ",
+    "hardhat:node:fork": "npx hardhat node --show-accounts",
+    "export-deployments": "npx hardhat export --export-all exports/deployments.json"
   },
   "author": "",
   "license": "MIT",

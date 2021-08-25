@@ -1,5 +1,3 @@
-import { HardhatUserConfig, NetworkUserConfig, HardhatNetworkAccountsUserConfig } from "hardhat/types";
-
 import "@typechain/hardhat";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-ethers";
@@ -12,8 +10,12 @@ import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import "solidity-coverage";
 import "hardhat-contract-sizer";
+
+import { HardhatUserConfig, NetworkUserConfig } from "hardhat/types";
+
 import * as dotenv from "dotenv";
 dotenv.config();
+
 import "./tasks/accounts";
 
 const chainIds = {
@@ -64,12 +66,12 @@ const config: HardhatUserConfig = {
       rinkeby: `privatekey://${DEPLOYER_PRIVATE_KEY}`, 
     },
     foundationMember1: {
-      default: 1,
+      default: FOUNDATION_MEMBER_1_PUBLIC_KEY,
       mainnet: FOUNDATION_MEMBER_1_PUBLIC_KEY, 
       rinkeby: FOUNDATION_MEMBER_1_PUBLIC_KEY,
     },
     foundationMember2: {
-      default: 2,
+      default: FOUNDATION_MEMBER_2_PUBLIC_KEY,
       mainnet: FOUNDATION_MEMBER_2_PUBLIC_KEY, 
       rinkeby: FOUNDATION_MEMBER_2_PUBLIC_KEY,
     }
@@ -93,7 +95,6 @@ const config: HardhatUserConfig = {
     localhost: {
       live: false,
       accounts: TEST_ACCOUNTS,
-      chainId: chainIds.hardhat,
       saveDeployments: true,
       tags: ["test"]
     },

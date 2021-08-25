@@ -1,17 +1,21 @@
-import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
-import { BigNumber } from "ethers";
+import { BigNumber, ethers, EventFilter } from "ethers";
 import useTheDateContract from "@/hooks/useTheDateContract"; 
-import useBlockNumber from "@/hooks/useBlockNumber"; 
+import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
 import useEtherPrice from "@/hooks/useEtherPrice"; 
 import { useState } from "react";
-import { shortenHex, formatEtherscanLink, blockTimestampToUTC, SECONDS_IN_A_DAY} from '@/utils/ethers';
-import { useRendersCount, useAsync } from "react-use";  
+import { parseBalance, shortenHex, formatEtherscanLink, toPriceFormat } from '@/utils/ethers';
+import { blockTimestampToUTC } from '@/utils/thedate';
+import { useAsync } from "react-use";  
+import { formatEther } from "@ethersproject/units";
+import useTheDateArtwork from "@/hooks/useTheDateArtwork";
+import Link from "next/link";
+import { Event } from "ethers";
 
 interface ArtworkHistoryItem {
   tokenId: number;
   from: string;
   action: string;
-  message: string;
+  message: JSX.Element;
   transactionHash: string;
   blockNumber: number; 
   timestamp: number;
@@ -20,116 +24,99 @@ interface ArtworkHistoryItem {
 export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
   const { library, chainId } = useActiveWeb3React();
   const TheDate = useTheDateContract();  
-  const { data : blockNumber} = useBlockNumber();
+  const { exists } = useTheDateArtwork(tokenId);  
   const { data: etherPrice } = useEtherPrice();
-  const [ tokenId, setTokenId ] = useState<number>(0);
   const [ history, setHistory ] = useState<ArtworkHistoryItem[]>([]);
-  const rendersCount = useRendersCount();
 
   useAsync(async () => {
-    if (!library || !blockNumber || !TheDate) {
+    if (!library || !TheDate || !exists) {
       return; 
     }
-    const block_ = await library.getBlock(blockNumber);
-    const tokenId_ = BigNumber.from(block_.timestamp).div(SECONDS_IN_A_DAY).toNumber();
-    
-    const filters = [
-      {
-        filter: TheDate.filters.BidPlaced(tokenId_, null, null),
-        fn: (x) => {message: x.to }
-      }, 
-      {
-        filter: TheDate.filters.ArtworkMinted(tokenId_, null, null),
-        fn: (x) => {message: x.to }
-      }, 
-      {
-        filter: TheDate.filters.ArtworkNoteEngraved(tokenId_, null, null),
-        fn: (x) => {message: x.to }
-      }, 
-      {
-        filter: TheDate.filters.ArtworkNoteErased(tokenId_),
-        fn: (x) => {message: "1 Ether spend for erasing." }
-      }, 
-      {
-        filter: TheDate.filters.AuctionEnded(tokenId_, null, null),
-        fn: (x) => {message: x.to }
-      }, 
-      {
-        filter: TheDate.filters.Transfer(null, null, tokenId_),
-        fn: (x) => {message: x.to }
-      }, 
-    ]
-    // const history_ = (await TheDate.queryFilter(
-    //   )).map(async x => ({
-    //   tokenId: x.args.tokenId.toNumber(),
-    //   action: x.event,
-    //   from: x.args.bidder,
-    //   message: parseBalance(x.args.amount),
-    //   transactionHash: x.transactionHash,
-    //   blockNumber: x.blockNumber,
-    //   timestamp: (await x.getBlock()).timestamp
-    // }));
 
-    const history_ = await Promise.all((await TheDate.queryFilter(
-      TheDate.filters.Transfer(null, null, tokenId_))).map(async x => ({
-      tokenId: x.args.tokenId.toNumber(),
+    const history_ = await Promise.all((await TheDate.queryFilter(TheDate.filters.BidPlaced(tokenId, null, null))).map(async (x) => ({
+      from: x.args.bidder,
+      message: <span>Bid Placed for Ξ{ parseBalance(x.args.amount) }</span>,
       action: x.event!,
-      from: x.args.from,
-      message: shortenHex(x.args.to),
+      tokenId: x.args.tokenId.toNumber(),
       transactionHash: x.transactionHash,
       blockNumber: x.blockNumber,
       timestamp: (await x.getBlock()).timestamp
-    })));
-
-    const history_ = await Promise.all((await TheDate.queryFilter(
-      TheDate.filters.(null, null, tokenId_))).map(async x => ({
-      tokenId: x.args.tokenId.toNumber(),
-      action: x.event!,
-      from: x.args.from,
-      message: shortenHex(x.args.to),
-      transactionHash: x.transactionHash,
-      blockNumber: x.blockNumber,
-      timestamp: (await x.getBlock()).timestamp
-    })));
-
-    setTokenId(tokenId_);
-    setHistory(history_);
-    
-    // TheDate?.filters.ArtworkMinted(tokenId),
-    //    TheDate?.filters.ArtworkNoteEngraved(tokenId, null),
-    //    TheDate?.filters.ArtworkNoteErased(tokenId),
-    //    TheDate?.filters.AuctionEnded(tokenId, null, null),
-    //    TheDate?.filters.Transfer(null, null, tokenId)];
+    })).concat(
+      (await TheDate.queryFilter(TheDate.filters.ArtworkMinted(tokenId))).map(async (x) => ({
+        from: TheDate.address,
+        message: <span>Artwork Minted</span>,
+        action: x.event!,
+        tokenId: x.args.tokenId.toNumber(),
+        transactionHash: x.transactionHash,
+        blockNumber: x.blockNumber,
+        timestamp: (await x.getBlock()).timestamp
+    }))).concat(
+      (await TheDate.queryFilter(TheDate.filters.ArtworkNoteEngraved(tokenId, null, null))).map(async (x) => ({
+        from: x.args.owner,
+        message: <span>Engrave note &quote;{x.args.note}&quote;</span>,
+        action: x.event!,
+        tokenId: x.args.tokenId.toNumber(),
+        transactionHash: x.transactionHash,
+        blockNumber: x.blockNumber,
+        timestamp: (await x.getBlock()).timestamp
+    }))).concat(
+      (await TheDate.queryFilter(TheDate.filters.ArtworkNoteErased(tokenId, null))).map(async (x) => ({
+        from: x.args.owner,
+        message: <span>Erase note.</span>,
+        action: x.event!,
+        tokenId: x.args.tokenId.toNumber(),
+        transactionHash: x.transactionHash,
+        blockNumber: x.blockNumber,
+        timestamp: (await x.getBlock()).timestamp
+    }))).concat(
+      (await TheDate.queryFilter(TheDate.filters.AuctionEnded(tokenId, null, null))).map(async (x) => ({
+        from: x.args.winner,
+        message: <span>Claim artwork</span>,
+        action: x.event!,
+        tokenId: x.args.tokenId.toNumber(),
+        transactionHash: x.transactionHash,
+        blockNumber: x.blockNumber,
+        timestamp: (await x.getBlock()).timestamp
+    }))).concat(
+      (await TheDate.queryFilter(TheDate.filters.Transfer(null, null, tokenId)))
+        .filter((x) => (x.args.from !== TheDate.address && x.args.from !== ethers.constants.AddressZero))
+        .map(async (x) => ({
+        from: x.args.from,
+        message: <span>Transfer to <Link href={`/gallery/${x.args.to}`}><a className="hover:link">{ shortenHex(x.args.to) }</a></Link></span>,
+        action: x.event!,
+        tokenId: x.args.tokenId.toNumber(),
+        transactionHash: x.transactionHash,
+        blockNumber: x.blockNumber,
+        timestamp: (await x.getBlock()).timestamp
+    }))));
 
     history_.sort((a, b) => (b.blockNumber - a.blockNumber));
-
-  }, [blockNumber, library, TheDate]);
+    setHistory(history_);
+  }, [library, TheDate, exists]);
 
   return (
     <table className="text-xs text-left">
       <thead>
         <tr>
-          <th className="w-44 text-left">Action</th>
+          <th className="w-60 text-left">Time</th>     
           <th className="w-44 text-left">From</th>
-          <th className="w-44 text-left">Message</th>     
-          <th className="w-60 text-left">Time</th> 
+          <th className="w-60 text-left">Message</th> 
         </tr>
       </thead>
       <tbody>
           {history && history.map((x, i) => (
-            <tr key="{i}" className={ i > 0 ? "line-through" : ""}>
-              <td>
-                {x.action}
-              </td>
-              <td>
-                <a className="link" href={formatEtherscanLink("Account", [chainId, x.from])}>
-                  { shortenHex(x.from) }
-                </a>
-              </td>
+            <tr key={i} className=" ">
               <td>
                 <a className="link" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                   { blockTimestampToUTC(x.timestamp) }
                 </a>
+              </td>
+              <td>
+                <Link href={`/gallery/${x.from}`}>
+                  <a className="hover:link">
+                  { shortenHex(x.from) }
+                </a>
+                </Link>
               </td>
               <td>
                 {x.message}

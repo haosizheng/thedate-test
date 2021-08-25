@@ -7,75 +7,76 @@ import { useAsync } from "react-use";
 import Link from "next/link";
 import { SECONDS_IN_A_DAY } from "@/utils/thedate";
 import useTheDateContract from "@/hooks/useTheDateContract";
+import ArtworkModelViewer from "./ArtworkModelViewer";
 
 export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
   const {library, account} = useActiveWeb3React();
   const TheDate = useTheDateContract();
-  const {exists, owner, dateString, noteString, highestBidder, auctionEnded,
-    engraveNote, eraseNote, claimArtwork } = useTheDateArtwork(tokenId);
-  const noteInputBox = useRef<HTMLInputElement>(null!);
+  const {exists, owner, dateString, noteString, highestBidder, auctionEnded, engraveNote, eraseNote, claimArtwork } = useTheDateArtwork(tokenId);
   
+  const noteInputBox = useRef<HTMLInputElement>(null!);
   const onClickEngrave = () => {
     if (noteInputBox.current?.textContent) {
       engraveNote(noteInputBox.current.textContent);
     }
   };
 
-  return (
-    !exists ?
-      <div>
-        No artwork exists
-      </div>
-    : (
-      <div>
-        { !!dateString && <p>
-          Date:{" "}
+  return  (<>
+    { exists !== undefined && owner != undefined && dateString !== undefined && noteString !== undefined && (
+      !exists ? 
+        <div>
+          No artwork exists
+        </div>
+      : (
+        <div>
+          <ArtworkModelViewer tokenId={tokenId} noteString="" />
+          <p>
+            Date:{" "}
             <Link href={`/artwork/${tokenId}`}>
               <a className="hover:link">{dateString}</a>
             </Link>
           </p>
-        }
-        <p>
-          Note: {noteString ? `"${noteString}"` : "(unset)"}
-          {account === owner && editable && !noteString && noteString !== "" && (
-            <>
-              <input ref={noteInputBox} type="text" placeholder="note here" />
-              <button className="link" onClick={onClickEngrave}>Engrave</button>
-            </>
-          )}
-          {account === owner && editable && !noteString && noteString.length > 0 && (
-            <button className="link" onClick={eraseNote}>Erase</button>
-          )}
-        </p>
-        <br/>
-        { !!owner &&
-        <p>
-          
-          Owner:{" "}
-          { owner === TheDate?.address ? (
-              !auctionEnded ? 
-                <>Auction not ended yet</>
-              : (editable && highestBidder === account) ? 
-                <button className="link" onClick={claimArtwork}>Claim your artwork</button>
-              : <Link href={`/artwork/${tokenId}`}>
-                  <a className="link">Not claimed yet</a>
+          <p>
+            Note: {noteString.length > 0 ? `"${noteString}"` : "(unset)"}
+            {account === owner && editable && noteString.length == 0 && (
+              <>
+                <input ref={noteInputBox} type="text" maxLength={100} 
+                  className="border-none focus:border-black-300 w-96 focus:outline-none outline-none focus:border-black focus:underline bg-transparent" placeholder="(unset)" />
+                  <br></br>
+                <button className="link" onClick={onClickEngrave}>Engrave</button>
+              </>
+            )}
+            {account === owner && editable && noteString.length > 0 && (
+              <button className="link" onClick={eraseNote}>Erase</button>
+            )}
+          </p>
+          <br/>
+          <p>
+            Owner:{" "}
+              { owner === TheDate?.address ? (
+                !auctionEnded ? 
+                  <>Auction not ended yet</>
+                : (editable && highestBidder === account) ? 
+                  <button className="link" onClick={claimArtwork}>Claim your artwork</button>
+                : <Link href={`/artwork/${tokenId}`}>
+                    <a className="link">Not claimed yet</a>
+                  </Link>
+              )
+              :
+                <Link href={`/gallery/${owner}`}>
+                  <a className="hover:link" >
+                    {shortenHex(owner)} { account === owner && " (you)" }
+                  </a>
                 </Link>
-            )
-            :
-            <Link href={`/gallery/${owner}`}>
-              <a className="hover:link" >
-                {shortenHex(owner)} { account === owner && " (you)" }
-              </a>
+            }
+          </p>
+          <p>Token ID: {" "}
+            <Link href={`/artwork/${tokenId}`}>
+              <a className="hover:link">#{tokenId}</a>
             </Link>
-        }
-        </p>
-        }
-        <p>Token ID: {" "}
-          <Link href={`/artwork/${tokenId}`}>
-            <a className="hover:link">#{tokenId}</a>
-          </Link>
-        </p>
-      </div>
-    )
+          </p>
+        </div>
+    ))
+    } </>
   );
 }

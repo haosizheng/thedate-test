@@ -7,6 +7,15 @@ export enum SupportedChainId {
   HARDHAT = 31337
 }
 
+export const NETWORK_NAMES: Record<SupportedChainId | number, string> = {
+  [SupportedChainId.MAINNET]: 'mainnet',
+  [SupportedChainId.ROPSTEN]: 'ropsten',
+  [SupportedChainId.RINKEBY]: 'rinkeby',
+  [SupportedChainId.GOERLI]: 'goerli',
+  [SupportedChainId.KOVAN]: 'kovan',
+  [SupportedChainId.HARDHAT]: 'hardhat'
+}
+
 export const NETWORK_LABELS: Record<SupportedChainId | number, string> = {
   [SupportedChainId.MAINNET]: 'Mainnet',
   [SupportedChainId.ROPSTEN]: 'Ropsten',

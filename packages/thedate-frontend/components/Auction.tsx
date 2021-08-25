@@ -61,8 +61,9 @@ export default function Auction() {
     // const bidPrice = bidPriceRef.current ?
     // ethers.utils.parseEther(bidPriceRef.current.conte)
     // const typeInBidPrice = Number.parseFloat(bidPriceRef.current?.textContent);
-
-    TheDate?.placeBid(tokenId!, {value: minBidPrice }).then(
+    if (!active || !account || !TheDate || !tokenId) 
+      return ;
+    TheDate.placeBid(tokenId, {value: minBidPrice }).then(
       (reason) => {
         if (errorMessageRef.current) {
           errorMessageRef.current!.innerText = "Success!";
@@ -77,8 +78,13 @@ export default function Auction() {
     )
   };
 
-  const bidPriceOnChange = (event: React.FormEvent<HTMLInputElement>) => {
-    
+  const bidPriceOnChange = (typeInValue: string) => {
+    const bidPrice = ethers.utils.parseEther(typeInValue);
+    if (bidPrice >= minBidPrice) {
+      setBidPrice(bidPrice)
+      return true;
+    }
+    return false;
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -120,20 +126,20 @@ export default function Auction() {
               Connect your Wallet below to enable bidding. 
             </p>
           : 
-            <p>
               <form onSubmit={handleSubmit}>
+                <p>
                 Auction to own the date. Place your bid with 
-              Ξ<input type="text" 
-                ref={ bidPriceRef }
-                className="bg-transparent hover:border focus:border  border-none border-black w-20 " 
-                pattern="^[0-9]\d*\.?\d*$"
-                value={parseBalance(minBidPrice)}
-                onChange= { bidPriceOnChange } 
-                placeholder={parseBalance(minBidPrice)} />
+                Ξ<input type="text" 
+                  ref={ bidPriceRef }
+                  className="bg-transparent hover:border focus:border  border-none border-black w-20 " 
+                  pattern="^[0-9]\d*\.?\d*$"
+                  value={parseBalance(minBidPrice)}
+                  onChange= { e => bidPriceOnChange(e.target.value) } 
+                  placeholder={parseBalance(minBidPrice)} />
                 <br/>
                 <a onClick={clickToAuction} className="hover:link" > Bid! </a>
+                </p>
               </form>
-            </p>
           }
 
           <p className="text-xs">
