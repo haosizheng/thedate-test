@@ -21,14 +21,14 @@ export default function Auction() {
   const TheDate = useTheDateContract();  
 
   const { data : blockNumber} = useBlockNumber();
-  const [ tokenId, setTokenId ] = useState<number>(0);
+  const [ tokenId, setTokenId ] = useState<number | undefined>(undefined);
 
-  const [ minBidPrice, setMinBidPrice ] = useState<BigNumber>(ethers.constants.Zero);
-  const [ highestBidder, setHighestBidder] = useState<string>(null!);
-  const [ highestBid, setHighestBid] = useState<BigNumber>(null!);
-  const [ reservePrice, setReservePrice] = useState<BigNumber>(null!);
-  const [ minBidIncrementPermyriad, setMinBidIncrementPermyriad] = useState<BigNumber>(null!);
-  const [ bidPrice, setBidPrice] = useState<BigNumber>(null!);
+  const [ minBidPrice, setMinBidPrice ] = useState<BigNumber | undefined>(ethers.constants.Zero);
+  const [ highestBidder, setHighestBidder] = useState<string | undefined>(undefined);
+  const [ highestBid, setHighestBid] = useState<BigNumber | undefined>(undefined);
+  const [ reservePrice, setReservePrice] = useState<BigNumber | undefined>(undefined);
+  const [ minBidIncrementPermyriad, setMinBidIncrementPermyriad] = useState<BigNumber | undefined>(undefined);
+  const [ bidPrice, setBidPrice] = useState<BigNumber | undefined>(undefined);
 
   useAsync(async () => {
     if (!library || !TheDate || !blockNumber) {
@@ -38,24 +38,20 @@ export default function Auction() {
     const tokenId_ = BigNumber.from(timestamp_).div(SECONDS_IN_A_DAY).toNumber();
     setTokenId(tokenId_);
 
-    console.log("Got");
-    const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId);
+    const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId_);
     const reservePrice_ = await TheDate.getAuctionReservePrice();
     const minBidIncrementPermyriad_ = await TheDate.getAuctionMinBidIncrementPermyriad();
-    console.log("Got2");
     
     if (!!highestBid_ && highestBid_.eq(ethers.constants.Zero)) {
       setMinBidPrice(reservePrice_);
     } else {
       setMinBidPrice(highestBid_.mul(minBidIncrementPermyriad_.add(10000)).div(10000));
     }
-    console.log("Got3");
 
     setHighestBid(highestBid_);
     setHighestBidder(highestBidder_);
     setMinBidIncrementPermyriad(minBidIncrementPermyriad_);
     setReservePrice(reservePrice_);
-    console.log("Got4");
 
   }, [library, TheDate, blockNumber]);
 
