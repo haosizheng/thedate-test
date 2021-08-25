@@ -1,11 +1,16 @@
 import React, { useEffect, useState, Suspense } from 'react'
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { OrbitControls, Html, useGLTF } from '@react-three/drei'
-import * as THREE from 'three'
-
-import { ImageLoader, Vector2, CubeTexture } from 'three'
-import { HDRCubeTextureLoader } from 'three/examples/jsm/loaders/HDRCubeTextureLoader'
+import * as THREE from "three"
+import { ImageLoader, Vector2, CubeTexture } from "three"
+import { HDRCubeTextureLoader } from "three/examples/jsm/loaders/HDRCubeTextureLoader"
 import { tokenIdToDateString } from "@/utils/thedate";
+
+// const loadFont = require("load-bmfont");
+// const createTextGeometry = require("three-bmfont-text");
+// const createMSDFShader = require("three-bmfont-text/shaders/msdf");
+// const fontFile = require("load-bmfont/../assets/Lato-Black.fnt");
+// const fontAtlas = require("../../assets/Lato-Black.png");
 
 function CreateCanvasTexture(date: string, note: string = "", backgroundColor: string, 
   textColor: string, useRoughness: boolean = false) 
@@ -15,6 +20,7 @@ function CreateCanvasTexture(date: string, note: string = "", backgroundColor: s
 
   canvas.width = 4096;
   canvas.height = 4096;
+  ctx.imageSmoothingEnabled = true;
   ctx.rect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = backgroundColor;
   ctx.textAlign = 'center';
@@ -82,10 +88,13 @@ function Artwork({dateString, noteString = ""}: {dateString: string, noteString?
 function Environment({ background = false }) {
   const { gl, scene } = useThree()
 
+  // @ts-ignore
   const [cubeMap] = useLoader(HDRCubeTextureLoader, 
-    [['px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr']], (loader) => {
-    loader.setPath('/pisaHDR/')
-    loader.setDataType(THREE.UnsignedByteType)
+    [
+      ['px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr']], (loader) => {
+    loader.setPath('/pisaHDR/');
+   // @ts-ignore
+    loader.setDataType(THREE.UnsignedByteType);
   });
 
   useEffect(() => {
@@ -111,7 +120,7 @@ export default function ArtworkModelViewer({ tokenId, noteString = "", autoRotat
   const [ready, set] = useState(false)
 
   return (
-    <Canvas dpr={[1, 2]} shadows camera={{ position: [5, 1, 8], fov: fov }}>
+    <Canvas dpr={[1, 2]} shadows camera={{ position: [0, 0, 10], fov: fov }}  gl={{ antialias: true }} >
       <ambientLight intensity={0.6} />
 
       <directionalLight position={[2.5, 3, 3]} intensity={0.5} />

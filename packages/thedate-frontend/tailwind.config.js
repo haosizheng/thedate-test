@@ -9,7 +9,19 @@ module.exports = {
   ],
   darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        '120': '30rem',
+        '160': '40rem',
+      },
+      maxHeight: {
+        '120': '30rem',
+        '160': '40rem',
+      },
+      fontFamily: {
+        mono: 'Roboto Mono',
+      },
+    },
   },
   variants: {
     extend: {

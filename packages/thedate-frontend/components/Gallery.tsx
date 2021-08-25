@@ -7,6 +7,9 @@ import useTheDateContract from "@/hooks/useTheDateContract";
 import { shortenHex } from "@/utils/ethers";
 import ArtworkImageViewer from "./ArtworkImageViewer";
 import ArtworkCatalogue from "./ArtworkCatalogue";
+import ArtworkModelViewer from "./ArtworkModelViewer";
+import Link from "next/link";
+import { tokenIdToDateString } from "@/utils/thedate";
 
 export default function Gallery({ owner }: { owner?: string }) {
   const { library, chainId, account, active } = useActiveWeb3React();
@@ -36,7 +39,7 @@ export default function Gallery({ owner }: { owner?: string }) {
       tokenIdList_ = await Promise.all(range(0, tokenNum_).map(async i => (await TheDate.tokenByIndex(i)).toNumber()));
     }
 
-    setTokenIdList(tokenIdList_);
+    setTokenIdList(tokenIdList_.reverse());
   }, [library, TheDate]);
 
   return (
@@ -46,23 +49,40 @@ export default function Gallery({ owner }: { owner?: string }) {
         { owner ? 
           <p>Gallery of {shortenHex(owner)}</p>
           :
-          <p>Gallery of all The Date </p>
+          <p>Gallery of all artworks </p>
         }
       </div>
     </div>
-    <div className="hero">
-      <div className="hero-content grid  grid-cols-1 md:grid-cols-3 gap-10">
-      {tokenIdList.map(tokenId => (
-        <div key={tokenId} className="flow flow-col">
-          <div className="flex" key={tokenId}>
-            <ArtworkImageViewer tokenId={tokenId} />
-          </div>
-          <div className="flex-grow ">
-            <ArtworkCatalogue tokenId={tokenId} />
-          </div>
-        </div>
-      ))}
-      </div>
+    <div className="hero pt-20">
+      <div className="hero-content">
+        <table> 
+          <tbody>
+              {tokenIdList.map(tokenId => (
+                <tr key={tokenId}>
+                  <td>
+                  <Link href={`/artwork/${tokenId}`}>
+                    <a className="hover:link">#{tokenId}</a>
+                  </Link>
+                  </td>
+                  <td className="pl-10">
+                  <Link href={`/artwork/${tokenId}`}>
+                    <a className="hover:link">{tokenIdToDateString(tokenId)}</a>
+                  </Link>
+                  </td>
+                  
+                {/* <div key={tokenId} className="flex flex-col items-center">
+                  <div className="flex-none w-96 h-96" key={tokenId}>
+                    <ArtworkImageViewer tokenId={tokenId} />
+                  </div>
+                  <div className="flex-grow">
+                    <ArtworkCatalogue tokenId={tokenId} />
+                  </div>
+                 */}
+                </tr>
+              ))}          
+          </tbody>
+         </table>
+       </div>
     </div>
     </>
   );

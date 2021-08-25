@@ -1,18 +1,16 @@
-import { ethers } from "ethers";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
 import { useState, useRef } from "react";
 import { shortenHex } from "@/utils/ethers";
-import { useAsync } from "react-use";
 import Link from "next/link";
-import { SECONDS_IN_A_DAY } from "@/utils/thedate";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import ArtworkModelViewer from "./ArtworkModelViewer";
 
 export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
   const {library, account} = useActiveWeb3React();
   const TheDate = useTheDateContract();
-  const {exists, owner, dateString, noteString, highestBidder, auctionEnded, engraveNote, eraseNote, claimArtwork } = useTheDateArtwork(tokenId);
+  const {exists, owner, dateString, noteString, highestBidder, auctionEnded, 
+    engraveNote, eraseNote, claimArtwork } = useTheDateArtwork(tokenId);
   
   const noteInputBox = useRef<HTMLInputElement>(null!);
   const onClickEngrave = () => {
@@ -29,7 +27,12 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
         </div>
       : (
         <div>
-          <ArtworkModelViewer tokenId={tokenId} noteString="" />
+          {/* <ArtworkModelViewer tokenId={tokenId} noteString="" /> */}
+          <p>Token ID: {" "}
+            <Link href={`/artwork/${tokenId}`}>
+              <a className="hover:link">#{tokenId}</a>
+            </Link>
+          </p>
           <p>
             Date:{" "}
             <Link href={`/artwork/${tokenId}`}>
@@ -37,11 +40,12 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
             </Link>
           </p>
           <p>
-            Note: {noteString.length > 0 ? `"${noteString}"` : "(unset)"}
+            Note: {noteString.length > 0 ? `"${noteString}"` : "(unengraved)"}
             {account === owner && editable && noteString.length == 0 && (
               <>
                 <input ref={noteInputBox} type="text" maxLength={100} 
-                  className="border-none focus:border-black-300 w-96 focus:outline-none outline-none focus:border-black focus:underline bg-transparent" placeholder="(unset)" />
+                  className="border-none focus:border-black-300 w-96 
+                  focus:outline-none outline-none focus:border-black focus:underline bg-transparent" placeholder="(unset)" />
                   <br></br>
                 <button className="link" onClick={onClickEngrave}>Engrave</button>
               </>
@@ -50,7 +54,6 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
               <button className="link" onClick={eraseNote}>Erase</button>
             )}
           </p>
-          <br/>
           <p>
             Owner:{" "}
               { owner === TheDate?.address ? (
@@ -69,11 +72,6 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
                   </a>
                 </Link>
             }
-          </p>
-          <p>Token ID: {" "}
-            <Link href={`/artwork/${tokenId}`}>
-              <a className="hover:link">#{tokenId}</a>
-            </Link>
           </p>
         </div>
     ))

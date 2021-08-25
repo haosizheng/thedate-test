@@ -46,6 +46,7 @@
     "react-use": "^17.2.4",
     "stream": "^0.0.2",
     "three": "^0.131.3",
+    "three-bmfont-text": "^3.0.1",
     "twin.macro": "^2.6.2",
     "use-nft": "^0.9.0"
   },
@@ -63,6 +64,7 @@
     "@types/react-dom": "^17.0.9",
     "@types/three": "^0.131.0",
     "autoprefixer": "^10.3.1",
+    "convert-bmfont": "^1.0.2",
     "eslint": "^7.32.0",
     "eslint-config-next": "^11.1.0",
     "moment": "^2.29.1",

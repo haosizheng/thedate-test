@@ -47,11 +47,13 @@ export default function ArtworkBidHistory({ tokenId }: { tokenId: number }) {
   return (
     <table className="text-xs text-left">
       <thead>
-        <tr>
-          <th className="w-60 text-left">Time</th>
-          <th className="w-44 text-left">From</th>
-          <th className="w-44 text-left">Price</th>        
-        </tr>
+        {bidHistory && bidHistory.length > 0 &&
+          <tr>
+            <th className="w-56 text-left">Time</th>
+            <th className="w-32 text-left">From</th>
+            <th className="w-44 text-left">Price</th>        
+          </tr>
+        }
       </thead>
       <tbody>
           {bidHistory && bidHistory.map((x, i) => (

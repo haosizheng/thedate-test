@@ -1,7 +1,6 @@
 import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
-import Meta from "@/components/Meta";
 
 export default function ArtworkRenderingPage() {
   const router = useRouter()
@@ -18,8 +17,8 @@ export default function ArtworkRenderingPage() {
 
   return (
     <>
-      <div className="static absolute inset-0	h-96 w-96 bg-neutral">
-        <ArtworkModelViewer tokenId={ tokenId } autoRotate={ false } fov={ 40 } />
+      <div className="static absolute inset-0 bg-neutral">
+        <ArtworkModelViewer tokenId={ tokenId } autoRotate={ false } fov={ 45 } />
       </div>
     </>
   );

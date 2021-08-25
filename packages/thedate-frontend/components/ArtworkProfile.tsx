@@ -18,11 +18,11 @@ export default function ArtworkProfile({tokenId}: {tokenId: number}) {
       : 
         <>
           <div className="hero">
-            <div className="hero-content h-full w-screen">
-              <ArtworkModelViewer tokenId={tokenId} noteString={noteString} />
+            <div className="flex items-center max-h-80 h-80 md:h-160 md:max-h-160 w-screen md:-mt-24">
+              <ArtworkModelViewer tokenId={tokenId} noteString={noteString} fov={30} />
             </div>
           </div>
-          <div className="hero">
+          <div className="hero py-10">
             <div className="hero-content">
               <div className="text-sm">
                 <ArtworkCatalogue tokenId={tokenId} editable />

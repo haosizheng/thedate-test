@@ -2,6 +2,8 @@ import { useWeb3React } from '@web3-react/core'
 import { useEffect } from 'react'
 import { injected } from '@/utils/connectors'
 
+declare let window: any;
+
 export default function useInactiveListener(suppress = false) {
   const { active, error, activate } = useWeb3React() // specifically using useWeb3React because of what this hook does
 

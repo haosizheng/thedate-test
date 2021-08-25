@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="hero py-20">
        <div className="hero-content text-sm text-center">
         <ul>
-          <li className="mb-5"><Wallet/></li>
+          <li className="mb-10"><Wallet/></li>
           <li><Link href="/about"><a className="link">About</a></Link></li>
           <li><Link href="/"><a className="link">Auction</a></Link></li>
           <li><Link href="/gallery"><a className="link">Gallery</a></Link></li>

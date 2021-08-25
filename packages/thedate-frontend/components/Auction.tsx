@@ -38,20 +38,25 @@ export default function Auction() {
     const tokenId_ = BigNumber.from(timestamp_).div(SECONDS_IN_A_DAY).toNumber();
     setTokenId(tokenId_);
 
+    console.log("Got");
     const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId);
     const reservePrice_ = await TheDate.getAuctionReservePrice();
     const minBidIncrementPermyriad_ = await TheDate.getAuctionMinBidIncrementPermyriad();
+    console.log("Got2");
     
-    if (highestBid_ && highestBid_.eq(0)) {
+    if (!!highestBid_ && highestBid_.eq(ethers.constants.Zero)) {
       setMinBidPrice(reservePrice_);
     } else {
       setMinBidPrice(highestBid_.mul(minBidIncrementPermyriad_.add(10000)).div(10000));
     }
+    console.log("Got3");
 
     setHighestBid(highestBid_);
     setHighestBidder(highestBidder_);
     setMinBidIncrementPermyriad(minBidIncrementPermyriad_);
     setReservePrice(reservePrice_);
+    console.log("Got4");
+
   }, [library, TheDate, blockNumber]);
 
   const errorMessageRef = useRef<HTMLDivElement>(null!);
@@ -94,14 +99,14 @@ export default function Auction() {
   return (
     <>
       <div className="hero">
-        <div className="hero-content h-96 w-full">
-          { tokenId ? <ArtworkModelViewer tokenId={tokenId} noteString="Character Counter is a 100% free online character count calculator that's simple to use. " /> : "Loading..." }
+        <div className="flex items-center max-h-80 h-80 md:h-120 md:max-h-120 xl:h-150 xl:max-h-150 w-screen -mt-10 ">
+          { tokenId ? <ArtworkModelViewer tokenId={tokenId} noteString="(to be engraved by the note owner)" fov={30}  /> : "Loading..." }
         </div>
       </div>
       <div className="hero">
-        <div className="hero-content py-16 leading-10 max-w-prose text-left flex-col flex">
+        <div className="flex px-8 items-left py-16 leading-10 max-w-prose text-left flex-col flex">
           <p className="">
-            One and only one <Link href="/about"><a className="link"><b>The Date</b></a></Link> artwork of Today - { tokenIdToDateString(tokenId) } - is 
+            One and only one <Link href="/about"><a className="hover:link"><b>The Date</b></a></Link> artwork of today &quot;{ tokenIdToDateString(tokenId) }&quot; is 
             available to mint into Ethernum network immutably in {" "}
             <Countdown intervalDelay={1000} 
               date={new Date((tokenId + 1) * SECONDS_IN_A_DAY * 1000)}
@@ -142,23 +147,20 @@ export default function Auction() {
               </form>
           }
 
-          <p className="text-xs">
-            { reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. </> }
-            { minBidIncrementPermyriad && <>Current highest bid is Ξ{parseBalance(highestBid)}. 
-              Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>}
-          </p>
-
-          
           <div className="text-xs" ref={errorMessageRef}></div>
+          
         </div>
       </div>
-      { tokenId &&
-        <div className="hero">
-          <div className="hero-content">
+      <div className="hero">
+          <div className="flex items-center flex-col">
             <ArtworkBidHistory tokenId={tokenId}/>
+            <p className="text-xs mt-10">
+            { reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. </> } <br></br>
+            { minBidIncrementPermyriad && <>Current highest bid is Ξ{parseBalance(highestBid)}. <br></br>
+              Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>}
+          </p>
           </div>
         </div>
-      }
     </>
   );
 }

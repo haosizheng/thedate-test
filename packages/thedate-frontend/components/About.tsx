@@ -18,11 +18,6 @@ export default function About() {
         </p>
 
         <p className="mb-8">
-          Given the immutable nature of blockchain, every <b>The Date</b> artwork will last forever, 
-          exceeding one&apos;s lifetime, and perhaps beyond existence of human race.
-        </p>
-        
-        <p className="mb-8">
           Each day, one and only one <b>The Date</b> artwork will be available to be minted 
           as <a className="link" href={etherscanLinkOfToken}>a non-fungible token</a>, 
           through <Link href="/"><a className="link">an auction</a></Link> opening from 00:00:00 UTC to 23:59:59 UTC.
@@ -34,6 +29,11 @@ export default function About() {
           Additionally, the owner could optionally engrave a note (100 ASCII characters including spaces) 
           onto the artwork at no cost. 
           However, the owner has to pay 1 ether to erase the existing engraved note before a new one can be engraved.
+        </p>
+
+        <p className="mb-8">
+          Given the immutable nature of blockchain, every <b>The Date</b> artwork will last forever, 
+          exceeding one&apos;s lifetime, and perhaps beyond existence of human race.
         </p>
 
         <p className="mb-8">

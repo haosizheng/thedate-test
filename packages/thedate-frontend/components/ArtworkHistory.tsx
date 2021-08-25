@@ -107,7 +107,7 @@ export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
           {history && history.map((x, i) => (
             <tr key={i} className=" ">
               <td>
-                <a className="link" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
+                <a className="hover:link" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                   { blockTimestampToUTC(x.timestamp) }
                 </a>
               </td>
