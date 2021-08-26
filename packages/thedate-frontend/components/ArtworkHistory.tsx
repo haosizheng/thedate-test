@@ -53,7 +53,7 @@ export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
     }))).concat(
       (await TheDate.queryFilter(TheDate.filters.ArtworkNoteEngraved(tokenId, null, null))).map(async (x) => ({
         from: x.args.owner,
-        message: <span>Engrave note &quote;{x.args.note}&quote;</span>,
+        message: <span>Engrave with &quot;{x.args.note}&quot;</span>,
         action: x.event!,
         tokenId: x.args.tokenId.toNumber(),
         transactionHash: x.transactionHash,

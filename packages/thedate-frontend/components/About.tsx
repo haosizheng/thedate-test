@@ -38,7 +38,7 @@ export default function About() {
 
         <p className="mb-8">
           The values of every artworks of <b>The Date</b> would be determined 
-          by <a className="link" href="http://opensea.io">free markets</a>, unfolding over time. <br/>
+          by <a className="link" href={`http://opensea.io/assets/${TheDate?.address}`}>free markets</a>, unfolding over time. <br/>
         </p>
 
         <p className="mb-8 text-right"> 

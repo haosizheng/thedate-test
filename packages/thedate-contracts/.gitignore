@@ -3,7 +3,6 @@ abis
 cache
 artifacts
 factories
-typechain
 coverage
 coverage.json
 bin
@@ -88,6 +87,7 @@ web_modules/
 .env
 .env.test
 .env.production
+.env.development
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

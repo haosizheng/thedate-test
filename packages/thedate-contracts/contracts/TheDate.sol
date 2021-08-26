@@ -61,6 +61,10 @@ contract TheDate is ERC721Enumerable, AccessControl, WithFoundation, WithRoyalty
         _baseTokenURI = baseTokenURI;
     }
 
+    function exists(uint256 tokenId) external view returns (bool) {
+        return super._exists(tokenId);
+    }
+
     function _beforeTokenTransfer(
         address from,
         address to,

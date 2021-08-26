@@ -3,11 +3,12 @@ import { useWeb3React } from '@web3-react/core'
 import { injected, walletconnect } from "@/utils/connectors";
 import { shortenHex } from "@/utils/ethers";
 import useENSName from "@/hooks/useENSName";
+import { NETWORK_NAMES } from "@/utils/chains";
 
 import PendingReturns from "./PendingReturns";
 
 export default function Wallet() {
-  const { error, account, activate, active } = useWeb3React();
+  const { error, account, activate, active, chainId } = useWeb3React();
   const ensName = useENSName(account);
   
   if (error) {
@@ -15,17 +16,21 @@ export default function Wallet() {
   }
 
   return (
-      <div>
+      <div id="#wallet">
         {active ? (
-          <div>
-            Connected as {" "}
-            <Link href={`/gallery/${account}`}>
-              <a className="hover:link">
-                {ensName || `${shortenHex(account, 4)}`}
-              </a>
-            </Link>
-            <PendingReturns />
-          </div>
+          !!chainId && chainId == Number(process.env.NETWORK_CHAIN_ID || "1") ? 
+            <div>
+              Connected as {" "}
+              <Link href={`/gallery/${account}`}>
+                <a className="hover:link">
+                  {ensName || `${shortenHex(account, 4)}`}
+                </a>
+              </Link>
+              <PendingReturns />
+            </div>
+          :
+            <div className="text-xs">Please switch your Metamask network to {NETWORK_NAMES[Number(process.env.NETWORK_CHAIN_ID || "1")]}!
+            </div>
         ) : (
           <div>
             Connect via {" "}

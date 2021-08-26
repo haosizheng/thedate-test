@@ -40,21 +40,28 @@ export default function Gallery({ owner }: { owner?: string }) {
     }
 
     setTokenIdList(tokenIdList_.reverse());
-  }, [library, TheDate]);
+  }, [library, TheDate, owner]);
 
   return (
     <>
     <div className="hero">
       <div className="hero-content">
         { owner ? 
-          <p>Gallery of {shortenHex(owner)}</p>
+          <p>Owned by {shortenHex(owner)}:</p>
           :
-          <p>Gallery of all artworks </p>
+          <p>List of all The Date:</p>
         }
       </div>
     </div>
     <div className="hero pt-20">
       <div className="hero-content">
+        { tokenIdList.length == 0 ? 
+            (owner ? 
+              <p className="text-xs">No artworks owned by {shortenHex(owner)} </p>
+              :
+              <p className="text-xs">No artworks exist </p>
+            )
+        : 
         <table> 
           <tbody>
               {tokenIdList.map(tokenId => (
@@ -82,6 +89,7 @@ export default function Gallery({ owner }: { owner?: string }) {
               ))}          
           </tbody>
          </table>
+         }
        </div>
     </div>
     </>

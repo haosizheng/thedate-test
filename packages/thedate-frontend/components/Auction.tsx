@@ -11,49 +11,85 @@ import useBlockNumber from '@/hooks/useBlockNumber';
 import useTheDateContract from '@/hooks/useTheDateContract';
 import Countdown from "react-countdown";
 import { SECONDS_IN_A_DAY, tokenIdToDateString } from "@/utils/thedate"
-import { parseBalance } from '@/utils/ethers';
+import { parseBalance, shortenHex, formatEtherscanLink, toPriceFormat } from '@/utils/ethers';
+import { blockTimestampToUTC } from '@/utils/thedate';
+import { formatEther } from "@ethersproject/units";
 
-import ArtworkBidHistory from './ArtworkBidHistory';
+// import ArtworkBidHistory from './ArtworkBidHistory';
 import ArtworkModelViewer from './ArtworkModelViewer';
+
+interface BidHistoryItem {
+  tokenId: number;
+  bidder: string;
+  amount: BigNumber;
+  transactionHash: string;
+  blockNumber: number; 
+  timestamp: number;
+}
 
 export default function Auction() {
   const { library, chainId, account, active, error} = useActiveWeb3React();
   const TheDate = useTheDateContract();  
-
-  const { data : blockNumber} = useBlockNumber();
   const [ tokenId, setTokenId ] = useState<number | undefined>(undefined);
-
-  const [ minBidPrice, setMinBidPrice ] = useState<BigNumber | undefined>(ethers.constants.Zero);
+  const [ exists, setExists ] = useState<boolean | undefined>(undefined);
+  const [ minBidPrice, setMinBidPrice ] = useState<BigNumber>(ethers.constants.Zero);
   const [ highestBidder, setHighestBidder] = useState<string | undefined>(undefined);
   const [ highestBid, setHighestBid] = useState<BigNumber | undefined>(undefined);
   const [ reservePrice, setReservePrice] = useState<BigNumber | undefined>(undefined);
   const [ minBidIncrementPermyriad, setMinBidIncrementPermyriad] = useState<BigNumber | undefined>(undefined);
   const [ bidPrice, setBidPrice] = useState<BigNumber | undefined>(undefined);
+  const [ bidHistory, setBidHistory ] = useState<BidHistoryItem[]>([]);
+  const { data: etherPrice } = useEtherPrice();
 
   useAsync(async () => {
-    if (!library || !TheDate || !blockNumber) {
+    if (!library || !TheDate) {
       return;
     }
-    const timestamp_ = (await library.getBlock(blockNumber)).timestamp;
-    const tokenId_ = BigNumber.from(timestamp_).div(SECONDS_IN_A_DAY).toNumber();
-    setTokenId(tokenId_);
-
-    const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId_);
-    const reservePrice_ = await TheDate.getAuctionReservePrice();
-    const minBidIncrementPermyriad_ = await TheDate.getAuctionMinBidIncrementPermyriad();
-    
-    if (!!highestBid_ && highestBid_.eq(ethers.constants.Zero)) {
+    try {
+      const reservePrice_ = await TheDate.getAuctionReservePrice();
+      const minBidIncrementPermyriad_ = await TheDate.getAuctionMinBidIncrementPermyriad();
+      setMinBidIncrementPermyriad(minBidIncrementPermyriad_);
+      setReservePrice(reservePrice_);
       setMinBidPrice(reservePrice_);
-    } else {
-      setMinBidPrice(highestBid_.mul(minBidIncrementPermyriad_.add(10000)).div(10000));
+
+      const blockNumber_ = await library.getBlockNumber();
+      const timestamp_ = (await library.getBlock(blockNumber_)).timestamp;
+      const tokenId_ = BigNumber.from(timestamp_).div(SECONDS_IN_A_DAY).toNumber();
+      
+      const exists_ = await TheDate.exists(tokenId_);
+      setExists(exists_);
+
+      if (!exists_) {
+        return;
+      }
+      setTokenId(tokenId_);
+
+      const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId_);
+      
+      if (!!highestBidder_ && highestBidder_ !== ethers.constants.AddressZero ) {
+        setMinBidPrice(highestBid_.mul(minBidIncrementPermyriad_.add(10000)).div(10000));
+      }
+
+      setHighestBid(highestBid_);
+      setHighestBidder(highestBidder_);
+
+      const filter = TheDate.filters.BidPlaced(tokenId_, null, null);
+      const bidHistory_ = await Promise.all((await TheDate.queryFilter(filter)).map(async (x) => ({
+        tokenId: x.args.tokenId.toNumber(),
+        bidder: x.args.bidder,
+        amount: x.args.amount,
+        transactionHash: x.transactionHash,
+        blockNumber: x.blockNumber,
+        timestamp: (await x.getBlock()).timestamp
+      })));
+      bidHistory_.sort((a, b) => (b.blockNumber - a.blockNumber));
+      setBidHistory(bidHistory_);
+
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-
-    setHighestBid(highestBid_);
-    setHighestBidder(highestBidder_);
-    setMinBidIncrementPermyriad(minBidIncrementPermyriad_);
-    setReservePrice(reservePrice_);
-
-  }, [library, TheDate, blockNumber]);
+  }, [library, TheDate]);
 
   const errorMessageRef = useRef<HTMLDivElement>(null!);
   const bidPriceRef = useRef<HTMLInputElement>(null!);
@@ -62,8 +98,9 @@ export default function Auction() {
     // const bidPrice = bidPriceRef.current ?
     // ethers.utils.parseEther(bidPriceRef.current.conte)
     // const typeInBidPrice = Number.parseFloat(bidPriceRef.current?.textContent);
-    if (!active || !account || !TheDate || !tokenId) 
+    if (!active || !account || !TheDate || !tokenId) {
       return ;
+    }
     TheDate.placeBid(tokenId, {value: minBidPrice }).then(
       (reason) => {
         if (errorMessageRef.current) {
@@ -73,7 +110,10 @@ export default function Auction() {
     ).catch(
       (reason) => {
         if (errorMessageRef.current) {
-          errorMessageRef.current!.innerText = reason.data.message;
+          errorMessageRef.current.innerText = reason.message;
+          window.setTimeout(() => {
+            errorMessageRef.current.innerText = ""
+          }, 2000);
         }
       }
     )
@@ -92,24 +132,27 @@ export default function Auction() {
     event.preventDefault();
   }
 
-  return (
-    <>
+  return (tokenId == undefined || tokenId == 0
+    ? <div className="hero">Loading...</div> 
+    : (<>
       <div className="hero">
         <div className="flex items-center max-h-80 h-80 md:h-120 md:max-h-120 xl:h-150 xl:max-h-150 w-screen -mt-10 ">
-          { tokenId ? <ArtworkModelViewer tokenId={tokenId} noteString="(to be engraved by the note owner)" fov={30}  /> : "Loading..." }
+          <ArtworkModelViewer tokenId={tokenId} noteString="(to be engraved by the note owner)" fov={30} />
         </div>
       </div>
       <div className="hero">
-        <div className="flex px-8 items-left py-16 leading-10 max-w-prose text-left flex-col flex">
-          <p className="">
-            One and only one <Link href="/about"><a className="hover:link"><b>The Date</b></a></Link> artwork of today &quot;{ tokenIdToDateString(tokenId) }&quot; is 
-            available to mint into Ethernum network immutably in {" "}
+        <div className="flex px-5 md:px-0 items-left py-20 leading-10 max-w-prose text-left flex-col flex">
+          <div className="">
+            One and only one {" "}
+            <Link href="/about"><a className="hover:link"><b>The Date</b></a></Link> {" "}
+            artwork of today &quot;{ tokenIdToDateString(tokenId) }&quot; is 
+            available to be auctioned and minted into Ethernum network immutably in remaining {" "}
             <Countdown intervalDelay={1000} 
               date={new Date((tokenId + 1) * SECONDS_IN_A_DAY * 1000)}
               renderer={ ({ formatted, completed }) => {
                 if (completed) {
                   // Render a completed state
-                  return <span>Auction ended!</span>;
+                  return <span>00:00:00</span>;
                 } else {
                   // Render a countdown
                   return <span>{formatted.hours}:{formatted.minutes}:{formatted.seconds}</span>;
@@ -117,47 +160,82 @@ export default function Auction() {
               }} 
             />
             .
-          </p>
-            
-          {/* <p>Why?  <Link href="/about"><a className="link">About The Date art project</a></Link></p> */}
-          <br></br>
-
-          {!account ?
-            <p>
-              Connect your Wallet below to enable bidding. 
-            </p>
-          : 
-              <form onSubmit={handleSubmit}>
-                <p>
-                Auction to own the date. Place your bid with 
-                Ξ<input type="text" 
-                  ref={ bidPriceRef }
-                  className="bg-transparent hover:border focus:border  border-none border-black w-20 " 
-                  pattern="^[0-9]\d*\.?\d*$"
-                  value={parseBalance(minBidPrice)}
-                  onChange= { e => bidPriceOnChange(e.target.value) } 
-                  placeholder={parseBalance(minBidPrice)} />
-                <br/>
-                <a onClick={clickToAuction} className="hover:link" > Bid! </a>
-                </p>
-              </form>
-          }
-
-          <div className="text-xs" ref={errorMessageRef}></div>
-          
+          </div>
         </div>
       </div>
       <div className="hero">
-          <div className="flex items-center flex-col">
-            <ArtworkBidHistory tokenId={tokenId}/>
-            <p className="text-xs mt-10">
-            { reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. </> } <br></br>
-            { minBidIncrementPermyriad && <>Current highest bid is Ξ{parseBalance(highestBid)}. <br></br>
-              Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>}
-          </p>
+        <div className="flex items-start flex-col px-5 py-16 md:px-0  max-w-prose w-full">
+          <div className="mb-5 ">Auction for Today &quot;{ tokenIdToDateString(tokenId) }&quot;:</div>
+          { bidHistory.length == 0 ? 
+            <div className="text-xs text-left">No bid is placed yet. </div>
+              : (
+                <table className="text-xs text-left">
+                  <thead>
+                    {bidHistory.length > 0 &&
+                      <tr>
+                        <th className="w-52 text-left">Time</th>
+                        <th className="w-40 text-left">From</th>
+                        <th className="w-44 text-left">Price</th>        
+                      </tr>
+                    }
+                  </thead>
+                  <tbody>
+                      {bidHistory.map((x, i) => (
+                        <tr key={i} className={ i > 0 ? "line-through text-gray-400" : ""}>
+                          <td>
+                            <a className="hover:link" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
+                              { blockTimestampToUTC(x.timestamp) }
+                            </a>
+                          </td>
+                          <td>
+                            <Link href={`/gallery/${x.bidder}`}>
+                              <a className="hover:link">
+                              { shortenHex(x.bidder) } { account === x.bidder && <> (you)</>}
+                            </a>
+                            </Link>
+                          </td>
+                          <td>
+                            Ξ{ parseBalance(x.amount) } { 
+                              etherPrice !== undefined ? `(\$${toPriceFormat(Number(formatEther(x.amount)) * etherPrice)})` : "" }
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              )
+            }
+            <div className="text-xs mt-5 text-left">
+              { !!reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. <br/></> } 
+              { !!highestBid  && <>Current highest bid is Ξ{parseBalance(highestBid)}. <br/> </>}
+              { !!minBidIncrementPermyriad && <>Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>} 
+            </div>
+        </div>
+      </div>
+      <div className="hero">
+        <div className="flex self-start items-start flex-col px-5 py-16 md:px-0 max-w-prose w-full">
+          <div className="flex-none text-left ">
+          {!account ?
+              <p>
+                Connect your Wallet below to join the auction.
+              </p>
+            : 
+                <form onSubmit={handleSubmit}>
+                  <p>
+                  <a onClick={clickToAuction} className="link" >Place your bid</a> with 
+                  Ξ<input type="text" 
+                    ref={ bidPriceRef }
+                    className="bg-transparent hover:border focus:border border-none border-black w-20 " 
+                    pattern="^[0-9]\d*\.?\d*$"
+                    value={parseBalance(minBidPrice)}
+                    onChange= { e => bidPriceOnChange(e.target.value) } 
+                    placeholder={parseBalance(minBidPrice)} /> {" "} <br/>
+                  </p>
+                </form>
+            }
+            <div className="text-xs mt-2 text-gray-400" ref={errorMessageRef}></div>
           </div>
         </div>
-    </>
-  );
+      </div>
+    </>));
 }
 

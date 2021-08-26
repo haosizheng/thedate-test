@@ -133,7 +133,7 @@ export default function ArtworkModelViewer({ tokenId, noteString = "", autoRotat
 
       <directionalLight position={[-1, 10, -2]} intensity={0.1} />
 
-      <Suspense fallback={<Html className="hero text-xs text-gray-500">Loading..</Html>}>
+      <Suspense fallback={<Html className="hero text-xs">Loading..</Html>}>
         <Environment />
         <Artwork dateString={tokenIdToDateString(tokenId)} 
           noteString={noteString ? noteString : ""} />

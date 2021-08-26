@@ -23,6 +23,13 @@ export default function useTheDateArtwork(tokenId: number) {
       return;
     }
     try { 
+      const exists_ = await TheDate.exists(tokenId);
+      setExists(exists_);
+
+      if (!exists_) {
+        return;
+      }
+
       const owner_ = await TheDate.ownerOf(tokenId);
       setOwner(owner_);
 

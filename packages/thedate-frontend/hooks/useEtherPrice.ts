@@ -12,7 +12,7 @@ export default function useEtherPrice() {
     async () => {
       return etherscanProvider.getEtherPrice()
     }, {
-      refreshInterval: 10 * 1000,
+      refreshInterval: 100 * 1000,
     }
   );
 

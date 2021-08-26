@@ -6,11 +6,18 @@ import useInactiveListener from '@/hooks/useInactiveListener';
 import { NetworkContextName } from '@/utils/connectors'
 
 export default function Web3ReactManager({ children }: { children: JSX.Element }) {
-  const { active } = useWeb3React()
-  const { active: networkActive, error: networkError, activate: activateNetwork } = useWeb3React(NetworkContextName)
+  const { active } = useWeb3React();
+  const { active: networkActive, error: networkError, activate: activateNetwork } = useWeb3React(NetworkContextName);
 
   // try to eagerly connect to an injected provider, if it exists and has granted access already
   const triedEager = useEagerConnect()
+
+  // always activated network connector
+  useEffect(() => {
+    if (!networkActive && !networkError) {
+      activateNetwork(network)
+    }
+  }, [networkActive, networkError, activateNetwork]);
 
   // after eagerly trying injected, if the network connect ever isn't active or in an error state, activate itd
   useEffect(() => {

@@ -3,7 +3,7 @@ import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { NetworkConnector } from '@web3-react/network-connector';
 import { SupportedChainId, INFURA_PREFIXES} from './chains'
 
-const INFURA_KEY = process.env.INFURA_KEY || "";
+const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
 const WALLETCONNECT_BRIDGE_URL = process.env.WALLETCONNECT_BRIDGE_URL || "https://bridge.walletconnect.org";
 const NETWORK_CHAIN_ID = process.env.NETWORK_CHAIN_ID ? 
   Number.parseInt(process.env.NETWORK_CHAIN_ID) : SupportedChainId.MAINNET;
@@ -15,9 +15,9 @@ const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.HARDHAT,
 ]
 const NETWORK_URLS: {[chainId: number]: string} = {
-  [SupportedChainId.MAINNET]: `https://${INFURA_PREFIXES[SupportedChainId.MAINNET]}infura.io/v3/${INFURA_KEY}`,
-  [SupportedChainId.RINKEBY]: `https://${INFURA_PREFIXES[SupportedChainId.RINKEBY]}infura.io/v3/${INFURA_KEY}`,
-  [SupportedChainId.ROPSTEN]: `https://${INFURA_PREFIXES[SupportedChainId.ROPSTEN]}infura.io/v3/${INFURA_KEY}`,
+  [SupportedChainId.MAINNET]: `https://${INFURA_PREFIXES[SupportedChainId.MAINNET]}infura.io/v3/${INFURA_API_KEY}`,
+  [SupportedChainId.RINKEBY]: `https://${INFURA_PREFIXES[SupportedChainId.RINKEBY]}infura.io/v3/${INFURA_API_KEY}`,
+  [SupportedChainId.ROPSTEN]: `https://${INFURA_PREFIXES[SupportedChainId.ROPSTEN]}infura.io/v3/${INFURA_API_KEY}`,
   [SupportedChainId.HARDHAT]: `http://127.0.0.1:8545`,
 }
 

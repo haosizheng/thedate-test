@@ -74,6 +74,22 @@ context("TheDate contract", () => {
   });
 
   describe("Artwork", async () => {
+    it("Existence", async () => {
+      expect(await mainContract.connect(user1).exists(1)).to.eq(false);
+
+      const tokenId = BigNumber.from(
+        (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
+      ).div(SECONDS_IN_A_DAY);
+
+      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("1.0") }))
+        .emit(mainContract, "ArtworkMinted")
+        .withArgs(tokenId)
+        .emit(mainContract, "BidPlaced")
+        .withArgs(tokenId, user1.address, ethers.utils.parseEther("1.0"));
+
+      expect(await mainContract.connect(user1).exists(tokenId)).to.eq(true);
+    });
+
     it("Set Token URL", async () => {
       const tokenId = BigNumber.from(
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,

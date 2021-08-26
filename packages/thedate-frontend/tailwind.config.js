@@ -38,14 +38,14 @@ module.exports = {
     themes: [
       {
         'mytheme': {                          /* your theme name */
-          "primary": "#ff7598",
-          "primary-focus": "#ff5784",
+          "primary": "#000000",
+          "primary-focus": "#000000",
           "primary-content": "#000000",
-          "secondary": "#75d1f0",
-          "secondary-focus": "#5abfdd",
+          "secondary": "#000000",
+          "secondary-focus": "#000000",
           "secondary-content": "#000000",
-          "accent": "#c07eec",
-          "accent-focus": "#af59e8",
+          "accent": "#454545",
+          "accent-focus": "#454545",
           "accent-content": "#ffffff",
           "neutral": "#E5E5E5",
           "neutral-focus": "#090901",
