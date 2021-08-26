@@ -55,14 +55,13 @@ export default function Auction() {
       const blockNumber_ = await library.getBlockNumber();
       const timestamp_ = (await library.getBlock(blockNumber_)).timestamp;
       const tokenId_ = BigNumber.from(timestamp_).div(SECONDS_IN_A_DAY).toNumber();
-      
+      setTokenId(tokenId_);
+
       const exists_ = await TheDate.exists(tokenId_);
       setExists(exists_);
-
       if (!exists_) {
         return;
       }
-      setTokenId(tokenId_);
 
       const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId_);
       
@@ -105,6 +104,9 @@ export default function Auction() {
       (reason) => {
         if (errorMessageRef.current) {
           errorMessageRef.current!.innerText = "Success!";
+          window.setTimeout(() => {
+            errorMessageRef.current.innerText = ""
+          }, 5000);
         }
       }
     ).catch(
@@ -113,7 +115,7 @@ export default function Auction() {
           errorMessageRef.current.innerText = reason.message;
           window.setTimeout(() => {
             errorMessageRef.current.innerText = ""
-          }, 2000);
+          }, 5000);
         }
       }
     )
@@ -166,9 +168,7 @@ export default function Auction() {
       <div className="hero">
         <div className="flex items-start flex-col px-5 py-16 md:px-0  max-w-prose w-full">
           <div className="mb-5 ">Auction for Today &quot;{ tokenIdToDateString(tokenId) }&quot;:</div>
-          { bidHistory.length == 0 ? 
-            <div className="text-xs text-left">No bid is placed yet. </div>
-              : (
+          { bidHistory.length > 0 && (
                 <table className="text-xs text-left">
                   <thead>
                     {bidHistory.length > 0 &&
@@ -205,6 +205,7 @@ export default function Auction() {
               )
             }
             <div className="text-xs mt-5 text-left">
+              { bidHistory.length == 0 && <> No bid is placed yet. <br/></> }
               { !!reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. <br/></> } 
               { !!highestBid  && <>Current highest bid is Ξ{parseBalance(highestBid)}. <br/> </>}
               { !!minBidIncrementPermyriad && <>Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>} 

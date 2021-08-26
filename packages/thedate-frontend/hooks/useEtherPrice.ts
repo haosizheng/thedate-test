@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { useMemo } from "react";
 
 export default function useEtherPrice() {
-  const etherscanProvider = useMemo(() => new EtherscanProvider("homestead"), []);
+  const etherscanProvider = useMemo(() => new EtherscanProvider("homestead", process.env.ETHERSCAN_API_KEY), []);
   const shouldFetch = !!etherscanProvider;
 
   const result = useSWR(

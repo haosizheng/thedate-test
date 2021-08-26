@@ -43,7 +43,7 @@ const TEST_ACCOUNTS = {
 }
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
-  const url = `https://${network}.infura.io/v3${INFURA_API_KEY}`;
+  const url = `https://${network}.infura.io/v3/${INFURA_API_KEY}`;
   return {
     accounts: [DEPLOYER_PRIVATE_KEY],
     chainId: chainIds[network],

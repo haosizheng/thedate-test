@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatEtherscanLink } from "@/utils/ethers";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
+import { NETWORK_CHAIN_ID } from "@/utils/connectors";
 
 export default function About() {
   const {chainId} = useActiveWeb3React();
@@ -38,7 +39,7 @@ export default function About() {
 
         <p className="mb-8">
           The values of every artworks of <b>The Date</b> would be determined 
-          by <a className="link" href={`http://opensea.io/assets/${TheDate?.address}`}>free markets</a>, unfolding over time. <br/>
+          by <a className="link" href={`http://${NETWORK_CHAIN_ID == 4 ? "testnets." : "" }opensea.io/assets/${TheDate?.address}`}>free markets</a>, unfolding over time. <br/>
         </p>
 
         <p className="mb-8 text-right"> 

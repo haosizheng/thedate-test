@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { useWeb3React } from '@web3-react/core'
-import { injected, walletconnect } from "@/utils/connectors";
+import { injected, walletconnect, NETWORK_CHAIN_ID } from "@/utils/connectors";
 import { shortenHex } from "@/utils/ethers";
 import useENSName from "@/hooks/useENSName";
 import { NETWORK_NAMES } from "@/utils/chains";
-
 import PendingReturns from "./PendingReturns";
 
 export default function Wallet() {
@@ -18,7 +17,7 @@ export default function Wallet() {
   return (
       <div id="#wallet">
         {active ? (
-          !!chainId && chainId == Number(process.env.NETWORK_CHAIN_ID || "1") ? 
+          !!chainId && chainId == NETWORK_CHAIN_ID ? 
             <div>
               Connected as {" "}
               <Link href={`/gallery/${account}`}>
