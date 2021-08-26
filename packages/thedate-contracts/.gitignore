@@ -1,16 +1,16 @@
 #Hardhat files
-abis
-cache
-artifacts
-factories
-coverage
-coverage.json
-bin
-generated
-deployments/hardhat
-deployments/localhost
-data
-build
+/abis
+/cache
+/artifacts
+/coverage
+/coverage.json
+/bin
+/generated
+/deployments/hardhat
+/deployments/localhost
+/data
+/build
+/factories
 
 # Logs
 logs

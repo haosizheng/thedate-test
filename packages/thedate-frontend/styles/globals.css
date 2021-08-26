@@ -7,9 +7,6 @@ body {
   @apply font-mono text-sm;
 }
 
-.artwork-on-auction {
-  @apply md:max-w-full w-full;
-   height: 30rem;
-  /*width: 100vw;
-  max-width: 100%; */
-} 
+.input-box {
+  border: 1px solid var(--themed-border,var(--accents-2));
+}
