@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Wallet from './Wallet';
+import Wallet from "@/components/Wallet";
 export default function Footer() {
   return (
     <footer className="hero py-20">
