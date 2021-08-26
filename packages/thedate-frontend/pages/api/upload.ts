@@ -60,7 +60,6 @@ export default async function upload(req: NextApiRequest, res: NextApiResponse) 
   await node.files.cp(`/ipfs/${imgResult.path}`, `/thedate/${tokenId}.png`);
   const foloderResult = await node.files.stat("/thedate/");
   node.name.publish(foloderResult.cid)
-  node.name.list()
 
   // const imgUrl = `https://ipfs.io/ipfs/${imgResult.path}`;
   // console.log(`imageUrl: ${imgUrl}`);
@@ -81,5 +80,4 @@ export default async function upload(req: NextApiRequest, res: NextApiResponse) 
   res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate')
   res.setHeader('Content-Type', 'image/png')
   // Write the image to the response with the specified Content-Type
-  res.end(data)
 }
