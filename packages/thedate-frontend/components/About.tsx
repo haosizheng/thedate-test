@@ -43,7 +43,7 @@ export default function About() {
         </p>
 
         <p className="mb-8 text-right"> 
-          --- created by @abr and @sai
+          --- created by @a and @s
         </p>
       </article>
     </div>

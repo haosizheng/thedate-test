@@ -146,7 +146,7 @@ export default function Auction() {
         <div className="flex px-5 md:px-0 items-left py-20 leading-10 max-w-prose text-left flex-col flex">
           <div className="">
             One and only one {" "}
-            <Link href="/about"><a className="hover:link"><b>The Date</b></a></Link> {" "}
+            <Link href="/about"><a className="link"><b>The Date</b></a></Link> {" "}
             artwork of today &quot;{ tokenIdToDateString(tokenId) }&quot; is 
             available to be auctioned and minted into Ethernum network immutably in remaining {" "}
             <Countdown intervalDelay={1000} 
@@ -217,7 +217,7 @@ export default function Auction() {
           <div className="flex-none text-left ">
           {!account ?
               <p>
-                Connect your Wallet below to join the auction.
+                Connect your wallet below to join the auction.
               </p>
             : 
                 <form onSubmit={handleSubmit}>

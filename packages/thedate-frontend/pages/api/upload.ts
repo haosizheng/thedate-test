@@ -4,7 +4,7 @@ import puppeteer from "puppeteer";
 import {create, urlSource } from "ipfs-http-client";
 import { constants } from 'buffer';
 
-export default async function render(req: NextApiRequest, res: NextApiResponse) {
+export default async function upload(req: NextApiRequest, res: NextApiResponse) {
   const { query: { tokenId } } = req
 
   if (!tokenId) {
@@ -27,25 +27,25 @@ export default async function render(req: NextApiRequest, res: NextApiResponse) 
   //   })
   // }
 
-  browser = await puppeteer.launch({
-    args: chrome.args,
-    defaultViewport: chrome.defaultViewport,
-    executablePath: await chrome.executablePath,
-    headless: true,
-    ignoreHTTPSErrors: true
-  })
+  // browser = await puppeteer.launch({
+  //   args: chrome.args,
+  //   defaultViewport: chrome.defaultViewport,
+  //   executablePath: await chrome.executablePath,
+  //   headless: true,
+  //   ignoreHTTPSErrors: true
+  // })
   
   browser = await puppeteer.launch({
-        headless: true
+      headless: false
   })
 
   const page = await browser.newPage()
   await page.setViewport({ width: 1024, height: 1024, deviceScaleFactor: 2 })
-  await page.goto(`${process.env.NEXT_PUBLIC_BASE_URL}/render/${tokenId}`)
+  await page.goto(`${process.env.NEXT_PUBLIC_BASE_URL}/model/${tokenId}`)
 //  await page.waitForFunction('window.status === "ready"')
   await page.waitFor(5000);
 
-  const data = await page.screenshot({
+  const imgData = await page.screenshot({
     quality: 100,
     type: 'jpeg'
   })
@@ -53,10 +53,14 @@ export default async function render(req: NextApiRequest, res: NextApiResponse) 
   await browser.close()
 
   const node = create({url: "https://ipfs.infura.io:5001"});
-  const imgResult = await node.add(data as Buffer);
+
+  const imgResult = await node.add(imgData as Buffer);
   await node.pin.add(imgResult.path);
 
-  node.files.mkdir
+  await node.files.cp(`/ipfs/${imgResult.path}`, `/thedate/${tokenId}.png`);
+  const foloderResult = await node.files.stat("/thedate/");
+  node.name.publish(foloderResult.cid)
+  node.name.list()
 
   // const imgUrl = `https://ipfs.io/ipfs/${imgResult.path}`;
   // console.log(`imageUrl: ${imgUrl}`);

@@ -18,7 +18,7 @@ export default function ArtworkRenderingPage() {
   return (
     <>
       <div className="static absolute inset-0 bg-neutral">
-        <ArtworkModelViewer tokenId={ tokenId } autoRotate={ false } fov={ 45 } />
+        <ArtworkModelViewer tokenId={ tokenId } autoRotate={ false } fov={ 35 } />
       </div>
     </>
   );

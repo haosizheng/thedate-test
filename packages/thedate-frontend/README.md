@@ -63,5 +63,53 @@ Netify / Vercel
   1.2 ArtworkCatague(tokenId)
 
 
-TODO:
-1. thedate-contracts only not thefoundation. 
+# TODO:
+
+# Contract 
+- [x] Learn Solidity (5h)
+- [x] Learn Hardhat (1h)
+- [x] Contract Writing (5h)
+- [x] Contract Testing (5h)
+- [x] Typechain (1h)
+- [x] Hardhat test and deploy to Rinkeby . (2h)
+- [x] Hardhat test on localhost  (1h)
+- [x] Hardhat deployment json (Read from thedate-frontend) (4h)
+- [x] Hardhat-deploy usage. (4h)
+- [x] env file setup (1h)
+- [x] env gitignore setup. (0.5h)
+- [x] Hardhat testnet config (0.5h)
+- [x] hardhat forking mainnet test. (0.5h)
+- [x] hardhat customized deploy command line. (1h)
+- [x] Etherscan verify Rinkeby (0.1h)
+- [ ] Organize env file. 
+
+# Frontend 
+- [ ] Learn Next.js (5h)
+- [ ] Learn tailwind.css (3h)
+- [ ] Learn Vercel (2h)
+- [ ] Learn Netlify (2h)
+- [ ] Learn Typescript (2h)
+- [ ] Learn some edge case (2h)
+- [ ] Learn IPFS Upload and Organize (2h)
+- [ ] Learn Serverless Rendering (2h)
+- [ ] Learn Three React (2h)
+- [ ] 
+
+# Programming 
+- [x] IFPS 
+- [x] 
+- [] Auction Test. 
+- [] Engraving module. 
+- [] Rendeing & Metadata on opensea. 
+- [] ipns
+- [] Serverless Rendering
+- [] Input Text Message Check.
+
+# Account 
+- [x] Vercel account
+- [x] Netlify account
+- [x] Twitter account
+- [x] Discord account
+- [x] Infura API.
+- [x] Etherscan API.
+- [x] Pinata.cloud API

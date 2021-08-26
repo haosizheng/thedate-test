@@ -17,8 +17,8 @@ export default function handler(
   res.status(200).json({ 
     name: `${tokenId}`,
     description: 'The date is the cool project', 
-    image: 'ipfs://QmTy8w65yBXgyfG2ZBg5TrfB2hPjrDQH3RCQFJGkARStJb',
-    animation_url: `https://thedate.art/render/${tokenId}`,
-    external_url: 'http://'
+    image: 'ipns://metadata.thedate.art/${tokenId}.png',
+    animation_url: `https://thedate.art/model/${tokenId}`,
+    external_url: `http://thedate.art/artwork/${tokenId}`
   })
 }
