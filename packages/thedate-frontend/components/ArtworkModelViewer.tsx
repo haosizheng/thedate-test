@@ -1,10 +1,10 @@
-import React, { useEffect, useState, Suspense } from 'react'
+import { tokenIdToDateString } from "@/utils/thedate"
+import { Html, OrbitControls, useGLTF } from '@react-three/drei'
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
-import { OrbitControls, Html, useGLTF } from '@react-three/drei'
+import React, { Suspense, useEffect, useState } from 'react'
 import * as THREE from "three"
-import { ImageLoader, Vector2, CubeTexture } from "three"
+import { ImageLoader, Vector2 } from "three"
 import { HDRCubeTextureLoader } from "three/examples/jsm/loaders/HDRCubeTextureLoader"
-import { tokenIdToDateString } from "@/utils/thedate";
 
 // const loadFont = require("load-bmfont");
 // const createTextGeometry = require("three-bmfont-text");

@@ -1,7 +1,6 @@
-import { useRouter } from 'next/router'
 import ArtworkProfile from "@/components/ArtworkProfile";
 import Layout from "@/components/Layout";
-import ErrorPage from 'next/error'
+import { useRouter } from 'next/router';
 
 export default function ArtworkPage() {
   const router = useRouter()

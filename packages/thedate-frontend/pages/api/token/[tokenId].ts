@@ -1,5 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 type Data = {
   name: string,
@@ -19,6 +19,6 @@ export default function handler(
     description: 'The date is the cool project', 
     image: 'ipns://metadata.thedate.art/${tokenId}.png',
     animation_url: `https://thedate.art/model/${tokenId}`,
-    external_url: `http://thedate.art/artwork/${tokenId}`
+    external_url: `https://thedate.art/artwork/${tokenId}`
   })
 }

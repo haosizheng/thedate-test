@@ -1,9 +1,9 @@
 
-import { useMemo } from "react";
-import { TheDate__factory, TheDate } from '@thefoundation/thedate-contracts/typechain';
-import deployments from '@thefoundation/thedate-contracts/exports/deployments.json';
-import useActiveWeb3React from "./useActiveWeb3React";
+import deployments from "@/../thedate-contracts/exports/deployments.json";
+import { TheDate__factory } from "@/../thedate-contracts/typechain";
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import { NETWORK_NAMES } from "@/utils/chains";
+import { useMemo } from "react";
 
 export default function useTheDateContract() {
   const { library, account, chainId } = useActiveWeb3React();

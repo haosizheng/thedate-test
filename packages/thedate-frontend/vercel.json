@@ -1,6 +1,6 @@
 {
   "functions": {
-    "pages/api/render.ts": {
+    "api/upload.ts": {
       "maxDuration": 30,
       "memory": 3008
     }

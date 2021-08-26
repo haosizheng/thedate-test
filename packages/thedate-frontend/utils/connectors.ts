@@ -1,7 +1,7 @@
+import { INFURA_PREFIXES, SupportedChainId } from '@/utils/chains';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { NetworkConnector } from '@web3-react/network-connector';
-import { SupportedChainId, INFURA_PREFIXES} from './chains'
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 
 export const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
 export const WALLETCONNECT_BRIDGE_URL = process.env.WALLETCONNECT_BRIDGE_URL || "https://bridge.walletconnect.org";

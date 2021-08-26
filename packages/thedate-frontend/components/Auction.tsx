@@ -1,22 +1,16 @@
-import Link from "next/link";
-import { useAsync } from "react-use";
-import { ethers } from "ethers";
-import { BigNumber } from "@ethersproject/bignumber";
-import { useState, useRef } from 'react';
-
-import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
-
+import ArtworkModelViewer from '@/components/ArtworkModelViewer';
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useEtherPrice from '@/hooks/useEtherPrice';
-import useBlockNumber from '@/hooks/useBlockNumber';
 import useTheDateContract from '@/hooks/useTheDateContract';
-import Countdown from "react-countdown";
-import { SECONDS_IN_A_DAY, tokenIdToDateString } from "@/utils/thedate"
-import { parseBalance, shortenHex, formatEtherscanLink, toPriceFormat } from '@/utils/ethers';
-import { blockTimestampToUTC } from '@/utils/thedate';
+import { formatEtherscanLink, parseBalance, shortenHex, toPriceFormat } from '@/utils/ethers';
+import { blockTimestampToUTC, SECONDS_IN_A_DAY, tokenIdToDateString } from "@/utils/thedate";
+import { BigNumber } from "@ethersproject/bignumber";
 import { formatEther } from "@ethersproject/units";
-
-// import ArtworkBidHistory from './ArtworkBidHistory';
-import ArtworkModelViewer from './ArtworkModelViewer';
+import { ethers } from "ethers";
+import Link from "next/link";
+import { useRef, useState } from 'react';
+import Countdown from "react-countdown";
+import { useAsync } from "react-use";
 
 interface BidHistoryItem {
   tokenId: number;

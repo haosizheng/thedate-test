@@ -1,15 +1,12 @@
 
-import { useState } from "react";
-import { useAsync } from "react-use";
-import { ethers } from "ethers";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import { shortenHex } from "@/utils/ethers";
-import ArtworkImageViewer from "./ArtworkImageViewer";
-import ArtworkCatalogue from "./ArtworkCatalogue";
-import ArtworkModelViewer from "./ArtworkModelViewer";
-import Link from "next/link";
 import { tokenIdToDateString } from "@/utils/thedate";
+import { ethers } from "ethers";
+import Link from "next/link";
+import { useState } from "react";
+import { useAsync } from "react-use";
 
 export default function Gallery({ owner }: { owner?: string }) {
   const { library, chainId, account, active } = useActiveWeb3React();

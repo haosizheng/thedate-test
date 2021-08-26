@@ -1,8 +1,7 @@
-import ArtworkImageViewer from "./ArtworkImageViewer";
-import ArtworkCatalogue from "./ArtworkCatalogue";
-import ArtworkModelViewer from "./ArtworkModelViewer";
+import ArtworkCatalogue from "@/components/ArtworkCatalogue";
+import ArtworkHistory from "@/components/ArtworkHistory";
+import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
-import ArtworkHistory from "./ArtworkHistory";
 
 export default function ArtworkProfile({tokenId}: {tokenId: number}) {
   const {exists, noteString} = useTheDateArtwork(tokenId);

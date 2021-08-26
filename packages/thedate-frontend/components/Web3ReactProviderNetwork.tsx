@@ -1,5 +1,5 @@
-import { createWeb3ReactRoot } from '@web3-react/core'
 import { NetworkContextName } from '@/utils/connectors';
+import { createWeb3ReactRoot } from '@web3-react/core';
 
 const Web3ReactProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 

@@ -1,15 +1,13 @@
-import { BigNumber, ethers, EventFilter } from "ethers";
-import useTheDateContract from "@/hooks/useTheDateContract"; 
-import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
-import useEtherPrice from "@/hooks/useEtherPrice"; 
-import { useState } from "react";
-import { parseBalance, shortenHex, formatEtherscanLink, toPriceFormat } from '@/utils/ethers';
-import { blockTimestampToUTC } from '@/utils/thedate';
-import { useAsync } from "react-use";  
-import { formatEther } from "@ethersproject/units";
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
+import useEtherPrice from "@/hooks/useEtherPrice";
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
+import useTheDateContract from "@/hooks/useTheDateContract";
+import { formatEtherscanLink, parseBalance, shortenHex } from '@/utils/ethers';
+import { blockTimestampToUTC } from '@/utils/thedate';
+import { ethers } from "ethers";
 import Link from "next/link";
-import { Event } from "ethers";
+import { useState } from "react";
+import { useAsync } from "react-use";
 
 interface ArtworkHistoryItem {
   tokenId: number;

@@ -2,7 +2,7 @@ const ipfs = require("ipfs-http-client");
 const chrome = require("chrome-aws-lambda");
 const puppeteer = require("puppeteer");
 
-//import {create, urlSource } from "ipfs-http-client";
+import {create, urlSource } from "ipfs-http-client";
 
 const projectId = '1xFkx06kx4VbDal79dGArNXkZbB';
 const projectSecret = '180a32d324578fba1a08312b10e05483';
@@ -60,7 +60,6 @@ const script = async () => {
   const folderResult = await node.files.stat("/thedate/");
   const nameResult = await node.name.publish(folderResult.cid);
   console.log(nameResult.name);
-
 }
 
 script().then();

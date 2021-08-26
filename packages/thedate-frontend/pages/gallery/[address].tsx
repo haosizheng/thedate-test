@@ -1,7 +1,7 @@
 import Gallery from "@/components/Gallery";
-import { useRouter } from 'next/router'
 import Layout from "@/components/Layout";
 import { ethers } from "ethers";
+import { useRouter } from 'next/router';
 
 export default function GalleryPage() {
   const router = useRouter()

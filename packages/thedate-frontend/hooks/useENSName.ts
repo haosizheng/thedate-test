@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
-import useActiveWeb3React from "./useActiveWeb3React";
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
+import { useEffect, useState } from "react";
 
 export default function useENSName(address?: string | null) {
   const { library } = useActiveWeb3React();

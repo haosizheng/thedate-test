@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { useWeb3React } from '@web3-react/core'
-import { network } from '@/utils/connectors'
 import useEagerConnect from '@/hooks/useEagerConnect';
 import useInactiveListener from '@/hooks/useInactiveListener';
-import { NetworkContextName } from '@/utils/connectors'
+import { network, NetworkContextName } from '@/utils/connectors';
+import { useWeb3React } from '@web3-react/core';
+import React, { useEffect, useState } from 'react';
 
 export default function Web3ReactManager({ children }: { children: JSX.Element }) {
   const { active } = useWeb3React();

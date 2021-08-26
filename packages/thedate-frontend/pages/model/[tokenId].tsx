@@ -1,6 +1,6 @@
 import ArtworkModelViewer from "@/components/ArtworkModelViewer";
-import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
+import { useRouter } from "next/router";
 
 export default function ArtworkRenderingPage() {
   const router = useRouter()

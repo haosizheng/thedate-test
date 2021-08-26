@@ -1,7 +1,7 @@
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
+import useBlockNumber from "@/hooks/useBlockNumber";
+import useKeepSWRDataLiveAsBlocksArrive from "@/hooks/useKeepSWRDataLiveAsBlocksArrive";
 import useSWR from "swr";
-import useBlockNumber from "./useBlockNumber";
-import useKeepSWRDataLiveAsBlocksArrive from "./useKeepSWRDataLiveAsBlocksArrive";
-import useActiveWeb3React from "./useActiveWeb3React";
 
 export default function useCurrentBlock() {
   const { library } = useActiveWeb3React();

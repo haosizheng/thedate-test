@@ -1,6 +1,6 @@
-import useSWR from "swr";
-import useKeepSWRDataLiveAsBlocksArrive from "./useKeepSWRDataLiveAsBlocksArrive";
+import useKeepSWRDataLiveAsBlocksArrive from "@/hooks/useKeepSWRDataLiveAsBlocksArrive";
 import { useWeb3React } from "@web3-react/core";
+import useSWR from "swr";
 
 export default function useETHBalance(address?: string | null, suspense = false) {
   const { library, chainId } = useWeb3React();

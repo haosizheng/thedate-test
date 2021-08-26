@@ -1,10 +1,9 @@
-import useActiveWeb3React from "@/hooks/useActiveWeb3React"; 
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
-import { useState, useRef } from "react";
+import useTheDateContract from "@/hooks/useTheDateContract";
 import { shortenHex } from "@/utils/ethers";
 import Link from "next/link";
-import useTheDateContract from "@/hooks/useTheDateContract";
-import ArtworkModelViewer from "./ArtworkModelViewer";
+import { useRef } from "react";
 
 export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
   const {library, account} = useActiveWeb3React();

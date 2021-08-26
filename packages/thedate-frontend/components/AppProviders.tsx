@@ -1,8 +1,8 @@
+import Web3ReactManager from "@/components/Web3ReactManager";
+import { Web3Provider } from '@ethersproject/providers';
+import { Web3ReactProvider } from '@web3-react/core';
+import dynamic from 'next/dynamic';
 import React from "react";
-import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
-import { Web3Provider } from '@ethersproject/providers'
-import Web3ReactManager from "./Web3ReactManager";
-import dynamic from 'next/dynamic'
 
 function getLibrary(provider: any) {
   const library = new Web3Provider(provider)

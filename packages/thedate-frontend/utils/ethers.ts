@@ -1,6 +1,6 @@
-import { formatUnits } from "@ethersproject/units";
+import { ETHERSCAN_PREFIXES } from '@/utils/chains';
 import type { BigNumberish } from "@ethersproject/bignumber";
-import { ETHERSCAN_PREFIXES } from './chains'
+import { formatUnits } from "@ethersproject/units";
 
 export function shortenHex(hex?: string | null, length = 4) {
   if (!hex) return "";

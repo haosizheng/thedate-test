@@ -1,5 +1,5 @@
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useSWR from "swr";
-import useActiveWeb3React from "./useActiveWeb3React";
 
 export default function useBlockNumber() {
   const { library } = useActiveWeb3React();

@@ -1,7 +1,7 @@
 import { EtherscanProvider } from "@ethersproject/providers";
-import useKeepSWRDataLiveAsBlocksArrive from "./useKeepSWRDataLiveAsBlocksArrive";
-import useSWR from "swr";
+import useKeepSWRDataLiveAsBlocksArrive from "@/hooks/useKeepSWRDataLiveAsBlocksArrive";
 import { useMemo } from "react";
+import useSWR from "swr";
 
 export default function useEtherPrice() {
   const etherscanProvider = useMemo(() => new EtherscanProvider("homestead", process.env.ETHERSCAN_API_KEY), []);

@@ -1,11 +1,9 @@
-
-import useActiveWeb3React from "./useActiveWeb3React";
-import useTheDateContract from "./useTheDateContract";
-import { useMemo, useState } from "react";
-import { useAsync } from "react-use";  
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
+import useTheDateContract from "@/hooks/useTheDateContract";
 import { SECONDS_IN_A_DAY, tokenIdToDateString } from "@/utils/thedate";
-import { BigNumber, ethers } from "ethers";  
-import useBlockNumber from "./useBlockNumber";
+import { BigNumber, ethers } from "ethers";
+import { useMemo, useState } from "react";
+import { useAsync } from "react-use";
 
 export default function useTheDateArtwork(tokenId: number) {
   const { library, chainId, account } = useActiveWeb3React();

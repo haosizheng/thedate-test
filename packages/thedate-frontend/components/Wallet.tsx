@@ -1,10 +1,10 @@
-import Link from "next/link";
-import { useWeb3React } from '@web3-react/core'
-import { injected, walletconnect, NETWORK_CHAIN_ID } from "@/utils/connectors";
-import { shortenHex } from "@/utils/ethers";
+import PendingReturns from "@/components/PendingReturns";
 import useENSName from "@/hooks/useENSName";
 import { NETWORK_NAMES } from "@/utils/chains";
-import PendingReturns from "./PendingReturns";
+import { injected, NETWORK_CHAIN_ID } from "@/utils/connectors";
+import { shortenHex } from "@/utils/ethers";
+import { useWeb3React } from '@web3-react/core';
+import Link from "next/link";
 
 export default function Wallet() {
   const { error, account, activate, active, chainId } = useWeb3React();
