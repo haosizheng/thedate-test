@@ -22,43 +22,51 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface TheDateInterface extends ethers.utils.Interface {
   functions: {
+    "DAO_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
+    "_settleAuction(uint256)": FunctionFragment;
+    "airdrop(address[],uint256[])": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
-    "artworks(uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "endAuction(uint256)": FunctionFragment;
-    "engraveArtworkNote(uint256,string)": FunctionFragment;
-    "eraseArtworkNote(uint256)": FunctionFragment;
+    "claim(uint256)": FunctionFragment;
+    "claimingPrice()": FunctionFragment;
+    "engraveNote(uint256,string)": FunctionFragment;
+    "engravingPrice()": FunctionFragment;
+    "eraseNote(uint256)": FunctionFragment;
+    "erasingPrice()": FunctionFragment;
     "exists(uint256)": FunctionFragment;
+    "generateMetadata(uint256)": FunctionFragment;
+    "generateSVGImage(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "getAuctionMinBidIncrementPermyriad()": FunctionFragment;
-    "getAuctionReservePrice()": FunctionFragment;
-    "getEngravingPrice()": FunctionFragment;
-    "getErasingPrice()": FunctionFragment;
+    "getDate(uint256)": FunctionFragment;
     "getHighestBid(uint256)": FunctionFragment;
-    "getNoteSizeLimit()": FunctionFragment;
-    "getPendingReturns(address)": FunctionFragment;
+    "getNote(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
-    "getRoyaltyPermyriad()": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "minBidIncrementBps()": FunctionFragment;
     "name()": FunctionFragment;
+    "noteSizeLimit()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "placeBid(uint256)": FunctionFragment;
+    "placeBid()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
+    "reservePrice()": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setAuctionMinBidIncrementPermyriad(uint256)": FunctionFragment;
+    "setAuctionMinBidIncrementBps(uint256)": FunctionFragment;
     "setAuctionReservePrice(uint256)": FunctionFragment;
-    "setBaseURI(string)": FunctionFragment;
+    "setClaimingPrice(uint256)": FunctionFragment;
     "setEngravingPrice(uint256)": FunctionFragment;
     "setErasingPrice(uint256)": FunctionFragment;
     "setNoteSizeLimit(uint256)": FunctionFragment;
-    "setRoyaltyPermyriad(uint256)": FunctionFragment;
+    "setRoyaltyBps(uint256)": FunctionFragment;
+    "setSVGImageTemplate(string[])": FunctionFragment;
+    "setTokenDescription(string)": FunctionFragment;
+    "settleLastAuction()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
@@ -66,36 +74,57 @@ interface TheDateInterface extends ethers.utils.Interface {
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "withdrawFund()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "DAO_ROLE", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "_settleAuction",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "airdrop",
+    values: [string[], BigNumberish[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "artworks",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: "claim", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "endAuction",
-    values: [BigNumberish]
+    functionFragment: "claimingPrice",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "engraveArtworkNote",
+    functionFragment: "engraveNote",
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "eraseArtworkNote",
+    functionFragment: "engravingPrice",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "eraseNote",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "erasingPrice",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "exists",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "generateMetadata",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "generateSVGImage",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -103,40 +132,20 @@ interface TheDateInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getAuctionMinBidIncrementPermyriad",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getAuctionReservePrice",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getEngravingPrice",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getErasingPrice",
-    values?: undefined
+    functionFragment: "getDate",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getHighestBid",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getNoteSizeLimit",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getPendingReturns",
-    values: [string]
+    functionFragment: "getNote",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
     values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRoyaltyPermyriad",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "grantRole",
@@ -150,7 +159,15 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "minBidIncrementBps",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "noteSizeLimit",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "onERC721Received",
     values: [string, string, BigNumberish, BytesLike]
@@ -159,13 +176,14 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "placeBid",
-    values: [BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: "placeBid", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
     values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "reservePrice",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "revokeRole",
@@ -184,14 +202,17 @@ interface TheDateInterface extends ethers.utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "setAuctionMinBidIncrementPermyriad",
+    functionFragment: "setAuctionMinBidIncrementBps",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setAuctionReservePrice",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "setBaseURI", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "setClaimingPrice",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "setEngravingPrice",
     values: [BigNumberish]
@@ -205,8 +226,20 @@ interface TheDateInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setRoyaltyPermyriad",
+    functionFragment: "setRoyaltyBps",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setSVGImageTemplate",
+    values: [string[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setTokenDescription",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "settleLastAuction",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -233,66 +266,58 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "withdrawFund",
-    values?: undefined
-  ): string;
 
+  decodeFunctionResult(functionFragment: "DAO_ROLE", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "artworks", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "endAuction", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "engraveArtworkNote",
+    functionFragment: "_settleAuction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "airdrop", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimingPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "eraseArtworkNote",
+    functionFragment: "engraveNote",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "engravingPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "eraseNote", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "erasingPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "generateMetadata",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "generateSVGImage",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAuctionMinBidIncrementPermyriad",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAuctionReservePrice",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getEngravingPrice",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getErasingPrice",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "getDate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getHighestBid",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getNoteSizeLimit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getPendingReturns",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "getNote", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getRoleAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRoyaltyPermyriad",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
@@ -301,7 +326,15 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "minBidIncrementBps",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "noteSizeLimit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "onERC721Received",
     data: BytesLike
@@ -310,6 +343,10 @@ interface TheDateInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "reservePrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
@@ -326,14 +363,17 @@ interface TheDateInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setAuctionMinBidIncrementPermyriad",
+    functionFragment: "setAuctionMinBidIncrementBps",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "setAuctionReservePrice",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setBaseURI", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setClaimingPrice",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setEngravingPrice",
     data: BytesLike
@@ -347,7 +387,19 @@ interface TheDateInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setRoyaltyPermyriad",
+    functionFragment: "setRoyaltyBps",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setSVGImageTemplate",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setTokenDescription",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "settleLastAuction",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -372,20 +424,22 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawFund",
-    data: BytesLike
-  ): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "ArtworkMinted(uint256)": EventFragment;
-    "ArtworkNoteEngraved(uint256,address,string)": EventFragment;
-    "ArtworkNoteErased(uint256,address)": EventFragment;
-    "AuctionEnded(uint256,address,uint256)": EventFragment;
+    "ArtworkAirdropped(uint256,address)": EventFragment;
+    "ArtworkClaimed(uint256,address)": EventFragment;
+    "AuctionMinBidIncrementBpsChanged(uint256)": EventFragment;
+    "AuctionReservePriceChanged(uint256)": EventFragment;
+    "AuctionSettled(uint256,address,uint256)": EventFragment;
     "BidPlaced(uint256,address,uint256)": EventFragment;
-    "FundWithdrew(address,uint256)": EventFragment;
+    "ClaimingPriceChanged(uint256)": EventFragment;
+    "EngravingPriceChanged(uint256)": EventFragment;
+    "ErasingPriceChanged(uint256)": EventFragment;
+    "NoteEngraved(uint256,address,string)": EventFragment;
+    "NoteErased(uint256,address)": EventFragment;
+    "NoteSizeLimitChanged(uint256)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
@@ -394,12 +448,20 @@ interface TheDateInterface extends ethers.utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ArtworkMinted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ArtworkNoteEngraved"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ArtworkNoteErased"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AuctionEnded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ArtworkAirdropped"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ArtworkClaimed"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "AuctionMinBidIncrementBpsChanged"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "AuctionReservePriceChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "AuctionSettled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BidPlaced"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "FundWithdrew"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ClaimingPriceChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EngravingPriceChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ErasingPriceChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NoteEngraved"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NoteErased"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NoteSizeLimitChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
@@ -450,7 +512,20 @@ export class TheDate extends BaseContract {
   interface: TheDateInterface;
 
   functions: {
+    DAO_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
+    _settleAuction(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    airdrop(
+      addresses: string[],
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     approve(
       to: string,
@@ -458,68 +533,66 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    artworks(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, string] & { date: BigNumber; note: string }>;
-
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    endAuction(
+    claim(
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    engraveArtworkNote(
+    claimingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    engraveNote(
       tokenId: BigNumberish,
       note: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    eraseArtworkNote(
+    engravingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    eraseNote(
       tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    erasingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     exists(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    generateMetadata(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    generateSVGImage(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    getAuctionMinBidIncrementPermyriad(
+    getDate(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { minBidIncrementPermyriad: BigNumber }>;
-
-    getAuctionReservePrice(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { reservePrice: BigNumber }>;
-
-    getEngravingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getErasingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+    ): Promise<[string]>;
 
     getHighestBid(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { bidder: string; amount: BigNumber }>;
 
-    getNoteSizeLimit(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getPendingReturns(
-      bidder: string,
+    getNote(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { amount: BigNumber }>;
+    ): Promise<[string]>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
-
-    getRoyaltyPermyriad(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { royaltyPermyriad: BigNumber }>;
 
     grantRole(
       role: BytesLike,
@@ -539,7 +612,11 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    minBidIncrementBps(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     name(overrides?: CallOverrides): Promise<[string]>;
+
+    noteSizeLimit(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     onERC721Received(
       arg0: string,
@@ -555,7 +632,6 @@ export class TheDate extends BaseContract {
     ): Promise<[string]>;
 
     placeBid(
-      tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -564,6 +640,8 @@ export class TheDate extends BaseContract {
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    reservePrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     revokeRole(
       role: BytesLike,
@@ -600,38 +678,52 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setAuctionMinBidIncrementPermyriad(
-      minBidIncrementPermyriad: BigNumberish,
+    setAuctionMinBidIncrementBps(
+      minBidIncrementBps_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setAuctionReservePrice(
-      reservePrice: BigNumberish,
+      reservePrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setBaseURI(
-      baseTokenURI: string,
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setEngravingPrice(
-      engravingPrice: BigNumberish,
+      engravingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setErasingPrice(
-      erasingPrice: BigNumberish,
+      erasingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setNoteSizeLimit(
-      noteSizeLimit: BigNumberish,
+      noteSizeLimit_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setRoyaltyPermyriad(
-      royaltyPermyriad: BigNumberish,
+    setRoyaltyBps(
+      royaltyBps_: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setSVGImageTemplate(
+      svgImageTemplate_: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setTokenDescription(
+      tokenDescription_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    settleLastAuction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -666,13 +758,22 @@ export class TheDate extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    withdrawFund(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
 
+  DAO_ROLE(overrides?: CallOverrides): Promise<string>;
+
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  _settleAuction(
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  airdrop(
+    addresses: string[],
+    tokenIds: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   approve(
     to: string,
@@ -680,61 +781,57 @@ export class TheDate extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  artworks(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<[BigNumber, string] & { date: BigNumber; note: string }>;
-
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  endAuction(
+  claim(
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  engraveArtworkNote(
+  claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  engraveNote(
     tokenId: BigNumberish,
     note: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  eraseArtworkNote(
+  engravingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  eraseNote(
     tokenId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
   exists(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+
+  generateMetadata(
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  generateSVGImage(
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   getApproved(
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getAuctionMinBidIncrementPermyriad(
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getAuctionReservePrice(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getEngravingPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getErasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+  getDate(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   getHighestBid(
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber] & { bidder: string; amount: BigNumber }>;
 
-  getNoteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getPendingReturns(
-    bidder: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  getNote(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-  getRoyaltyPermyriad(overrides?: CallOverrides): Promise<BigNumber>;
 
   grantRole(
     role: BytesLike,
@@ -754,7 +851,11 @@ export class TheDate extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  minBidIncrementBps(overrides?: CallOverrides): Promise<BigNumber>;
+
   name(overrides?: CallOverrides): Promise<string>;
+
+  noteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
 
   onERC721Received(
     arg0: string,
@@ -767,7 +868,6 @@ export class TheDate extends BaseContract {
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   placeBid(
-    tokenId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -776,6 +876,8 @@ export class TheDate extends BaseContract {
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  reservePrice(overrides?: CallOverrides): Promise<BigNumber>;
 
   revokeRole(
     role: BytesLike,
@@ -812,38 +914,52 @@ export class TheDate extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setAuctionMinBidIncrementPermyriad(
-    minBidIncrementPermyriad: BigNumberish,
+  setAuctionMinBidIncrementBps(
+    minBidIncrementBps_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setAuctionReservePrice(
-    reservePrice: BigNumberish,
+    reservePrice_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setBaseURI(
-    baseTokenURI: string,
+  setClaimingPrice(
+    claimingPrice_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setEngravingPrice(
-    engravingPrice: BigNumberish,
+    engravingPrice_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setErasingPrice(
-    erasingPrice: BigNumberish,
+    erasingPrice_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setNoteSizeLimit(
-    noteSizeLimit: BigNumberish,
+    noteSizeLimit_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setRoyaltyPermyriad(
-    royaltyPermyriad: BigNumberish,
+  setRoyaltyBps(
+    royaltyBps_: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setSVGImageTemplate(
+    svgImageTemplate_: string[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setTokenDescription(
+    tokenDescription_: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  settleLastAuction(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -876,12 +992,21 @@ export class TheDate extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  withdrawFund(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
+    DAO_ROLE(overrides?: CallOverrides): Promise<string>;
+
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    _settleAuction(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    airdrop(
+      addresses: string[],
+      tokenIds: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     approve(
       to: string,
@@ -889,58 +1014,51 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    artworks(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, string] & { date: BigNumber; note: string }>;
-
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    endAuction(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    claim(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    engraveArtworkNote(
+    claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    engraveNote(
       tokenId: BigNumberish,
       note: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    eraseArtworkNote(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    engravingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    eraseNote(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     exists(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+
+    generateMetadata(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    generateSVGImage(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getAuctionMinBidIncrementPermyriad(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getAuctionReservePrice(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getEngravingPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getErasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+    getDate(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     getHighestBid(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { bidder: string; amount: BigNumber }>;
 
-    getNoteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getPendingReturns(
-      bidder: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getNote(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-    getRoyaltyPermyriad(overrides?: CallOverrides): Promise<BigNumber>;
 
     grantRole(
       role: BytesLike,
@@ -960,7 +1078,11 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    minBidIncrementBps(overrides?: CallOverrides): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<string>;
+
+    noteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC721Received(
       arg0: string,
@@ -972,13 +1094,15 @@ export class TheDate extends BaseContract {
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    placeBid(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    placeBid(overrides?: CallOverrides): Promise<void>;
 
     renounceRole(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    reservePrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     revokeRole(
       role: BytesLike,
@@ -1015,37 +1139,52 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setAuctionMinBidIncrementPermyriad(
-      minBidIncrementPermyriad: BigNumberish,
+    setAuctionMinBidIncrementBps(
+      minBidIncrementBps_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setAuctionReservePrice(
-      reservePrice: BigNumberish,
+      reservePrice_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setBaseURI(baseTokenURI: string, overrides?: CallOverrides): Promise<void>;
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setEngravingPrice(
-      engravingPrice: BigNumberish,
+      engravingPrice_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setErasingPrice(
-      erasingPrice: BigNumberish,
+      erasingPrice_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setNoteSizeLimit(
-      noteSizeLimit: BigNumberish,
+      noteSizeLimit_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setRoyaltyPermyriad(
-      royaltyPermyriad: BigNumberish,
+    setRoyaltyBps(
+      royaltyBps_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    setSVGImageTemplate(
+      svgImageTemplate_: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setTokenDescription(
+      tokenDescription_: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    settleLastAuction(overrides?: CallOverrides): Promise<void>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -1075,8 +1214,6 @@ export class TheDate extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    withdrawFund(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -1098,20 +1235,7 @@ export class TheDate extends BaseContract {
       { owner: string; operator: string; approved: boolean }
     >;
 
-    ArtworkMinted(
-      tokenId?: BigNumberish | null
-    ): TypedEventFilter<[BigNumber], { tokenId: BigNumber }>;
-
-    ArtworkNoteEngraved(
-      tokenId?: BigNumberish | null,
-      owner?: string | null,
-      note?: null
-    ): TypedEventFilter<
-      [BigNumber, string, string],
-      { tokenId: BigNumber; owner: string; note: string }
-    >;
-
-    ArtworkNoteErased(
+    ArtworkAirdropped(
       tokenId?: BigNumberish | null,
       owner?: string | null
     ): TypedEventFilter<
@@ -1119,7 +1243,23 @@ export class TheDate extends BaseContract {
       { tokenId: BigNumber; owner: string }
     >;
 
-    AuctionEnded(
+    ArtworkClaimed(
+      tokenId?: BigNumberish | null,
+      owner?: string | null
+    ): TypedEventFilter<
+      [BigNumber, string],
+      { tokenId: BigNumber; owner: string }
+    >;
+
+    AuctionMinBidIncrementBpsChanged(
+      minBidIncrementBps?: null
+    ): TypedEventFilter<[BigNumber], { minBidIncrementBps: BigNumber }>;
+
+    AuctionReservePriceChanged(
+      reservePrice?: null
+    ): TypedEventFilter<[BigNumber], { reservePrice: BigNumber }>;
+
+    AuctionSettled(
       tokenId?: BigNumberish | null,
       winner?: string | null,
       amount?: null
@@ -1137,13 +1277,38 @@ export class TheDate extends BaseContract {
       { tokenId: BigNumber; bidder: string; amount: BigNumber }
     >;
 
-    FundWithdrew(
-      bidder?: string | null,
+    ClaimingPriceChanged(
+      claimingPrice?: null
+    ): TypedEventFilter<[BigNumber], { claimingPrice: BigNumber }>;
+
+    EngravingPriceChanged(
       amount?: null
+    ): TypedEventFilter<[BigNumber], { amount: BigNumber }>;
+
+    ErasingPriceChanged(
+      amount?: null
+    ): TypedEventFilter<[BigNumber], { amount: BigNumber }>;
+
+    NoteEngraved(
+      tokenId?: BigNumberish | null,
+      owner?: string | null,
+      note?: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { bidder: string; amount: BigNumber }
+      [BigNumber, string, string],
+      { tokenId: BigNumber; owner: string; note: string }
     >;
+
+    NoteErased(
+      tokenId?: BigNumberish | null,
+      owner?: string | null
+    ): TypedEventFilter<
+      [BigNumber, string],
+      { tokenId: BigNumber; owner: string }
+    >;
+
+    NoteSizeLimitChanged(
+      length?: null
+    ): TypedEventFilter<[BigNumber], { length: BigNumber }>;
 
     RoleAdminChanged(
       role?: BytesLike | null,
@@ -1183,7 +1348,20 @@ export class TheDate extends BaseContract {
   };
 
   estimateGas: {
+    DAO_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _settleAuction(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    airdrop(
+      addresses: string[],
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -1191,27 +1369,41 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    artworks(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    endAuction(
+    claim(
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    engraveArtworkNote(
+    claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    engraveNote(
       tokenId: BigNumberish,
       note: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    eraseArtworkNote(
+    engravingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    eraseNote(
       tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
     exists(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    generateMetadata(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    generateSVGImage(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1221,25 +1413,18 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getAuctionMinBidIncrementPermyriad(
+    getDate(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    getAuctionReservePrice(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getEngravingPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getErasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     getHighestBid(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getNoteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getPendingReturns(
-      bidder: string,
+    getNote(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1247,8 +1432,6 @@ export class TheDate extends BaseContract {
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    getRoyaltyPermyriad(overrides?: CallOverrides): Promise<BigNumber>;
 
     grantRole(
       role: BytesLike,
@@ -1268,7 +1451,11 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    minBidIncrementBps(overrides?: CallOverrides): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    noteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
 
     onERC721Received(
       arg0: string,
@@ -1284,7 +1471,6 @@ export class TheDate extends BaseContract {
     ): Promise<BigNumber>;
 
     placeBid(
-      tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1293,6 +1479,8 @@ export class TheDate extends BaseContract {
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    reservePrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     revokeRole(
       role: BytesLike,
@@ -1327,38 +1515,52 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setAuctionMinBidIncrementPermyriad(
-      minBidIncrementPermyriad: BigNumberish,
+    setAuctionMinBidIncrementBps(
+      minBidIncrementBps_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setAuctionReservePrice(
-      reservePrice: BigNumberish,
+      reservePrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setBaseURI(
-      baseTokenURI: string,
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setEngravingPrice(
-      engravingPrice: BigNumberish,
+      engravingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setErasingPrice(
-      erasingPrice: BigNumberish,
+      erasingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setNoteSizeLimit(
-      noteSizeLimit: BigNumberish,
+      noteSizeLimit_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setRoyaltyPermyriad(
-      royaltyPermyriad: BigNumberish,
+    setRoyaltyBps(
+      royaltyBps_: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setSVGImageTemplate(
+      svgImageTemplate_: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setTokenDescription(
+      tokenDescription_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    settleLastAuction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1393,15 +1595,24 @@ export class TheDate extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    withdrawFund(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    DAO_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     DEFAULT_ADMIN_ROLE(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    _settleAuction(
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    airdrop(
+      addresses: string[],
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     approve(
@@ -1410,33 +1621,44 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    artworks(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     balanceOf(
       owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    endAuction(
+    claim(
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    engraveArtworkNote(
+    claimingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    engraveNote(
       tokenId: BigNumberish,
       note: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    eraseArtworkNote(
+    engravingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    eraseNote(
       tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    erasingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     exists(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    generateMetadata(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    generateSVGImage(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1446,36 +1668,23 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getAuctionMinBidIncrementPermyriad(
+    getDate(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    getAuctionReservePrice(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getEngravingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getErasingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getHighestBid(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getNoteSizeLimit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getPendingReturns(
-      bidder: string,
+    getNote(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getRoleAdmin(
       role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoyaltyPermyriad(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1497,7 +1706,13 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    minBidIncrementBps(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    noteSizeLimit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     onERC721Received(
       arg0: string,
@@ -1513,7 +1728,6 @@ export class TheDate extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     placeBid(
-      tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1522,6 +1736,8 @@ export class TheDate extends BaseContract {
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    reservePrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     revokeRole(
       role: BytesLike,
@@ -1556,38 +1772,52 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setAuctionMinBidIncrementPermyriad(
-      minBidIncrementPermyriad: BigNumberish,
+    setAuctionMinBidIncrementBps(
+      minBidIncrementBps_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setAuctionReservePrice(
-      reservePrice: BigNumberish,
+      reservePrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setBaseURI(
-      baseTokenURI: string,
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setEngravingPrice(
-      engravingPrice: BigNumberish,
+      engravingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setErasingPrice(
-      erasingPrice: BigNumberish,
+      erasingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setNoteSizeLimit(
-      noteSizeLimit: BigNumberish,
+      noteSizeLimit_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setRoyaltyPermyriad(
-      royaltyPermyriad: BigNumberish,
+    setRoyaltyBps(
+      royaltyBps_: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setSVGImageTemplate(
+      svgImageTemplate_: string[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setTokenDescription(
+      tokenDescription_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    settleLastAuction(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1620,10 +1850,6 @@ export class TheDate extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawFund(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -16,7 +16,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-func.tags = ["MainContract"];
+func.tags = ["MainContract", "deploy"];
 func.dependencies = ["FoundationContract"];
 
 export default func;

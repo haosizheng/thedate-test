@@ -43,11 +43,11 @@ context("TheDate contract", () => {
 
   describe("WithRoyalty", async () => {
     it("Royalty", async () => {
-      expect(await mainContract.getRoyaltyPermyriad()).to.eq(1000);
-      await expect(mainContract.setRoyaltyPermyriad(50000)).to.be.revertedWith(
-        "royaltyPermyriad should be within [0, 10000].",
+      expect(await mainContract.getRoyaltyBps()).to.eq(1000);
+      await expect(mainContract.setRoyaltyBps(50000)).to.be.revertedWith(
+        "royaltyBps should be within [0, 10000].",
       );
-      await mainContract.setRoyaltyPermyriad(5000);
+      await mainContract.setRoyaltyBps(5000);
       const [receiver, royaltyAmount] = await mainContract.royaltyInfo(
         ethers.constants.Zero,
         ethers.utils.parseEther("1"),
@@ -126,7 +126,7 @@ context("TheDate contract", () => {
       const erasingPrice = await mainContract.getErasingPrice();
 
       await mainContract.setAuctionReservePrice(ethers.utils.parseEther("0.1"));
-      await mainContract.setAuctionMinBidIncrementPermyriad(5000); //50%
+      await mainContract.setAuctionMinBidIncrementBps(5000); //50%
       await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.1") }))
         .emit(mainContract, "ArtworkMinted")
         .withArgs(tokenId);
@@ -186,47 +186,6 @@ context("TheDate contract", () => {
     });
   });
 
-  // describe("TheDate - Appearance", async () => {
-
-  //   it("Apperance with large script", async () => {
-  //     const randomCode = [...Array(5000)].map(() => "1").join();
-  //     console.log(randomCode.length);
-  //     const gasUsed = (await (await mainContract.addNewApperance("{}", randomCode)).wait()).gasUsed;
-  //     expect(gasUsed).lte(12500000); //block gas limit
-
-  //     console.log(gasUsed.toString());
-  //     console.log(ethers.utils.formatUnits(gasUsed.mul(ethers.utils.parseUnits("20", "gwei")), "ether").toString());
-  //   });
-
-  //   it("Default apperance", async () => {
-  //     const randomCode = "abc";
-  //     await expect(mainContract.addNewApperance("{}", randomCode))
-  //       .emit(mainContract, "ApperanceAdded").withArgs(1);
-
-  //     await expect(mainContract.updateApperance(1, "{changed}", randomCode))
-  //       .emit(mainContract, "ApperanceUpdated").withArgs(1);
-
-  //     //Exception case that defaultApperance is unlocked.
-  //     await expect(mainContract.setDefaultApperanceId(1))
-  //       .to.be.revertedWith("apperances[apperanceId] should be locked.");
-
-  //     // Lock it
-  //     await expect(mainContract.lockApperance(1))
-  //       .emit(mainContract, "ApperanceLocked").withArgs(1);
-
-  //     await expect(mainContract.setDefaultApperanceId(1))
-  //       .emit(mainContract, "DefaultApperanceChanged").withArgs(1);
-  //     expect(await mainContract.defaultApperanceId()).to.eq(1);
-
-  //     // Unlock it
-  //     expect(await mainContract.unlockApperance(1))
-  //       .emit(mainContract, "ApperanceUnlocked").withArgs(1);
-
-  //     expect((await mainContract.apperances(1)).metadata).to.eq("{changed}");
-  //     expect((await mainContract.apperances(1)).script).to.eq(randomCode);
-  //   });
-  // });
-
   describe("MintedByAuction", async () => {
     it("Bid too early", async () => {
       const tokenId = BigNumber.from(
@@ -256,10 +215,10 @@ context("TheDate contract", () => {
       ).to.be.revertedWith("AccessControl: account");
     });
 
-    it("SetAuctionMinBidIncrementPermyriad", async () => {
-      await mainContract.setAuctionMinBidIncrementPermyriad(500); //5%
-      expect(await mainContract.connect(user2).getAuctionMinBidIncrementPermyriad()).to.eq(500);
-      await expect(mainContract.connect(user1).setAuctionMinBidIncrementPermyriad(1000)).to.be.revertedWith(
+    it("SetAuctionMinBidIncrementBps", async () => {
+      await mainContract.setAuctionMinBidIncrementBps(500); //5%
+      expect(await mainContract.connect(user2).getAuctionMinBidIncrementBps()).to.eq(500);
+      await expect(mainContract.connect(user1).setAuctionMinBidIncrementBps(1000)).to.be.revertedWith(
         "AccessControl: account",
       );
     });
@@ -279,7 +238,7 @@ context("TheDate contract", () => {
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
       ).div(SECONDS_IN_A_DAY);
       await mainContract.setAuctionReservePrice(ethers.utils.parseEther("0.1"));
-      await mainContract.setAuctionMinBidIncrementPermyriad(5000); //50%
+      await mainContract.setAuctionMinBidIncrementBps(5000); //50%
 
       const bid_satisfy_fn = (
         x: [string, BigNumber] & { bidder: string; amount: BigNumber },
@@ -315,7 +274,7 @@ context("TheDate contract", () => {
       await expect(
         mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.1") }),
       ).to.be.revertedWith("Must send more than the highest bid.");
-      // Exception case that the increased bid is not higher than auctionMinBidIncrementPermyriad
+      // Exception case that the increased bid is not higher than auctionMinBidIncrementBps
       await expect(
         mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.11") }),
       ).to.be.revertedWith("Must send over the last bid by minBidIncrement permyriad.");

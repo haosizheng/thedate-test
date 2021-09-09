@@ -39,14 +39,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log("mock artworks created.")
 };
 
-func.tags = ["test", "MockArtworks"];
+func.tags = ["reserve", "MockArtworks"];
 
 func.skip = async ({ getChainId }) => {
   const chainId = await getChainId();
   return chainId !== "31337";
 }
 
-func.dependencies = ["FoundationContract", "MainContract"];
+func.dependencies = ["deploy"];
 
 export default func;
 

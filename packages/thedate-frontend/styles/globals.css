@@ -3,10 +3,95 @@
 @tailwind utilities;
 
 body {
-  font-family: "Roboto Mono";
-  @apply font-mono text-sm;
+  @apply font-serif;
+  @apply text-neutral-base;
+  @apply bg-neutral;
 }
 
-.input-box {
-  border: 1px solid var(--themed-border,var(--accents-2));
+.header {
+  @apply mx-auto;
+  @apply my-10 sm:my-16;
+}
+
+.header h1 {
+  @apply text-center;
+}
+
+.footer {
+  @apply mx-auto;
+  @apply container;
+  @apply max-w-screen-md;
+  @apply my-10 sm:my-16;
+  @apply p-10;
+}
+
+.footer a {
+  @apply text-neutral-focus;
+  @apply underline;
+}
+
+.footer__row {
+  @apply flex flex-row justify-center gap-4;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply text-neutral-base;
+}
+
+h1 {
+  @apply text-3xl;
+}
+
+h2 {
+  @apply text-xl;
+}
+
+h3 {
+  @apply text-lg;
+}
+
+.content {
+  @apply container;
+  @apply max-w-screen-md;
+  @apply mx-auto;
+  @apply px-10;
+  @apply py-3;
+}
+
+.content figure {
+  @apply mx-auto;
+  @apply max-w-xs;
+  @apply justify-center;
+  @apply mt-0;
+  @apply mb-12 sm:mb-16;
+  @apply hover:opacity-80;
+}
+
+.content .artwork-3d {
+  @apply flex;
+  @apply items-center;
+  @apply max-h-60 h-60 md:h-96 md:max-h-96 w-full;
+
+}
+
+.faq__item {
+  @apply mx-auto;
+  @apply my-5;
+}
+
+h3 {
+  @apply border-b;
+  @apply my-5;
+  @apply inline-block;
+}
+
+p {
+  @apply text-neutral-content;
+  @apply text-base;
+  @apply mb-5;
+}
+
+p a {
+  @apply text-neutral-focus;
+  @apply underline;
 }

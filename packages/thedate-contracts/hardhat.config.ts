@@ -102,6 +102,7 @@ const config: HardhatUserConfig = {
       accounts: TEST_ACCOUNTS,
       chainId: chainIds.hardhat,
       live: false,
+      initialBaseFeePerGas: 0,
       saveDeployments: true,
       tags: ["test"],
       forking: {

@@ -7,8 +7,6 @@ export const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
 export const WALLETCONNECT_BRIDGE_URL = process.env.WALLETCONNECT_BRIDGE_URL || "https://bridge.walletconnect.org";
 export const NETWORK_CHAIN_ID = process.env.NETWORK_CHAIN_ID ? Number.parseInt(process.env.NETWORK_CHAIN_ID) : SupportedChainId.MAINNET;
 
-console.log(NETWORK_CHAIN_ID);
-
 const SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.MAINNET, 
   SupportedChainId.RINKEBY,

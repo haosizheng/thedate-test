@@ -1,19 +1,22 @@
-import Wallet from "@/components/Wallet";
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="hero py-20">
-       <div className="hero-content text-sm text-center">
-        <ul>
-          <li className="mb-10"><Wallet/></li>
-          <li><Link href="/about"><a className="link">About</a></Link></li>
-          <li><Link href="/"><a className="link">Auction</a></Link></li>
-          <li><Link href="/gallery"><a className="link">Gallery</a></Link></li>
-          <li><Link href="https://twitter.com/thedate-art"><a className="link">Twitter</a></Link></li>
-          <li><Link href="https://discord.gg/thedate-art"><a className="link">Discord</a></Link></li>
-        </ul>
+    <div className="footer">
+      <div className="footer__row">
+        <Link href="/"><a>Home</a></Link>
+        <Link href="/faq"><a>FAQ</a></Link>
+        <Link href="/auction"><a>Auction</a></Link>
+        <Link href="/artwork"><a>Artwork</a></Link>
+        <Link href="/artwork"><a>Updates</a></Link>
       </div> 
-    </footer>
+      <div className="footer__row">
+        <a href="https://discord.gg/thedate-art">Contract</a> 
+        <a href="https://discord.gg/thedate-art">OpenSea</a> 
+        <a href="https://discord.gg/thedate-art">Discord</a> 
+        <a href="https://discord.gg/twitter">Twitter</a>
+        <a href="https://discord.gg/thedate-art">DAO</a> 
+      </div> 
+    </div>
   );
 }

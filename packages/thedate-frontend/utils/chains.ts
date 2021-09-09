@@ -34,6 +34,11 @@ export const ETHERSCAN_PREFIXES: Record<SupportedChainId | number, string> = {
   [SupportedChainId.HARDHAT]: ''
 }
 
+export const OPENSEA_PREFIXES: Record<SupportedChainId | number, string> = {
+  [SupportedChainId.MAINNET]: '',
+  [SupportedChainId.RINKEBY]: 'testnet.',
+}
+
 export const INFURA_PREFIXES: Record<SupportedChainId | number, string> = {
   [SupportedChainId.MAINNET]: 'mainnet.',
   [SupportedChainId.ROPSTEN]: 'ropsten.',

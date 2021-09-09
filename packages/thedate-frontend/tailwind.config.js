@@ -5,10 +5,15 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx}'
   ],
   plugins: [
-    require('daisyui')
   ],
   darkMode: false, // or 'media' or 'class'
   theme: {
+    colors: {
+      "neutral": "#1A1A1A",
+      "neutral-base": "#FFFFFF",
+      "neutral-content": "#8e8e8e",
+      "neutral-focus": "#cbcbcb",
+    },
     extend: {
       height: {
         '120': '30rem',
@@ -19,7 +24,8 @@ module.exports = {
         '160': '40rem',
       },
       fontFamily: {
-        mono: 'Roboto Mono',
+        serif: ['EB Garamond', 'serif'],
+        mono: ['Roboto Mono', 'monospace'],
       },
     },
   },
@@ -28,44 +34,4 @@ module.exports = {
       borderStyle: ['hover', 'focus'],
     }
   },
-  daisyui: {
-    styled: true,
-    themes: true,
-    base: true,
-    utils: true,
-    logs: true,
-    rtl: false,
-    themes: [
-      {
-        'mytheme': {                          /* your theme name */
-          "primary": "#000000",
-          "primary-focus": "#000000",
-          "primary-content": "#000000",
-          "secondary": "#000000",
-          "secondary-focus": "#000000",
-          "secondary-content": "#000000",
-          "accent": "#454545",
-          "accent-focus": "#454545",
-          "accent-content": "#ffffff",
-          "neutral": "#E5E5E5",
-          "neutral-focus": "#090901",
-          "neutral-content": "#000000",
-          "base-100": "##ffffff",
-          "base-200": "#f9fafb",
-          "base-300": "#d1d5db",
-          "base-content": "#1f2937",
-          "info": "#2094f3",
-          "success": "#009485",
-          "warning": "#ff9900",
-          "error": "#ff5724",
-          "--rounded-box": "0",
-          "--rounded-btn": "0",
-          "--rounded-badge": "0",
-          "--tab-radius": "0",
-          '--focus-ring': '0',
-          '--border-btn': '0',
-        },
-      },
-    ],
-  }
 }

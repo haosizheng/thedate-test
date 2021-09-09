@@ -93,7 +93,9 @@ Netify / Vercel
 - [ ] Learn IPFS Upload and Organize (2h)
 - [ ] Learn Serverless Rendering (2h)
 - [ ] Learn Three React (2h)
-- [ ] 
+
+- [ ] nft.storage API 
+
 
 # Programming 
 - [x] IFPS 
@@ -113,3 +115,18 @@ Netify / Vercel
 - [x] Infura API.
 - [x] Etherscan API.
 - [x] Pinata.cloud API
+
+
+# Plan 
+1. Write a new contracts of The Date.
+1.1 Airdrop 7777 to all Loot holders. 
+1.2 Claim at random 
+1.3 Auction Each Date after Launch Date. 
+
+
+1. 
+First, finish the frontend first. 
+Second, finish the contract first.
+
+2. 
+Test claim and airdrop 

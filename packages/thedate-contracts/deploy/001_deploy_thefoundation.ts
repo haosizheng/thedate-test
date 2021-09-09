@@ -14,7 +14,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     foundationMember1,
     foundationMember2,
   ];
-  const FOUNDATION_SHARES: number[] = [500000, 500000];
+  const FOUNDATION_SHARES: number[] = [700000, 300000];
   
   await deploy("TheFoundation", {
     from: deployer,
@@ -23,7 +23,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-func.tags = ["FoundationContract"];
+func.tags = ["deploy", "FoundationContract"];
 
 export default func;
 

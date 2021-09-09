@@ -1,24 +1,22 @@
 import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
+import useTheDateArtwork from "@/hooks/useTheDateArtwork";
 
 export default function ArtworkRenderingPage() {
   const router = useRouter()
   const { tokenId: tokenIdQuery } = router.query
   const tokenId = typeof tokenIdQuery === "string" ? Number(tokenIdQuery) : undefined;
-
-  if (!tokenId || !Number.isInteger(tokenId)) {
-    return (
-      <Layout>
-        <div className="hero">Error - Wrong token ID</div>
-      </Layout>
-    );
-  }
+  const { exists, noteString } = useTheDateArtwork(tokenId || 0);
 
   return (
-    <>
+    (exists === undefined) ?
+      <div className="static absolute inset-0 bg-neutral">Loading...</div> 
+    : !exists ?
+      <div className="static absolute inset-0 bg-neutral">Token &quot;{tokenIdQuery}&quot; does not exists</div>
+    : <>
       <div className="static absolute inset-0 bg-neutral">
-        <ArtworkModelViewer tokenId={ tokenId } autoRotate={ false } fov={ 35 } />
+        <ArtworkModelViewer tokenId={ tokenId! } noteString={noteString} autoRotate={ true } fov={ 35 } />
       </div>
     </>
   );

@@ -10,15 +10,12 @@
     "lint": "npx eslint .",
     "coverage": "npx hardhat coverage",
     "size-contracts": "npx hardhat size-contracts",
-
     "hardhat:increase1day": "npx hardhat node increaseTime 1d",
-
     "deploy:rinkeby:reset": "npx hardhat deploy --network rinkeby --reset",
     "deploy:rinkeby": "npx hardhat deploy --network rinkeby",
     "verify:rinkeby": "npx hardhat etherscan-verify --network rinkeby --solc-input",
     "deploy:hardhat": "npx hardhat deploy --network hardhat --write true",
     "deploy:mainnet": "npx hardhat deploy --network mainnet",
-
     "hardhat:node": "npx hardhat node --network hardhat --show-accounts ",
     "hardhat:node:fork": "npx hardhat node --show-accounts",
     "export-deployments": "npx hardhat export --export-all exports/deployments.json"
@@ -45,6 +42,7 @@
     "@types/node": "^16.4.10",
     "@typescript-eslint/eslint-plugin": "^4.29.2",
     "@typescript-eslint/parser": "^4.29.2",
+    "base64-sol": "^1.0.1",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
     "eslint": "^7.30.0",
@@ -66,7 +64,9 @@
     "ts-node": "^10.0.0",
     "typechain": "^5.0.0",
     "typescript": "^4.3.2",
-    "yarn-upgrade-all": "^0.5.4"
+    "yarn-upgrade-all": "^0.5.4",
+    "@quant-finance/solidity-datetime": "^2.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }

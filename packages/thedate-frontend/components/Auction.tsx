@@ -1,4 +1,5 @@
 import ArtworkModelViewer from '@/components/ArtworkModelViewer';
+import ArtworkSVG from '@/components/ArtworkSVG';
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useEtherPrice from '@/hooks/useEtherPrice';
 import useTheDateContract from '@/hooks/useTheDateContract';
@@ -129,14 +130,14 @@ export default function Auction() {
   }
 
   return (tokenId == undefined || tokenId == 0
-    ? <div className="hero">Loading...</div> 
+    ? <div className="content">Loading...</div> 
     : (<>
-      <div className="hero">
-        <div className="flex items-center max-h-80 h-80 md:h-120 md:max-h-120 xl:h-150 xl:max-h-150 w-screen -mt-10 ">
-          <ArtworkModelViewer tokenId={tokenId} noteString="(to be engraved by the note owner)" fov={30} />
+      <div className="content">
+        <div className="figure">
+          <ArtworkSVG dateString="2021-03-32" noteString="(to be engraved by the note owner)" />
         </div>
       </div>
-      <div className="hero">
+      <div className="content">
         <div className="flex px-5 md:px-0 items-left py-20 leading-10 max-w-prose text-left flex-col flex">
           <div className="">
             One and only one {" "}
@@ -159,7 +160,7 @@ export default function Auction() {
           </div>
         </div>
       </div>
-      <div className="hero">
+      <div className="content">
         <div className="flex items-start flex-col px-5 py-16 md:px-0  max-w-prose w-full">
           <div className="mb-5 ">Auction for Today &quot;{ tokenIdToDateString(tokenId) }&quot;:</div>
           { bidHistory.length > 0 && (

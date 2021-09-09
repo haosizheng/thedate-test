@@ -21,22 +21,48 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface FoundationInterface extends ethers.utils.Interface {
   functions: {
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
+    "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "payee(uint256)": FunctionFragment;
     "release(address)": FunctionFragment;
+    "releaseERC1155(address,address,uint256,uint256)": FunctionFragment;
     "releaseERC20(address,address)": FunctionFragment;
+    "releaseERC721(address,address,uint256)": FunctionFragment;
     "released(address)": FunctionFragment;
     "releasedERC20(address,address)": FunctionFragment;
     "shares(address)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
     "totalReleased()": FunctionFragment;
     "totalReleasedERC20(address)": FunctionFragment;
     "totalShares()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "onERC1155BatchReceived",
+    values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC1155Received",
+    values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC721Received",
+    values: [string, string, BigNumberish, BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "payee", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "release", values: [string]): string;
   encodeFunctionData(
+    functionFragment: "releaseERC1155",
+    values: [string, string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "releaseERC20",
     values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "releaseERC721",
+    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "released", values: [string]): string;
   encodeFunctionData(
@@ -44,6 +70,10 @@ interface FoundationInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "shares", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "totalReleased",
     values?: undefined
@@ -57,10 +87,30 @@ interface FoundationInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "onERC1155BatchReceived",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC1155Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC721Received",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "payee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "releaseERC1155",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "releaseERC20",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "releaseERC721",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "released", data: BytesLike): Result;
@@ -69,6 +119,10 @@ interface FoundationInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "shares", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "totalReleased",
     data: BytesLike
@@ -83,13 +137,17 @@ interface FoundationInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "ERC1155PaymentReleased(address,address,uint256,uint256)": EventFragment;
     "ERC20PaymentReleased(address,uint256,address)": EventFragment;
+    "ERC721PaymentReleased(address,address,uint256)": EventFragment;
     "PayeeAdded(address,uint256)": EventFragment;
     "PaymentReceived(address,uint256)": EventFragment;
     "PaymentReleased(address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "ERC1155PaymentReleased"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ERC20PaymentReleased"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ERC721PaymentReleased"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PayeeAdded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PaymentReceived"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PaymentReleased"): EventFragment;
@@ -139,6 +197,32 @@ export class Foundation extends BaseContract {
   interface: FoundationInterface;
 
   functions: {
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     payee(index: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     release(
@@ -146,9 +230,24 @@ export class Foundation extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    releaseERC1155(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
+      value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     releaseERC20(
       account: string,
       currency: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    releaseERC721(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -162,6 +261,11 @@ export class Foundation extends BaseContract {
 
     shares(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     totalReleased(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     totalReleasedERC20(
@@ -172,6 +276,32 @@ export class Foundation extends BaseContract {
     totalShares(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
+  onERC1155BatchReceived(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish[],
+    arg3: BigNumberish[],
+    arg4: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  onERC1155Received(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
+    arg3: BigNumberish,
+    arg4: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  onERC721Received(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
+    arg3: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   payee(index: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   release(
@@ -179,9 +309,24 @@ export class Foundation extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  releaseERC1155(
+    account: string,
+    token: string,
+    tokenId: BigNumberish,
+    value: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   releaseERC20(
     account: string,
     currency: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  releaseERC721(
+    account: string,
+    token: string,
+    tokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -195,6 +340,11 @@ export class Foundation extends BaseContract {
 
   shares(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+  supportsInterface(
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   totalReleased(overrides?: CallOverrides): Promise<BigNumber>;
 
   totalReleasedERC20(
@@ -205,13 +355,54 @@ export class Foundation extends BaseContract {
   totalShares(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     payee(index: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     release(account: string, overrides?: CallOverrides): Promise<void>;
 
+    releaseERC1155(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
+      value: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     releaseERC20(
       account: string,
       currency: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    releaseERC721(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -225,6 +416,11 @@ export class Foundation extends BaseContract {
 
     shares(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     totalReleased(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalReleasedERC20(
@@ -236,6 +432,16 @@ export class Foundation extends BaseContract {
   };
 
   filters: {
+    ERC1155PaymentReleased(
+      to?: null,
+      token?: null,
+      id?: null,
+      value?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber, BigNumber],
+      { to: string; token: string; id: BigNumber; value: BigNumber }
+    >;
+
     ERC20PaymentReleased(
       to?: null,
       amount?: null,
@@ -243,6 +449,15 @@ export class Foundation extends BaseContract {
     ): TypedEventFilter<
       [string, BigNumber, string],
       { to: string; amount: BigNumber; currency: string }
+    >;
+
+    ERC721PaymentReleased(
+      to?: null,
+      token?: null,
+      id?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { to: string; token: string; id: BigNumber }
     >;
 
     PayeeAdded(
@@ -268,6 +483,32 @@ export class Foundation extends BaseContract {
   };
 
   estimateGas: {
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     payee(index: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     release(
@@ -275,9 +516,24 @@ export class Foundation extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    releaseERC1155(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
+      value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     releaseERC20(
       account: string,
       currency: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    releaseERC721(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -291,6 +547,11 @@ export class Foundation extends BaseContract {
 
     shares(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     totalReleased(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalReleasedERC20(
@@ -302,6 +563,32 @@ export class Foundation extends BaseContract {
   };
 
   populateTransaction: {
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    onERC721Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     payee(
       index: BigNumberish,
       overrides?: CallOverrides
@@ -312,9 +599,24 @@ export class Foundation extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    releaseERC1155(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
+      value: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     releaseERC20(
       account: string,
       currency: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    releaseERC721(
+      account: string,
+      token: string,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -331,6 +633,11 @@ export class Foundation extends BaseContract {
 
     shares(
       account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
