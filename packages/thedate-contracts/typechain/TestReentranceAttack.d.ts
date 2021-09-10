@@ -11,6 +11,8 @@ import {
   PopulatedTransaction,
   BaseContract,
   ContractTransaction,
+  Overrides,
+  PayableOverrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -18,22 +20,31 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface DateTimeInterface extends ethers.utils.Interface {
+interface TestReentranceAttackInterface extends ethers.utils.Interface {
   functions: {
-    "daysToDate(uint256)": FunctionFragment;
+    "deposit()": FunctionFragment;
+    "startReentranceAttack()": FunctionFragment;
+    "thedate()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "deposit", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "daysToDate",
-    values: [BigNumberish]
+    functionFragment: "startReentranceAttack",
+    values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "thedate", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "daysToDate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "startReentranceAttack",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "thedate", data: BytesLike): Result;
 
   events: {};
 }
 
-export class DateTime extends BaseContract {
+export class TestReentranceAttack extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -74,58 +85,61 @@ export class DateTime extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: DateTimeInterface;
+  interface: TestReentranceAttackInterface;
 
   functions: {
-    daysToDate(
-      _days: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        year: BigNumber;
-        month: BigNumber;
-        day: BigNumber;
-      }
-    >;
+    deposit(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    startReentranceAttack(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    thedate(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  daysToDate(
-    _days: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
-      year: BigNumber;
-      month: BigNumber;
-      day: BigNumber;
-    }
-  >;
+  deposit(
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  startReentranceAttack(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  thedate(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    daysToDate(
-      _days: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        year: BigNumber;
-        month: BigNumber;
-        day: BigNumber;
-      }
-    >;
+    deposit(overrides?: CallOverrides): Promise<void>;
+
+    startReentranceAttack(overrides?: CallOverrides): Promise<void>;
+
+    thedate(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    daysToDate(
-      _days: BigNumberish,
-      overrides?: CallOverrides
+    deposit(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    startReentranceAttack(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    thedate(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    daysToDate(
-      _days: BigNumberish,
-      overrides?: CallOverrides
+    deposit(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    startReentranceAttack(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    thedate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

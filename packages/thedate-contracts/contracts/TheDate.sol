@@ -2,31 +2,24 @@
 pragma solidity ^0.8.0;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { ERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Base64 } from "base64-sol/base64.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
-import { Counters } from "@openzeppelin/contracts/utils/Counters.sol";
 import { IWETH } from "./interfaces/IWETH.sol";
-import "hardhat/console.sol";
 
-contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, ERC721Holder {
+contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
     // ==== Roles ====
     bytes32 public constant DAO_ROLE = keccak256("DAO_ROLE");
 
     // ==== Parameters ====
     // == DAO controlled parameters ==
-    uint256 public claimingPrice = 0.01 ether;
-    uint256 public reservePrice = 0.01 ether;
+    uint256 public claimingPrice = 0.1 ether;
+    uint256 public reservePrice = 0.1 ether;
     uint256 public minBidIncrementBps = 1000;
     uint256 public engravingPrice = 0.01 ether;
     uint256 public erasingPrice = 0.1 ether;
@@ -102,7 +95,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
 
     function setEngravingPrice(uint256 engravingPrice_) external onlyRole(DAO_ROLE) {
         engravingPrice = engravingPrice_;
-        emit EngravingPriceChanged(engravingPrice_);
+        emit EngravingPriceChanged(engravingPrice);
     }
 
     function setErasingPrice(uint256 erasingPrice_) external onlyRole(DAO_ROLE) {
@@ -116,47 +109,47 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     // == Admin controlled parameters ==
-    function setRoyaltyBps(uint256 royaltyBps_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(royaltyBps_ <= 10000, "royaltyBps should be within [0, 10000].");
+    function setRoyaltyBps(uint256 royaltyBps_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(royaltyBps_ <= 10000, "royaltyBps should be within [0, 10000]");
         royaltyBps = royaltyBps_;
     }
 
-    function setTokenDescription(string memory tokenDescription_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setTokenDescription(string memory tokenDescription_) external onlyRole(DEFAULT_ADMIN_ROLE) {
         tokenDescription = tokenDescription_;
     }
 
-    function setSVGImageTemplate(string[] memory svgImageTemplate_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setSVGImageTemplate(string[] memory svgImageTemplate_) external onlyRole(DEFAULT_ADMIN_ROLE) {
         svgImageTemplate = svgImageTemplate_;
     }
 
     // ==== Owner related functions ==== 
     // == Owner related modifiers ==
     modifier onlyOwner(uint256 tokenId) {
-        require(ownerOf(tokenId) == msg.sender, "Caller should be the owner of the artwork.");
+        require(ownerOf(tokenId) == msg.sender, "Caller should be the owner of the artwork");
         _;
     }
 
     // == Note related operations ==
     modifier validNote(string memory note) {
-        require(bytes(note).length < noteSizeLimit, "Note should be shorter than noteSizeLimit.");
+        require(bytes(note).length < noteSizeLimit, "Note should be shorter than noteSizeLimit");
         _;
     }
 
-    function engraveNote(uint256 tokenId, string memory note) public payable onlyOwner(tokenId) validNote(note) {
-        require(msg.value >= engravingPrice, "Should pay >= engravingPrice.");
-        require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving.");
+    function engraveNote(uint256 tokenId, string memory note) external payable onlyOwner(tokenId) validNote(note) {
+        require(msg.value >= engravingPrice, "Should pay >= engravingPrice");
+        require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving");
 
         _notes[tokenId] = note;
-        _foundation.send(msg.value);
+        _foundation.transfer(msg.value);
         emit NoteEngraved(tokenId, ownerOf(tokenId), note);
     }
 
-    function eraseNote(uint256 tokenId) public payable onlyOwner(tokenId) {
-        require(msg.value >= erasingPrice, "Should pay >= erasingPrice.");
-        require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing.");
+    function eraseNote(uint256 tokenId) external payable onlyOwner(tokenId) {
+        require(msg.value >= erasingPrice, "Should pay >= erasingPrice");
+        require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing");
 
         _notes[tokenId] = "";
-        _foundation.send(msg.value);
+        _foundation.transfer(msg.value);
         emit NoteErased(tokenId, ownerOf(tokenId));
     }
 
@@ -184,7 +177,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     function generateSVGImage(uint256 tokenId) public view returns (string memory) {
-        require(_exists(tokenId), "tokenId is non-existent.");
+        require(_exists(tokenId), "tokenId is non-existent");
         string memory date = getDate(tokenId);
         string memory note = getNote(tokenId);
         
@@ -205,7 +198,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     function generateMetadata(uint256 tokenId) public view returns (string memory) {
-        require(_exists(tokenId), "tokenId is non-existent.");
+        require(_exists(tokenId), "tokenId is non-existent");
         string memory image = Base64.encode(
             bytes(generateSVGImage(tokenId))
         );
@@ -236,15 +229,12 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
     
     // ==== Claiming related functions ====
-    function _claim(address to, uint256 tokenId) internal nonReentrant {
-        require(tokenId < block.timestamp / 1 days, "Only past tokenId is claimable.");
-        require(
-            _highestBidder[tokenId] == address(0) && _highestBid[tokenId] == 0,
-            "tokenId should not be auctioned."
-        );
-        require(!_exists(tokenId), "tokenId should not be claimed.");
+    function _claim(address to, uint256 tokenId) internal {
+        require(tokenId < block.timestamp / 1 days, "Only past tokenId is claimable");
+        require(_highestBidder[tokenId] == address(0) && _highestBid[tokenId] == 0, "tokenId should not be auctioned");
+        require(!_exists(tokenId), "tokenId should not be claimed");
 
-        _safeMint(to, tokenId);
+        _mint(to, tokenId);
         _moveToNextAvailable();
     }
 
@@ -255,24 +245,24 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
         }
     }
 
-    function claim(uint256 tokenId) public  payable {
+    function claim(uint256 tokenId) public payable {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
                 IERC721(_loot).balanceOf(msg.sender) > 0 || 
-                msg.value >= claimingPrice, "Should pay >= claiming price or own a Loot NFT.");
+                msg.value >= claimingPrice, "Should pay >= claiming price or own a Loot NFT");
 
         settleLastAuction();
         _claim(msg.sender, tokenId);
 
         if (msg.value > 0) {
-            _foundation.send(msg.value);
+            _foundation.transfer(msg.value);
         }
 
         emit ArtworkClaimed(tokenId, msg.sender);
     }
 
-    function airdrop(address[] memory addresses, uint256[] memory tokenIds) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function airdrop(address[] memory addresses, uint256[] memory tokenIds) external nonReentrant onlyRole(DEFAULT_ADMIN_ROLE) {
         settleLastAuction();
-
+        
         for (uint i = 0; i < tokenIds.length; ++i) {
             address to = addresses[i];
             uint256 tokenId = tokenIds[i];
@@ -302,14 +292,21 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
         }
     }
 
+    function getCurrentMinimumBid() public view returns (uint256 amount) {
+        uint256 tokenId = block.timestamp / 1 days;
+        uint256 minimumBid = _highestBid[tokenId] * (10000 + minBidIncrementBps) / 10000;
+        if (reservePrice > minimumBid) {
+            minimumBid = reservePrice;
+        }
+        return minimumBid;
+    }
+
     function placeBid() public payable nonReentrant {
         uint256 tokenId = block.timestamp / 1 days;
         uint256 amount = msg.value;
 
-        require(!(amount < reservePrice), "Must send more than reservePrice.");
-
-        require(!(amount < (_highestBid[tokenId] * (10000 + minBidIncrementBps)) / 10000),
-            "Must send more than last bid by minBidIncrementBps amount.");
+        require(amount >= reservePrice, "Must send more than reservePrice");
+        require(amount >= getCurrentMinimumBid(), "Must send more than last bid by minBidIncrementBps");
 
         if (_highestBidder[tokenId] == address(0)) {
             settleLastAuction();
@@ -325,16 +322,14 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     /// @notice Settle the auction and send the highest bid to the beneficiary.
-    function _settleAuction(uint256 tokenId) internal nonReentrant {
-        require(block.timestamp / 1 days > tokenId, "Auction not yet ended.");
-        require(
-            _highestBidder[tokenId] != address(0) && _highestBid[tokenId] > 0,
-            "There should be at least a bid for the date."
-        );
-        require(!_exists(tokenId), "Should not reclaim the auction.");
+    function _settleAuction(uint256 tokenId) internal {
+        require(block.timestamp / 1 days > tokenId, "Auction not yet ended");
+        require(_highestBidder[tokenId] != address(0) && _highestBid[tokenId] > 0, "There should be at least a bid for the date");
+        require(!_exists(tokenId), "Should not reclaim the auction");
 
+        // It cannot be a safeMint. The Auction will never ends.
         _mint(_highestBidder[tokenId], tokenId);
-        _foundation.send(_highestBid[tokenId]);
+        _foundation.transfer(_highestBid[tokenId]);
 
         emit AuctionSettled(tokenId, _highestBidder[tokenId], _highestBid[tokenId]);
     }
@@ -376,13 +371,12 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     function supportsInterface(bytes4 interfaceId) 
-        public view override(ERC721Enumerable, AccessControl, IERC165) returns (bool) 
+        public view override(ERC721, AccessControl, IERC165) returns (bool) 
     {
-        return ERC721Enumerable.supportsInterface(interfaceId) ||
+        return ERC721.supportsInterface(interfaceId) ||
             AccessControl.supportsInterface(interfaceId) || 
             type(IERC2981).interfaceId == interfaceId ||
-            type(IERC165).interfaceId == interfaceId ||        
-            type(IERC721Receiver).interfaceId == interfaceId;
+            type(IERC165).interfaceId == interfaceId;
     }
 
     // ==== Royalty Functions ====

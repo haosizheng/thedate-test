@@ -39,6 +39,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "generateMetadata(uint256)": FunctionFragment;
     "generateSVGImage(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getCurrentMinimumBid()": FunctionFragment;
     "getDate(uint256)": FunctionFragment;
     "getHighestBid(uint256)": FunctionFragment;
     "getNote(uint256)": FunctionFragment;
@@ -49,7 +50,6 @@ interface TheDateInterface extends ethers.utils.Interface {
     "minBidIncrementBps()": FunctionFragment;
     "name()": FunctionFragment;
     "noteSizeLimit()": FunctionFragment;
-    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "placeBid()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
@@ -72,11 +72,8 @@ interface TheDateInterface extends ethers.utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "svgImageTemplate(uint256)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "tokenByIndex(uint256)": FunctionFragment;
     "tokenDescription()": FunctionFragment;
-    "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
-    "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
@@ -140,6 +137,10 @@ interface TheDateInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getCurrentMinimumBid",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getDate",
     values: [BigNumberish]
   ): string;
@@ -175,10 +176,6 @@ interface TheDateInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "noteSizeLimit",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "onERC721Received",
-    values: [string, string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
@@ -263,24 +260,12 @@ interface TheDateInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "tokenByIndex",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "tokenDescription",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "tokenOfOwnerByIndex",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "tokenURI",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupply",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "transferFrom",
@@ -331,6 +316,10 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrentMinimumBid",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getDate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getHighestBid",
@@ -354,10 +343,6 @@ interface TheDateInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "noteSizeLimit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "onERC721Received",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
@@ -434,22 +419,10 @@ interface TheDateInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "tokenByIndex",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "tokenDescription",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenOfOwnerByIndex",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupply",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
@@ -617,6 +590,10 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getCurrentMinimumBid(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { amount: BigNumber }>;
+
     getDate(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -657,14 +634,6 @@ export class TheDate extends BaseContract {
     name(overrides?: CallOverrides): Promise<[string]>;
 
     noteSizeLimit(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     ownerOf(
       tokenId: BigNumberish,
@@ -781,25 +750,12 @@ export class TheDate extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     tokenDescription(overrides?: CallOverrides): Promise<[string]>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transferFrom(
       from: string,
@@ -881,6 +837,8 @@ export class TheDate extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getCurrentMinimumBid(overrides?: CallOverrides): Promise<BigNumber>;
+
   getDate(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   getHighestBid(
@@ -915,14 +873,6 @@ export class TheDate extends BaseContract {
   name(overrides?: CallOverrides): Promise<string>;
 
   noteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
-
-  onERC721Received(
-    arg0: string,
-    arg1: string,
-    arg2: BigNumberish,
-    arg3: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -1036,22 +986,9 @@ export class TheDate extends BaseContract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  tokenByIndex(
-    index: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   tokenDescription(overrides?: CallOverrides): Promise<string>;
 
-  tokenOfOwnerByIndex(
-    owner: string,
-    index: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
   transferFrom(
     from: string,
@@ -1125,6 +1062,8 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getCurrentMinimumBid(overrides?: CallOverrides): Promise<BigNumber>;
+
     getDate(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     getHighestBid(
@@ -1159,14 +1098,6 @@ export class TheDate extends BaseContract {
     name(overrides?: CallOverrides): Promise<string>;
 
     noteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -1276,22 +1207,9 @@ export class TheDate extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     tokenDescription(overrides?: CallOverrides): Promise<string>;
 
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferFrom(
       from: string,
@@ -1502,6 +1420,8 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCurrentMinimumBid(overrides?: CallOverrides): Promise<BigNumber>;
+
     getDate(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1545,14 +1465,6 @@ export class TheDate extends BaseContract {
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     noteSizeLimit(overrides?: CallOverrides): Promise<BigNumber>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     ownerOf(
       tokenId: BigNumberish,
@@ -1667,25 +1579,12 @@ export class TheDate extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     tokenDescription(overrides?: CallOverrides): Promise<BigNumber>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferFrom(
       from: string,
@@ -1770,6 +1669,10 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCurrentMinimumBid(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getDate(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1815,14 +1718,6 @@ export class TheDate extends BaseContract {
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     noteSizeLimit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    onERC721Received(
-      arg0: string,
-      arg1: string,
-      arg2: BigNumberish,
-      arg3: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     ownerOf(
       tokenId: BigNumberish,
@@ -1937,25 +1832,12 @@ export class TheDate extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     tokenDescription(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferFrom(
       from: string,
