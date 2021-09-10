@@ -24,12 +24,13 @@ interface TheDateInterface extends ethers.utils.Interface {
   functions: {
     "DAO_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "_settleAuction(uint256)": FunctionFragment;
     "airdrop(address[],uint256[])": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "claim(uint256)": FunctionFragment;
+    "claimNextAvailable()": FunctionFragment;
     "claimingPrice()": FunctionFragment;
+    "daysToDate(uint256)": FunctionFragment;
     "engraveNote(uint256,string)": FunctionFragment;
     "engravingPrice()": FunctionFragment;
     "eraseNote(uint256)": FunctionFragment;
@@ -54,6 +55,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "renounceRole(bytes32,address)": FunctionFragment;
     "reservePrice()": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
+    "royaltyBps()": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -68,8 +70,10 @@ interface TheDateInterface extends ethers.utils.Interface {
     "setTokenDescription(string)": FunctionFragment;
     "settleLastAuction()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
+    "svgImageTemplate(uint256)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
+    "tokenDescription()": FunctionFragment;
     "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -82,10 +86,6 @@ interface TheDateInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "_settleAuction",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "airdrop",
     values: [string[], BigNumberish[]]
   ): string;
@@ -96,8 +96,16 @@ interface TheDateInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "claim", values: [BigNumberish]): string;
   encodeFunctionData(
+    functionFragment: "claimNextAvailable",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "claimingPrice",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "daysToDate",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "engraveNote",
@@ -190,6 +198,10 @@ interface TheDateInterface extends ethers.utils.Interface {
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "royaltyBps",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "royaltyInfo",
     values: [BigNumberish, BigNumberish]
   ): string;
@@ -245,10 +257,18 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "svgImageTemplate",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "tokenByIndex",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenDescription",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "tokenOfOwnerByIndex",
@@ -272,18 +292,19 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "_settleAuction",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "airdrop", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "claimNextAvailable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "claimingPrice",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "daysToDate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "engraveNote",
     data: BytesLike
@@ -350,6 +371,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "royaltyBps", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
     data: BytesLike
@@ -406,9 +428,17 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "svgImageTemplate",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "tokenByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenDescription",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -516,11 +546,6 @@ export class TheDate extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    _settleAuction(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     airdrop(
       addresses: string[],
       tokenIds: BigNumberish[],
@@ -540,7 +565,22 @@ export class TheDate extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    claimNextAvailable(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     claimingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    daysToDate(
+      _days: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        year: BigNumber;
+        month: BigNumber;
+        day: BigNumber;
+      }
+    >;
 
     engraveNote(
       tokenId: BigNumberish,
@@ -649,6 +689,8 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    royaltyBps(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     royaltyInfo(
       tokenId: BigNumberish,
       salePrice: BigNumberish,
@@ -732,12 +774,19 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    svgImageTemplate(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    tokenDescription(overrides?: CallOverrides): Promise<[string]>;
 
     tokenOfOwnerByIndex(
       owner: string,
@@ -764,11 +813,6 @@ export class TheDate extends BaseContract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  _settleAuction(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   airdrop(
     addresses: string[],
     tokenIds: BigNumberish[],
@@ -788,7 +832,22 @@ export class TheDate extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  claimNextAvailable(
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  daysToDate(
+    _days: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber] & {
+      year: BigNumber;
+      month: BigNumber;
+      day: BigNumber;
+    }
+  >;
 
   engraveNote(
     tokenId: BigNumberish,
@@ -885,6 +944,8 @@ export class TheDate extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  royaltyBps(overrides?: CallOverrides): Promise<BigNumber>;
+
   royaltyInfo(
     tokenId: BigNumberish,
     salePrice: BigNumberish,
@@ -968,12 +1029,19 @@ export class TheDate extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  svgImageTemplate(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   symbol(overrides?: CallOverrides): Promise<string>;
 
   tokenByIndex(
     index: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  tokenDescription(overrides?: CallOverrides): Promise<string>;
 
   tokenOfOwnerByIndex(
     owner: string,
@@ -997,11 +1065,6 @@ export class TheDate extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    _settleAuction(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     airdrop(
       addresses: string[],
       tokenIds: BigNumberish[],
@@ -1018,7 +1081,20 @@ export class TheDate extends BaseContract {
 
     claim(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
+    claimNextAvailable(overrides?: CallOverrides): Promise<void>;
+
     claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    daysToDate(
+      _days: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        year: BigNumber;
+        month: BigNumber;
+        day: BigNumber;
+      }
+    >;
 
     engraveNote(
       tokenId: BigNumberish,
@@ -1110,6 +1186,8 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    royaltyBps(overrides?: CallOverrides): Promise<BigNumber>;
+
     royaltyInfo(
       tokenId: BigNumberish,
       salePrice: BigNumberish,
@@ -1191,12 +1269,19 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    svgImageTemplate(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     symbol(overrides?: CallOverrides): Promise<string>;
 
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    tokenDescription(overrides?: CallOverrides): Promise<string>;
 
     tokenOfOwnerByIndex(
       owner: string,
@@ -1352,11 +1437,6 @@ export class TheDate extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    _settleAuction(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     airdrop(
       addresses: string[],
       tokenIds: BigNumberish[],
@@ -1376,7 +1456,16 @@ export class TheDate extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    claimNextAvailable(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    daysToDate(
+      _days: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     engraveNote(
       tokenId: BigNumberish,
@@ -1488,6 +1577,8 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    royaltyBps(overrides?: CallOverrides): Promise<BigNumber>;
+
     royaltyInfo(
       tokenId: BigNumberish,
       salePrice: BigNumberish,
@@ -1569,12 +1660,19 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    svgImageTemplate(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    tokenDescription(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenOfOwnerByIndex(
       owner: string,
@@ -1604,11 +1702,6 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    _settleAuction(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     airdrop(
       addresses: string[],
       tokenIds: BigNumberish[],
@@ -1631,7 +1724,16 @@ export class TheDate extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    claimNextAvailable(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     claimingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    daysToDate(
+      _days: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     engraveNote(
       tokenId: BigNumberish,
@@ -1745,6 +1847,8 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    royaltyBps(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     royaltyInfo(
       tokenId: BigNumberish,
       salePrice: BigNumberish,
@@ -1826,12 +1930,19 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    svgImageTemplate(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    tokenDescription(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenOfOwnerByIndex(
       owner: string,

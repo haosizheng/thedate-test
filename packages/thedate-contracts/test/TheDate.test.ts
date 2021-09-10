@@ -1,7 +1,10 @@
 import { ethers } from "hardhat";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
-import { TheFoundation__factory, TheFoundation, TheDate__factory, TheDate } from "../typechain";
+import { Foundation, Foundation__factory, 
+  MockWETH, MockWETH__factory,
+  MockERC721, MockERC721__factory,
+  TheDate, TheDate__factory, ERC721 } from "../typechain";
 import type { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber } from "@ethersproject/bignumber";
 
@@ -11,8 +14,10 @@ const expect = chai.expect;
 chai.use(solidity);
 
 context("TheDate contract", () => {
-  let foundationContract: TheFoundation;
+  let foundationContract: Foundation;
   let mainContract: TheDate;
+  let mockWETHContract: MockWETH;
+  let mockLootContract: MockERC721;
 
   let foundationUsers: SignerWithAddress[];
   let foundationMembers: Address[];
@@ -22,31 +27,46 @@ context("TheDate contract", () => {
   let user2: SignerWithAddress;
   let user3: SignerWithAddress;
   let user4: SignerWithAddress;
+  let user5: SignerWithAddress;
+  let user6: SignerWithAddress;
+
   const SECONDS_IN_A_DAY = 86400;
 
-  beforeEach(async () => {
-    [deployer, user1, user2, user3, user4] = await ethers.getSigners();
+  before(async () => {
+    [deployer, user1, user2, user3, user4, user5, user6] = await ethers.getSigners();
 
     // Setup the foundation
     foundationUsers = [user1, user2];
     foundationMembers = [user1.address, user2.address];
-    foundationShares = [30, 70];
-    foundationContract = await (
-      await new TheFoundation__factory(deployer).deploy(foundationMembers, foundationShares)
-    ).deployed();
+    foundationShares = [70, 30];
 
+    foundationContract = await (await new Foundation__factory(deployer).deploy(foundationMembers, foundationShares)).deployed();
+    mockWETHContract = await (await new MockWETH__factory(deployer).deploy()).deployed();
+    mockLootContract = await (await new MockERC721__factory(deployer).deploy()).deployed();
+    
+    // User 5 and User 6 has Loot
+    for (let i = 0; i < 10; i += 2) { 
+      mockLootContract.mint(user5.address, i);
+      mockLootContract.mint(user6.address, i + 1);
+    }
+  });
+  
+  beforeEach(async () => {
     // Deploy the main contract
-    mainContract = (await (
-      await new TheDate__factory(deployer).deploy(foundationContract.address)
-    ).deployed()) as TheDate;
+    mainContract = await (await new TheDate__factory(deployer)
+      .deploy(foundationContract.address, mockWETHContract.address, mockLootContract.address)).deployed();
   });
 
-  describe("WithRoyalty", async () => {
-    it("Royalty", async () => {
-      expect(await mainContract.getRoyaltyBps()).to.eq(1000);
-      await expect(mainContract.setRoyaltyBps(50000)).to.be.revertedWith(
-        "royaltyBps should be within [0, 10000].",
-      );
+  describe("Royalty", async () => {
+    it("Get/Set Royalty Bps", async () => {
+      expect(await mainContract.royaltyBps()).to.eq(1000);
+      await expect(mainContract.setRoyaltyBps(50000))
+        .to.be.revertedWith("royaltyBps should be within [0, 10000].");
+      await expect(mainContract.connect(user1).setRoyaltyBps(500))
+        .to.be.revertedWith("AccessControl: account");
+    });
+      
+    it("Royalty splits correctly", async () => {
       await mainContract.setRoyaltyBps(5000);
       const [receiver, royaltyAmount] = await mainContract.royaltyInfo(
         ethers.constants.Zero,
@@ -57,19 +77,170 @@ context("TheDate contract", () => {
     });
   });
 
+  describe("Metadata functions", async () => {
+    it("Check getDate from Token 0", async () => {
+      const testCase = [0, 10, 1000, 2000, 18500, 40000, 100000, 1000000, 2000000, 10000000];
+      const getFormattedDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = (1 + date.getMonth()).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+      
+        return year + '-' + month + '-' + day;
+      }
+      for (const i of testCase) {
+        const currentDate: string = getFormattedDate(new Date(i * SECONDS_IN_A_DAY * 1000));
+        expect(await mainContract.getDate(i)).to.be.eq(currentDate);
+      }
+    });
+
+    it.only("Engrave and erase the note", async () => {
+      const tokenId = 0;
+      const userNote = "I love you.";
+      const userNoteLong = "I love you. Long Long Long ...";
+      const userNoteUnicode = "哈哈哈哈哈哈";
+      const userNoteUnicodeLong = "哈哈哈哈哈哈哈";
+
+      expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("0.01"));
+      expect(await mainContract.erasingPrice()).to.eq(ethers.utils.parseEther("0.1"));
+      expect(await mainContract.noteSizeLimit()).to.eq(BigNumber.from(100));
+      await mainContract.connect(deployer).setNoteSizeLimit(20);
+
+      const engravingPrice = await mainContract.engravingPrice();
+      const erasingPrice = await mainContract.erasingPrice();
+
+      await expect(mainContract.connect(user1).claim(tokenId, {value: await mainContract.claimingPrice()}))
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(tokenId, user1.address);
+
+      // Exception case that set the message before auction ends.
+      await expect(mainContract.connect(user2).engraveNote(tokenId, userNote, {value: engravingPrice}))
+        .to.be.revertedWith("Caller should be the owner of the artwork.");
+
+      // Exception case that longer user note
+      await expect(mainContract.connect(user1).engraveNote(tokenId, userNoteLong, {value: engravingPrice}))
+        .to.be.revertedWith("Note should be shorter than noteSizeLimit.");
+
+      // Exception case that without enough funds.
+      await expect(mainContract.connect(user1).engraveNote(tokenId, userNote))
+        .to.be.revertedWith("Should pay >= engravingPrice.");
+
+      // User 1 sets the note of his artwork.
+      await expect(mainContract.connect(user1).engraveNote(tokenId, userNote, { value: engravingPrice }))
+        .to.emit(mainContract, "NoteEngraved").withArgs(tokenId, user1.address, userNote);
+
+      //        .to.changeEtherBalance(foundationContract.address, engravingPrice);
+      expect(await mainContract.getNote(tokenId)).to.eq(userNote);
+
+      // Exception case that user 1 engraves his artwork's note twice.
+      await expect(mainContract.connect(user1).engraveNote(tokenId, userNote, { value: engravingPrice }))
+        .to.be.revertedWith("Note should be empty before engraving");
+
+      // Exception case that user 2 erase the note of user1's artwork.
+      await expect(mainContract.connect(user2).eraseNote(tokenId, {value: erasingPrice}))
+        .to.be.revertedWith("Caller should be the owner of the artwork");
+
+      // Exception case that user 1 erases the note of his artwork with no fund.
+      await expect(mainContract.connect(user1).eraseNote(tokenId, {value: ethers.utils.parseEther("0.001")}))
+        .to.be.revertedWith("Should pay >= erasingPrice");
+
+      // User 1 erases the note of his artwork.
+      await expect(mainContract.connect(user1).eraseNote(tokenId, { value: erasingPrice}))
+        .to.emit(mainContract, "NoteErased").withArgs(tokenId, user1.address);
+      expect(await mainContract.getNote(tokenId)).to.be.eq("");
+
+      // Exception case that user 1 erases his artwork's note twice.
+      await expect(mainContract.connect(user1).eraseNote(tokenId, { value: erasingPrice }))
+        .to.be.revertedWith("Note should be nonempty before erasing");
+      
+      // Unicode
+      await expect(mainContract.connect(user1).engraveNote(tokenId, userNoteUnicode, { value: engravingPrice }))
+        .to.emit(mainContract, "NoteEngraved").withArgs(tokenId, user1.address, userNoteUnicode);
+
+      await expect(() => mainContract.connect(user1).eraseNote(tokenId, { value: erasingPrice }))
+        .to.changeEtherBalance(foundationContract.address, erasingPrice);
+    });
+
+    // it("generateSVGImage", async () => {
+
+    // });
+  });
+
+  describe("Claiming", async () => {
+    it("Claiming at a cost", async () => {
+      // Users claims at a cost
+      await expect(mainContract.connect(user1).claim(0)).to.be.revertedWith("Should pay >= claiming price or own a Loot NFT.");
+      await expect(mainContract.connect(user1).claim(0, {value: await mainContract.claimingPrice()}))
+        .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, 1)
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(0, user1.address);
+
+      // Loot holder claims for free
+      await expect(mainContract.connect(user5).claim(1))
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(1, user5.address);
+
+      // Admin claims for free
+      await expect(mainContract.connect(deployer).claim(2))
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(2, deployer.address);
+
+      // Claims for next available 
+      await expect(mainContract.connect(deployer).claimNextAvailable())
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(3, deployer.address);
+    });
+
+    it("Claiming next available", async () => {
+      // Users claims at a cost
+      await expect(mainContract.connect(deployer).claimNextAvailable())
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(0, deployer.address);
+      await expect(mainContract.connect(deployer).claimNextAvailable())
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(1, deployer.address);
+      await expect(mainContract.connect(deployer).claim(1))
+        .to.revertedWith("tokenId should not be claimed.");
+      await expect(mainContract.connect(deployer).claim(2))
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(2, deployer.address);
+      await expect(mainContract.connect(deployer).claimNextAvailable())
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(3, deployer.address);
+    });
+
+    it("Airdrop", async () => {
+      // Loot holder claims for free
+      await expect(mainContract.connect(user1).claim(1)).to.be.revertedWith("Should pay >= claiming price or own a Loot NFT");
+      await expect(mainContract.connect(user1).claim(1, {value: await mainContract.claimingPrice()}))
+        .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, 1)
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(1, user1.address);
+
+      // Loot holder claims for free
+      await expect(mainContract.connect(user5).claim(2))
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(2, user5.address);
+
+      // Admin claims for free
+      await expect(mainContract.connect(deployer).claim(3))
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(3, deployer.address);
+    });
+  });
+
   describe("Parameters", async () => {
-    it("noteSizeLimit", async () => {
-      expect(await mainContract.getEngravingPrice()).to.eq(ethers.constants.Zero);
-      expect(await mainContract.getErasingPrice()).to.eq(ethers.utils.parseEther("1.0"));
-      expect(await mainContract.getNoteSizeLimit()).to.eq(BigNumber.from(100));
+    it("DAO controlled parameters", async () => {
+      expect(mainContract.grantRole(await mainContract.DAO_ROLE(), user5.address))
+        .emit(mainContract, "RoleGranted").withArgs(await mainContract.DAO_ROLE(), deployer.address, user5.address);
 
-      await mainContract.setEngravingPrice(ethers.utils.parseEther("2.0"));
-      await mainContract.setErasingPrice(ethers.utils.parseEther("1.0"));
-      await mainContract.setNoteSizeLimit(120);
+      expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("0.01"));
+      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("0.01"));
+      expect(await mainContract.minBidIncrementBps()).to.eq(BigNumber.from(1000));
+      expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("0.01"));
+      expect(await mainContract.erasingPrice()).to.eq(ethers.utils.parseEther("0.1"));
+      expect(await mainContract.noteSizeLimit()).to.eq(BigNumber.from(100));
 
-      expect(await mainContract.getEngravingPrice()).to.eq(ethers.utils.parseEther("2.0"));
-      expect(await mainContract.getErasingPrice()).to.eq(ethers.utils.parseEther("1.0"));
-      expect(await mainContract.getNoteSizeLimit()).to.eq(BigNumber.from(120));
+      await mainContract.connect(user5).setClaimingPrice(ethers.utils.parseEther("2.0"));
+      await mainContract.connect(user5).setAuctionReservePrice(ethers.utils.parseEther("1.0"));
+      await mainContract.connect(user5).setAuctionMinBidIncrementBps(2000);
+      await mainContract.connect(user5).setEngravingPrice(ethers.utils.parseEther("2.0"));
+      await mainContract.connect(user5).setErasingPrice(ethers.utils.parseEther("1.0"));
+      await mainContract.connect(user5).setNoteSizeLimit(120);
+
+      expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("2.0"));
+      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("1.0"));
+      expect(await mainContract.minBidIncrementBps()).to.eq(BigNumber.from(2000));
+      expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("0.01"));
+      expect(await mainContract.erasingPrice()).to.eq(ethers.utils.parseEther("0.1"));
+      expect(await mainContract.noteSizeLimit()).to.eq(BigNumber.from(120));
     });
   });
 
@@ -81,135 +252,22 @@ context("TheDate contract", () => {
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
       ).div(SECONDS_IN_A_DAY);
 
-      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("1.0") }))
-        .emit(mainContract, "ArtworkMinted")
-        .withArgs(tokenId)
+      await expect(mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("1.0") }))
         .emit(mainContract, "BidPlaced")
         .withArgs(tokenId, user1.address, ethers.utils.parseEther("1.0"));
 
-      expect(await mainContract.connect(user1).exists(tokenId)).to.eq(true);
-    });
+      expect(await mainContract.connect(user1).exists(tokenId)).to.eq(false);
 
-    it("Set Token URL", async () => {
-      const tokenId = BigNumber.from(
-        (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
-      ).div(SECONDS_IN_A_DAY);
-
-      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("1.0") }))
-        .emit(mainContract, "ArtworkMinted")
-        .withArgs(tokenId)
+      await expect(mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("1.0") }))
         .emit(mainContract, "BidPlaced")
         .withArgs(tokenId, user1.address, ethers.utils.parseEther("1.0"));
-
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
-
-      expect(mainContract.tokenURI(1)).to.be.revertedWith("ERC721Metadata: URI query for nonexistent token");
-
-      expect(await mainContract.tokenURI(tokenId)).to.eq("https://thedate.art/api/token/" + tokenId.toString());
-
-      await mainContract.setBaseURI("https://www.thedate.art/api/token/");
-
-      expect(await mainContract.tokenURI(tokenId)).to.eq("https://www.thedate.art/api/token/" + tokenId.toString());
-    });
-
-    it("Engrave and erase the note", async () => {
-      const tokenId = BigNumber.from(
-        (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
-      ).div(SECONDS_IN_A_DAY);
-      const userNote = "I love you.";
-
-      expect(await mainContract.getEngravingPrice()).to.eq(ethers.constants.Zero);
-      expect(await mainContract.getErasingPrice()).to.eq(ethers.utils.parseEther("1.0"));
-      expect(await mainContract.getNoteSizeLimit()).to.eq(BigNumber.from(100));
-
-      const engravingPrice = await mainContract.getEngravingPrice();
-      const erasingPrice = await mainContract.getErasingPrice();
-
-      await mainContract.setAuctionReservePrice(ethers.utils.parseEther("0.1"));
-      await mainContract.setAuctionMinBidIncrementBps(5000); //50%
-      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.1") }))
-        .emit(mainContract, "ArtworkMinted")
-        .withArgs(tokenId);
-
-      // Exception case that set the message before auction ends.
-      await expect(mainContract.connect(user1).engraveArtworkNote(tokenId, userNote, 
-        {value: engravingPrice})).to.be.revertedWith(
-        "Caller should be the owner of the artwork.",
-      );
-
-      // 1 more day passed
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
-
-      // User 1 wins the auction
-      await expect(mainContract.connect(user1).endAuction(tokenId))
-        .emit(mainContract, "Transfer")
-        .withArgs(mainContract.address, user1.address, tokenId);
-
-      // Exception case that user 2 sets the note of his artwork.
-      await expect(mainContract.connect(user2).engraveArtworkNote(tokenId, userNote, {value: engravingPrice})).to.be.revertedWith(
-        "Caller should be the owner of the artwork.",
-      );
-
-      // User 1 sets the note of his artwork.
-      await expect(
-        mainContract.connect(user1).engraveArtworkNote(tokenId, userNote, { value: ethers.utils.parseEther("0.001") }),
-      )
-        .emit(mainContract, "ArtworkNoteEngraved")
-        .withArgs(tokenId, user1.address, userNote);
-      expect(await mainContract.artworks(tokenId)).has.property("note", userNote);
-
-      // Exception case that user 1 engraves his artwork's note twice.
-      await expect(
-        mainContract.connect(user1).engraveArtworkNote(tokenId, userNote, { value: ethers.utils.parseEther("0.001") }),
-      ).to.be.revertedWith("Note should be empty before engraving");
-
-      // Exception case that user 2 erase the note of user1's artwork.
-      await expect(mainContract.connect(user2).eraseArtworkNote(tokenId, {value: erasingPrice})).to.be.revertedWith(
-        "Caller should be the owner of the artwork.",
-      );
-
-      // Exception case that user 1 erases the note of his artwork with no fund.
-      await expect(mainContract.connect(user1).eraseArtworkNote(tokenId, {value: ethers.utils.parseEther("0.001")})).to.be.revertedWith(
-        "Should pay >= erasingPrice",
-      );
-
-      // User 1 erases the note of his artwork.
-      await expect(mainContract.connect(user1).eraseArtworkNote(tokenId, { value: erasingPrice}))
-        .emit(mainContract, "ArtworkNoteErased")
-        .withArgs(tokenId, user1.address);
-      expect(await mainContract.artworks(tokenId)).has.property("note", "");
-
-      // Exception case that user 1 erases his artwork's note twice.
-      await expect(
-        mainContract.connect(user1).eraseArtworkNote(tokenId, { value: erasingPrice }),
-      ).to.be.revertedWith("Note should be nonempty before erasing");
     });
   });
 
-  describe("MintedByAuction", async () => {
-    it("Bid too early", async () => {
-      const tokenId = BigNumber.from(
-        (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
-      ).div(SECONDS_IN_A_DAY);
-
-      await expect(
-        mainContract.connect(user1).placeBid(tokenId.add(1), { value: ethers.utils.parseEther("0.5") }),
-      ).to.be.revertedWith("Auction is not started.");
-    });
-
-    it("Bid too late", async () => {
-      const tokenId = BigNumber.from(
-        (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
-      ).div(SECONDS_IN_A_DAY);
-
-      await expect(
-        mainContract.connect(user1).placeBid(tokenId.sub(1), { value: ethers.utils.parseEther("0.5") }),
-      ).to.be.revertedWith("Auction is ended.");
-    });
-
+  describe("Auction", async () => {
     it("SetAuctionReservePrice", async () => {
       await mainContract.setAuctionReservePrice(ethers.utils.parseEther("0.1"));
-      expect(await mainContract.connect(user2).getAuctionReservePrice()).to.eq(ethers.utils.parseEther("0.1"));
+      expect(await mainContract.connect(user2).reservePrice()).to.eq(ethers.utils.parseEther("0.1"));
       await expect(
         mainContract.connect(user1).setAuctionReservePrice(ethers.utils.parseEther("0.1")),
       ).to.be.revertedWith("AccessControl: account");
@@ -217,7 +275,7 @@ context("TheDate contract", () => {
 
     it("SetAuctionMinBidIncrementBps", async () => {
       await mainContract.setAuctionMinBidIncrementBps(500); //5%
-      expect(await mainContract.connect(user2).getAuctionMinBidIncrementBps()).to.eq(500);
+      expect(await mainContract.connect(user2).minBidIncrementBps()).to.eq(500);
       await expect(mainContract.connect(user1).setAuctionMinBidIncrementBps(1000)).to.be.revertedWith(
         "AccessControl: account",
       );
@@ -228,173 +286,95 @@ context("TheDate contract", () => {
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
       ).div(SECONDS_IN_A_DAY);
 
-      await expect(mainContract.connect(user1).endAuction(tokenId.sub(1))).to.be.revertedWith(
-        "There should be at least a bid for the date.",
-      );
+      expect(mainContract.connect(user1).settleLastAuction());
     });
 
     it("Place Bid", async () => {
       const tokenId = BigNumber.from(
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
       ).div(SECONDS_IN_A_DAY);
+
       await mainContract.setAuctionReservePrice(ethers.utils.parseEther("0.1"));
       await mainContract.setAuctionMinBidIncrementBps(5000); //50%
 
-      const bid_satisfy_fn = (
-        x: [string, BigNumber] & { bidder: string; amount: BigNumber },
-        bidder: string,
-        amount: BigNumber,
-      ) => ethers.utils.getAddress(x.bidder) === ethers.utils.getAddress(bidder) && x.amount.eq(amount);
-
       // Exception case that the bid is lower than reserve price
       await expect(
-        mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.01") }),
+        mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("0.01") }),
       ).to.be.revertedWith("Must send more than reservePrice.");
 
       // Check the highest bid
       expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(ethers.constants.AddressZero);
-      expect((await mainContract.getHighestBid(tokenId)).amount).to.satisfy((x: BigNumber) =>
-        x.eq(ethers.constants.Zero),
-      );
+      expect((await mainContract.getHighestBid(tokenId)).amount).to.eq(ethers.constants.Zero);
 
       // The first bid is placed by User1
-      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.1") }))
+      await expect(mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("0.1") }))
         .emit(mainContract, "BidPlaced")
         .withArgs(tokenId, user1.address, ethers.utils.parseEther("0.1"))
-        .emit(mainContract, "ArtworkMinted")
-        .withArgs(tokenId);
 
       // Check the highest bid
       expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(user1.address);
-      expect((await mainContract.getHighestBid(tokenId)).amount).to.satisfy((x: BigNumber) =>
-        x.eq(ethers.utils.parseEther("0.1")),
-      );
+      expect((await mainContract.getHighestBid(tokenId)).amount).to.eq(ethers.utils.parseEther("0.1"));
 
       // Exception case that the bid is not higher than highest bid
       await expect(
-        mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.1") }),
+        mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("0.1") }),
       ).to.be.revertedWith("Must send more than the highest bid.");
+
       // Exception case that the increased bid is not higher than auctionMinBidIncrementBps
       await expect(
-        mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.11") }),
+        mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("0.11") }),
       ).to.be.revertedWith("Must send over the last bid by minBidIncrement permyriad.");
 
       // The second bid is placed by User1
-      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.15") }))
+      expect(async () => 
+        await expect(mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("0.15") }))
         .emit(mainContract, "BidPlaced")
-        .withArgs(tokenId, user1.address, ethers.utils.parseEther("0.15"));
+        .withArgs(tokenId, user1.address, ethers.utils.parseEther("0.15")))
+        .changeEtherBalance(
+          user1,
+          ethers.utils.parseEther("0.1"),
+        );
 
       // The third bid is placed by User2
-      await expect(mainContract.connect(user2).placeBid(tokenId, { value: ethers.utils.parseEther("0.25") }))
+      expect(async () => await expect(mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.25") }))
         .emit(mainContract, "BidPlaced")
-        .withArgs(tokenId, user2.address, ethers.utils.parseEther("0.25"));
+        .withArgs(tokenId, user2.address, ethers.utils.parseEther("0.25")))
+        .changeEtherBalance(
+          user1,
+          ethers.utils.parseEther("0.15"),
+        );
 
       // Check the highest bid
       expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(user2.address);
-      expect((await mainContract.getHighestBid(tokenId)).amount).to.satisfy((x: BigNumber) =>
-        x.eq(ethers.utils.parseEther("0.25")),
-      );
-
-      // User1 withdrawed fund.
-      expect(await mainContract.getPendingReturns(user1.address)).to.eq(ethers.utils.parseEther("0.25"));
-      await expect(() => mainContract.connect(user1).withdrawFund()).changeEtherBalance(
-        user1,
-        ethers.utils.parseEther("0.25"),
-      );
-
-      expect(await mainContract.getPendingReturns(user1.address)).to.eq(ethers.utils.parseEther("0"));
+      expect((await mainContract.getHighestBid(tokenId)).amount).to.eq(ethers.utils.parseEther("0.25"));
 
       // The fourth bid is placed by User 3
-      await expect(mainContract.connect(user3).placeBid(tokenId, { value: ethers.utils.parseEther("0.5") }))
+      await expect(mainContract.connect(user3).placeBid({ value: ethers.utils.parseEther("0.5") }))
         .emit(mainContract, "BidPlaced")
         .withArgs(tokenId, user3.address, ethers.utils.parseEther("0.5"));
-      // Check user2's refund.
-      expect(await mainContract.getPendingReturns(user2.address)).to.eq(ethers.utils.parseEther("0.25"));
-
-      // The fifth bid is placed by User1
-      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("0.75") }))
-        .emit(mainContract, "BidPlaced")
-        .withArgs(tokenId, user1.address, ethers.utils.parseEther("0.75"));
-      // Exception case that User1 withdraw with no refund.
-      await expect(mainContract.connect(user1).withdrawFund()).to.be.revertedWith("No pending returns.");
-
-      // The sixth bid is placed by User1
-      await expect(mainContract.connect(user1).placeBid(tokenId, { value: ethers.utils.parseEther("1.5") }))
-        .emit(mainContract, "BidPlaced")
-        .withArgs(tokenId, user1.address, ethers.utils.parseEther("1.5"));
-      // Check user1 and user3's refund.
-      expect(await mainContract.getPendingReturns(user1.address)).to.eq(ethers.utils.parseEther("0.75"));
-      expect(await mainContract.getPendingReturns(user2.address)).to.eq(ethers.utils.parseEther("0.25"));
-      expect(await mainContract.getPendingReturns(user3.address)).to.eq(ethers.utils.parseEther("0.5"));
-
-      // Exception case endAuction before the day ends.
-      await expect(mainContract.connect(user1).endAuction(tokenId)).to.be.revertedWith("Auction not yet ended.");
 
       // 1 day passed
       await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
-
-      // Exception case that place bid after auction ends
-      await expect(
-        mainContract.connect(user3).placeBid(tokenId, { value: ethers.utils.parseEther("2") }),
-      ).to.be.revertedWith("Auction is ended.");
-
-      // Place bid for the next date by User 3
-      await expect(mainContract.connect(user3).placeBid(tokenId.add(1), { value: ethers.utils.parseEther("0.1") }))
+      
+      // The first bid for day 2 with auto auction settled for day 1
+      await expect(mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.3") }))
         .emit(mainContract, "BidPlaced")
-        .withArgs(tokenId.add(1), user3.address, ethers.utils.parseEther("0.1"));
+        .withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.3"))
+        .emit(mainContract, "AuctionSettled")
+        .withArgs(tokenId, user2.address, ethers.utils.parseEther("0.25"));
 
-      // Place bid for the next date by User 2
-      await expect(mainContract.connect(user2).placeBid(tokenId.add(1), { value: ethers.utils.parseEther("0.2") }))
-        .emit(mainContract, "BidPlaced")
-        .withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.2"));
-
-      expect(await mainContract.getPendingReturns(user1.address)).to.eq(ethers.utils.parseEther("0.75"));
-      expect(await mainContract.getPendingReturns(user2.address)).to.eq(ethers.utils.parseEther("0.25"));
-      expect(await mainContract.getPendingReturns(user3.address)).to.eq(ethers.utils.parseEther("0.6"));
-
-      // Withdraw funds by User 3.
-      await expect(mainContract.connect(user3).withdrawFund())
-        .emit(mainContract, "FundWithdrew")
-        .withArgs(user3.address, ethers.utils.parseEther("0.6"));
-
-      // Claim the token for winner user1
-      expect(await mainContract.ownerOf(tokenId)).to.eq(mainContract.address);
-      await expect(() => mainContract.connect(user1).endAuction(tokenId)).changeEtherBalance(
-        foundationContract,
-        ethers.utils.parseEther("1.5"),
-      );
-      expect(await mainContract.ownerOf(tokenId)).to.eq(user1.address);
-
-      // Reclaim the token for winner user1
-      await expect(mainContract.connect(user1).endAuction(tokenId)).to.be.revertedWith(
-        "Should not reclaim the auction.",
-      );
-
+      // Manually auction settlement before auction ends.
+      await expect(() => mainContract.connect(user2).settleLastAuction())
+          .changeEtherBalance(foundationContract.address, 0);
+        
       // 1 more day passed
       await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
 
-      // Exception case that User1 will claim the item where User2 is the winner.
-      await expect(mainContract.connect(user1).endAuction(tokenId.add(1))).to.be.revertedWith(
-        "Only winner or admin can claim the item.",
-      );
-
-      // Admin will end the auction.
-      expect(await mainContract.ownerOf(tokenId.add(1))).to.eq(mainContract.address);
-      await expect(mainContract.connect(deployer).endAuction(tokenId.add(1)))
-        .emit(mainContract, "AuctionEnded")
-        .withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.2"))
-        .emit(mainContract, "Transfer")
-        .withArgs(mainContract.address, user2.address, tokenId.add(1));
-      expect(await mainContract.ownerOf(tokenId.add(1))).to.eq(user2.address);
-
-      // Withdraw funds by User 1.
-      await expect(mainContract.connect(user1).withdrawFund())
-        .emit(mainContract, "FundWithdrew")
-        .withArgs(user1.address, ethers.utils.parseEther("0.75"));
-      // Withdraw funds by User 2.
-      await expect(mainContract.connect(user2).withdrawFund())
-        .emit(mainContract, "FundWithdrew")
-        .withArgs(user2.address, ethers.utils.parseEther("0.25"));
+      // Manually auction settlement after auction ends.
+      await expect(async () => await expect(mainContract.connect(user2).settleLastAuction())
+        .emit(mainContract, "AuctionSettled")
+        .withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.3")))
+        .changeEtherBalance(foundationContract.address, ethers.utils.parseEther("0.3"));
     });
   });
 });

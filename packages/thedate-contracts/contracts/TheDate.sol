@@ -11,12 +11,13 @@ import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721H
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Base64 } from "base64-sol/base64.sol";
-import { DateTime } from "./libraries/DateTime.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import { Counters } from "@openzeppelin/contracts/utils/Counters.sol";
 import { IWETH } from "./interfaces/IWETH.sol";
+import "hardhat/console.sol";
 
 contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, ERC721Holder {
     // ==== Roles ====
@@ -32,12 +33,12 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     uint256 public noteSizeLimit = 100;
 
     // == Admin controlled parameters ==
-    uint256 private _royaltyBps = 1000;
-    string private _tokenDescription = "The Date is a metadata-based NFT art experiment about time and blockchain. " 
+    uint256 public royaltyBps = 1000;
+    string public tokenDescription = "The Date is a metadata-based NFT art experiment about time and blockchain. " 
         "Each fleeting day would be imprinted into an NFT artwork on blockchain immutably. " 
         "Optionally, the owner can engrave or erase a note on the artwork as an additional metadata. " 
         "Feel free to use the Date in any way you want.";
-    string[] private _svgImageTemplate = [''
+    string[] public svgImageTemplate = [''
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">'
         '<rect width="100%" height="100%" fill="black" />'
         '<text x="50%" y="50%" fontSize="50px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">',
@@ -77,8 +78,11 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     // == Auction ==
     mapping(uint256 => address) private _highestBidder;
     mapping(uint256 => uint256) private _highestBid;
+
+    // There is at most one unchaimed and auctioned token.
     uint256 _lastUnchaimedAuctionedTokenId = 0;
-    
+    uint256 _nextUnchaimedTokenId = 0;
+
     // ==== Parameter Related Functions ==== 
     // == DAO controlled parameters ==
     function setClaimingPrice(uint256 claimingPrice_) external onlyRole(DAO_ROLE) {
@@ -114,15 +118,15 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     // == Admin controlled parameters ==
     function setRoyaltyBps(uint256 royaltyBps_) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(royaltyBps_ <= 10000, "royaltyBps should be within [0, 10000].");
-        _royaltyBps = royaltyBps_;
+        royaltyBps = royaltyBps_;
     }
 
     function setTokenDescription(string memory tokenDescription_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _tokenDescription = tokenDescription_;
+        tokenDescription = tokenDescription_;
     }
 
     function setSVGImageTemplate(string[] memory svgImageTemplate_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _svgImageTemplate = svgImageTemplate_;
+        svgImageTemplate = svgImageTemplate_;
     }
 
     // ==== Owner related functions ==== 
@@ -139,26 +143,26 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     function engraveNote(uint256 tokenId, string memory note) public payable onlyOwner(tokenId) validNote(note) {
-        require(msg.value >= engravingPrice, "Should pay >= engravingPrice");
-        require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving");
+        require(msg.value >= engravingPrice, "Should pay >= engravingPrice.");
+        require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving.");
 
         _notes[tokenId] = note;
-        _safeTransferETHWithFallback(_foundation, msg.value);
+        _foundation.send(msg.value);
         emit NoteEngraved(tokenId, ownerOf(tokenId), note);
     }
 
     function eraseNote(uint256 tokenId) public payable onlyOwner(tokenId) {
-        require(msg.value >= erasingPrice, "Should pay >= erasingPrice");
-        require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing");
+        require(msg.value >= erasingPrice, "Should pay >= erasingPrice.");
+        require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing.");
 
         _notes[tokenId] = "";
-        _safeTransferETHWithFallback(_foundation, msg.value);
+        _foundation.send(msg.value);
         emit NoteErased(tokenId, ownerOf(tokenId));
     }
 
     // ==== Metadata functions ====
     function getDate(uint256 tokenId) public pure returns (string memory) {
-        (uint256 year, uint256 month, uint256 day) = DateTime.daysToDate(tokenId);
+        (uint256 year, uint256 month, uint256 day) = daysToDate(tokenId);
         string memory yearStr = Strings.toString(year);
         string memory monthStr = Strings.toString(month);
         if (bytes(monthStr).length == 1) {
@@ -176,22 +180,23 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
     
     function _stringEquals(string memory a, string memory b) internal pure returns (bool) {
-        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+        return bytes(a).length == bytes(b).length && keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b)));
     }
 
     function generateSVGImage(uint256 tokenId) public view returns (string memory) {
+        require(_exists(tokenId), "tokenId is non-existent.");
         string memory date = getDate(tokenId);
         string memory note = getNote(tokenId);
         
         string memory output = "";
-        for (uint i = 0; i < _svgImageTemplate.length; ++i) {
+        for (uint i = 0; i < svgImageTemplate.length; ++i) {
             string memory part;
-            if (_stringEquals(_svgImageTemplate[i], "{{date}}")) {
+            if (_stringEquals(svgImageTemplate[i], "{{date}}")) {
                 part = date;
-            } else if (_stringEquals(_svgImageTemplate[i], "{{note}}")) {
+            } else if (_stringEquals(svgImageTemplate[i], "{{note}}")) {
                 part = note;
             } else {
-                part = _svgImageTemplate[i];
+                part = svgImageTemplate[i];
             }
             output = string(abi.encodePacked(output, part));
         }
@@ -200,6 +205,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     function generateMetadata(uint256 tokenId) public view returns (string memory) {
+        require(_exists(tokenId), "tokenId is non-existent.");
         string memory image = Base64.encode(
             bytes(generateSVGImage(tokenId))
         );
@@ -210,7 +216,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
             ': ', 
             getDate(tokenId), 
             '", "description": "',
-            _tokenDescription,
+            tokenDescription,
             '", "image": "data:image/svg+xml;base64,', 
             image, 
             '"}'
@@ -220,6 +226,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(_exists(tokenId), "tokenId is nonexistent");
         string memory output = string(abi.encodePacked(
             'data:application/json;base64,', 
             Base64.encode(bytes(generateMetadata(tokenId)))
@@ -238,25 +245,32 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
         require(!_exists(tokenId), "tokenId should not be claimed.");
 
         _safeMint(to, tokenId);
-        
-        emit ArtworkClaimed(tokenId, to);
+        _moveToNextAvailable();
     }
 
-    function claim(uint256 tokenId) public nonReentrant payable {
+    function claimNextAvailable() external nonReentrant payable {
         settleLastAuction();
-
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
-                IERC721(_loot).balanceOf(msg.sender) > 0 || 
-                msg.value >= claimingPrice, "Should pay >= claiming price or own a Loot NFT");
-
-        _claim(msg.sender, tokenId);
-
-        if (msg.value > 0) {
-            _safeTransferETHWithFallback(_foundation, msg.value);
+        if (!_exists(_nextUnchaimedTokenId) && _nextUnchaimedTokenId < block.timestamp / 1 days) {
+            claim(_nextUnchaimedTokenId);
         }
     }
 
-    function airdrop(address[] memory addresses, uint256[] memory tokenIds) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function claim(uint256 tokenId) public  payable {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
+                IERC721(_loot).balanceOf(msg.sender) > 0 || 
+                msg.value >= claimingPrice, "Should pay >= claiming price or own a Loot NFT.");
+
+        settleLastAuction();
+        _claim(msg.sender, tokenId);
+
+        if (msg.value > 0) {
+            _foundation.send(msg.value);
+        }
+
+        emit ArtworkClaimed(tokenId, msg.sender);
+    }
+
+    function airdrop(address[] memory addresses, uint256[] memory tokenIds) external onlyRole(DEFAULT_ADMIN_ROLE) {
         settleLastAuction();
 
         for (uint i = 0; i < tokenIds.length; ++i) {
@@ -268,12 +282,18 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
         }
     }
 
+    function _moveToNextAvailable() internal  {
+        while (_exists(_nextUnchaimedTokenId) && _nextUnchaimedTokenId < block.timestamp / 1 days) {
+            ++_nextUnchaimedTokenId;
+        }
+    }
+
     // ==== Auction related functions ==== 
     function getHighestBid(uint256 tokenId) external view returns (address bidder, uint256 amount) {
         return (_highestBidder[tokenId], _highestBid[tokenId]);
     }
 
-    function settleLastAuction() public nonReentrant {
+    function settleLastAuction() public {
         uint256 tokenId = _lastUnchaimedAuctionedTokenId;
 
         if (block.timestamp / 1 days > tokenId &&  _highestBidder[tokenId] != address(0) && _highestBid[tokenId] > 0 
@@ -305,7 +325,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     }
 
     /// @notice Settle the auction and send the highest bid to the beneficiary.
-    function _settleAuction(uint256 tokenId) public nonReentrant {
+    function _settleAuction(uint256 tokenId) internal nonReentrant {
         require(block.timestamp / 1 days > tokenId, "Auction not yet ended.");
         require(
             _highestBidder[tokenId] != address(0) && _highestBid[tokenId] > 0,
@@ -314,7 +334,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
         require(!_exists(tokenId), "Should not reclaim the auction.");
 
         _mint(_highestBidder[tokenId], tokenId);
-        _safeTransferETHWithFallback(_foundation, _highestBid[tokenId]);
+        _foundation.send(_highestBid[tokenId]);
 
         emit AuctionSettled(tokenId, _highestBidder[tokenId], _highestBid[tokenId]);
     }
@@ -369,7 +389,54 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard, 
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
         external view override returns (address receiver, uint256 royaltyAmount)
     {
-        return (_foundation, (salePrice * _royaltyBps) / 10000);
+        return (_foundation, (salePrice * royaltyBps) / 10000);
+    }
+
+    // ==== Day =====
+        // ------------------------------------------------------------------------
+    // Calculate year/month/day from the number of days since 1970/01/01 using
+    // the date conversion algorithm from
+    //   http://aa.usno.navy.mil/faq/docs/JD_Formula.php
+    // and adding the offset 2440588 so that 1970/01/01 is day 0
+    //
+    // int L = days + 68569 + offset
+    // int N = 4 * L / 146097
+    // L = L - (146097 * N + 3) / 4
+    // year = 4000 * (L + 1) / 1461001
+    // L = L - 1461 * year / 4 + 31
+    // month = 80 * L / 2447
+    // dd = L - 2447 * month / 80
+    // L = month / 11
+    // month = month + 2 - 12 * L
+    // year = 100 * (N - 49) + year + L
+    // ------------------------------------------------------------------------
+    int256 constant OFFSET19700101 = 2440588;
+
+    function daysToDate(uint256 _days)
+        public
+        pure
+        returns (
+            uint256 year,
+            uint256 month,
+            uint256 day
+        )
+    {
+        int256 __days = int256(_days);
+
+        int256 L = __days + 68569 + OFFSET19700101;
+        int256 N = (4 * L) / 146097;
+        L = L - (146097 * N + 3) / 4;
+        int256 _year = (4000 * (L + 1)) / 1461001;
+        L = L - (1461 * _year) / 4 + 31;
+        int256 _month = (80 * L) / 2447;
+        int256 _day = L - (2447 * _month) / 80;
+        L = _month / 11;
+        _month = _month + 2 - 12 * L;
+        _year = 100 * (N - 49) + _year + L;
+
+        year = uint256(_year);
+        month = uint256(_month);
+        day = uint256(_day);
     }
 
     // Default functions
