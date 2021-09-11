@@ -6,6 +6,9 @@ import { BigNumber } from "@ethersproject/bignumber";
 const SECONDS_IN_A_DAY = 86400;
 
 const reservedDateList = [
+  {date:"1989-01-09", note:""}, 
+  {date:"1988-10-22", note:""}, 
+  {date:"2021-08-27", note:"On the date Loot was launched."}, 
   {date:"2001-09-11", note:"September 11 attacks"}, 
   {date:"2015-07-30", note:"Ethereum Initial released"}, 
   {date:"2018-01-24", note:"ERC-721 was released"}, 
@@ -48,9 +51,7 @@ const reservedDateList = [
   {date:"2009-01-12", note:"The first bitcoin transaction takes place"}, 
   {date:"2012-06-20", note:"Coinbase was founded"}, 
   {date:"2013-12-06", note:"Dogecoin was released"}, 
-  {date:"1983-01-01", note:"Birthday of the Internet"},
-  {date:"1989-01-09", note:""}, 
-  {date:"1988-10-22", note:""}
+  {date:"1983-01-01", note:"Birthday of the Internet"}
 ];
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {

@@ -38,6 +38,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "generateMetadata(uint256)": FunctionFragment;
     "generateSVGImage(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getCurrentAuctionTokenId()": FunctionFragment;
     "getCurrentMinimumBid()": FunctionFragment;
     "getDate(uint256)": FunctionFragment;
     "getHighestBid(uint256)": FunctionFragment;
@@ -133,6 +134,10 @@ interface TheDateInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCurrentAuctionTokenId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getCurrentMinimumBid",
@@ -320,6 +325,10 @@ interface TheDateInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrentAuctionTokenId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -604,6 +613,8 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getCurrentAuctionTokenId(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getCurrentMinimumBid(
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { amount: BigNumber }>;
@@ -860,6 +871,8 @@ export class TheDate extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getCurrentAuctionTokenId(overrides?: CallOverrides): Promise<BigNumber>;
+
   getCurrentMinimumBid(overrides?: CallOverrides): Promise<BigNumber>;
 
   getDate(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
@@ -1095,6 +1108,8 @@ export class TheDate extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getCurrentAuctionTokenId(overrides?: CallOverrides): Promise<BigNumber>;
 
     getCurrentMinimumBid(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1463,6 +1478,8 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCurrentAuctionTokenId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getCurrentMinimumBid(overrides?: CallOverrides): Promise<BigNumber>;
 
     getDate(
@@ -1718,6 +1735,10 @@ export class TheDate extends BaseContract {
 
     getApproved(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getCurrentAuctionTokenId(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

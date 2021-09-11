@@ -140,7 +140,7 @@ export default function ArtworkModelViewer({ tokenId, noteString = "", autoRotat
       </Suspense>
 
       <OrbitControls autoRotate={autoRotate} 
-        enablePan={false} enableZoom={true} minDistance={8} maxDistance={10} minPolarAngle={Math.PI/2 - Math.PI/10} 
+        enablePan={false} enableZoom={false} minDistance={8} maxDistance={10} minPolarAngle={Math.PI/2 - Math.PI/10} 
         maxPolarAngle={Math.PI/2 +  Math.PI/10} />
     </Canvas>
   )

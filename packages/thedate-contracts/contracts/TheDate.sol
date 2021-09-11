@@ -281,6 +281,10 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
         }
     }
 
+    function getCurrentAuctionTokenId() public view returns (uint256) {
+        return block.timestamp / 1 days;
+    }
+
     function getCurrentMinimumBid() public view returns (uint256 amount) {
         uint256 tokenId = block.timestamp / 1 days;
         uint256 minimumBid = _highestBid[tokenId] * (10000 + minBidIncrementBps) / 10000;

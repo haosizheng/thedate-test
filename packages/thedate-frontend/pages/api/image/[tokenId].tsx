@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function upload(req: NextApiRequest, res: NextApiResponse) {
-  SVG
 
   // Set the s-maxage property which caches the images then on the Vercel edge
   res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate');

@@ -40,7 +40,7 @@ export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
       blockNumber: x.blockNumber,
       timestamp: (await x.getBlock()).timestamp
     })).concat(
-      (await TheDate.queryFilter(TheDate.filters.ArtworkMinted(tokenId))).map(async (x) => ({
+      (await TheDate.queryFilter(TheDate.filters.Transfer(ethers.constants.AddressZero, undefined, tokenId))).map(async (x) => ({
         from: TheDate.address,
         message: <span>Artwork Minted</span>,
         action: x.event!,
@@ -49,7 +49,7 @@ export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
         blockNumber: x.blockNumber,
         timestamp: (await x.getBlock()).timestamp
     }))).concat(
-      (await TheDate.queryFilter(TheDate.filters.ArtworkNoteEngraved(tokenId, null, null))).map(async (x) => ({
+      (await TheDate.queryFilter(TheDate.filters.NoteEngraved(tokenId, null, null))).map(async (x) => ({
         from: x.args.owner,
         message: <span>Engrave with &quot;{x.args.note}&quot;</span>,
         action: x.event!,
@@ -58,7 +58,7 @@ export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
         blockNumber: x.blockNumber,
         timestamp: (await x.getBlock()).timestamp
     }))).concat(
-      (await TheDate.queryFilter(TheDate.filters.ArtworkNoteErased(tokenId, null))).map(async (x) => ({
+      (await TheDate.queryFilter(TheDate.filters.NoteErased(tokenId, null))).map(async (x) => ({
         from: x.args.owner,
         message: <span>Erase note.</span>,
         action: x.event!,
@@ -67,7 +67,7 @@ export default function ArtworkHistory({ tokenId }: { tokenId: number }) {
         blockNumber: x.blockNumber,
         timestamp: (await x.getBlock()).timestamp
     }))).concat(
-      (await TheDate.queryFilter(TheDate.filters.AuctionEnded(tokenId, null, null))).map(async (x) => ({
+      (await TheDate.queryFilter(TheDate.filters.AuctionSettled(tokenId, null, null))).map(async (x) => ({
         from: x.args.winner,
         message: <span>Claim artwork</span>,
         action: x.event!,

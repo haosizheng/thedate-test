@@ -51,7 +51,6 @@ export default function UpdatesPage() {
           </figure>
         </div>
 
-     
       </div>
     </Layout>
   );

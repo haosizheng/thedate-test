@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import ArtworkSVG from "@/components/ArtworkSVG";
+import ArtworkSVGOnChain from "@/components/ArtworkSVGOnChain";
 import { PROJECT_INFO } from "@/utils/constants";
 import useSuperpowerContract from "@/hooks/useSuperpowerContract";
 import { useState } from "react";
@@ -24,7 +24,7 @@ export default function HomePage() {
         <div className="content">
           <figure>
             <a href="">
-              <ArtworkSVG tokenId={1} />
+              <ArtworkSVGOnChain tokenId={1} />
             </a>
           </figure>
 

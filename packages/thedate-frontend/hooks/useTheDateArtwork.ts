@@ -31,13 +31,13 @@ export default function useTheDateArtwork(tokenId: number) {
       const owner_ = await TheDate.ownerOf(tokenId);
       setOwner(owner_);
 
-      const artwork_ = await TheDate.artworks(tokenId);
+      const note_ = await TheDate.getNote(tokenId);
       const { bidder: bidder_, amount: amount_ } = await TheDate.getHighestBid(tokenId);
 
       setHighestBidder(bidder_);
       setHighestBid(amount_);
-      setDateString(tokenIdToDateString(artwork_.date.toNumber()));
-      setNoteString(artwork_.note);
+      setDateString(tokenIdToDateString(tokenId));
+      setNoteString(note_);
 
       if (!!owner_ && owner_ !== ethers.constants.AddressZero) {
         setExists(true);
@@ -60,7 +60,7 @@ export default function useTheDateArtwork(tokenId: number) {
         || newNoteString.length == 0  || newNoteString.length > 100) {
         return;
       }
-      await TheDate?.engraveArtworkNote(tokenId, newNoteString);
+      await TheDate?.engraveNote(tokenId, newNoteString);
     };
   
     const eraseNote = async () => {
@@ -68,7 +68,7 @@ export default function useTheDateArtwork(tokenId: number) {
         || noteString == undefined || noteString.length == 0 ) {
         return;
       }
-      await TheDate?.eraseArtworkNote(tokenId, { value: ethers.utils.parseEther("1") });
+      await TheDate?.eraseNote(tokenId, { value: ethers.utils.parseEther("1") });
     };
   
     const claimArtwork = async () => {

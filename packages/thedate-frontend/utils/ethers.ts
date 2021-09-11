@@ -1,7 +1,6 @@
 import { ETHERSCAN_PREFIXES, OPENSEA_PREFIXES } from '@/utils/chains';
 import type { BigNumberish } from "@ethersproject/bignumber";
 import { formatUnits } from "@ethersproject/units";
-import {getTheDateContractAddress} from '@/utils/contracts';
 
 export function shortenHex(hex?: string | null, length = 4) {
   if (!hex) return "";
@@ -17,6 +16,7 @@ export const parseBalance = (balance: BigNumberish, decimals = 18, decimalsToDis
 export function formatOpenSeaLink(
   type?: "Collection" | "Asset",
   chainId?: number | undefined, 
+  contractOrCollectionName?: string | undefined,
   tokenId?: string | number | undefined
 ) {
   if (!type || !chainId) {
@@ -27,15 +27,14 @@ export function formatOpenSeaLink(
   let linkType;
   switch (type) {
     case "Collection": {
-      return `${linkPrefix}/collection/thedate`;
+      return `${linkPrefix}/collection/${contractOrCollectionName}`;
     }
     case "Asset": {
-      return `assets/${getTheDateContractAddress(chainId)}/${tokenId}`;
+      return `assets/${contractOrCollectionName}/${tokenId}`;
     }
   }
 }
 
-  
 export function formatEtherscanLink(
   type?: "Account" | "Transaction" | "Token",
   data?: [number | undefined, string | null | undefined]
