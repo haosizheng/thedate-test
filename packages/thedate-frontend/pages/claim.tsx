@@ -18,7 +18,21 @@ export default function ClaimPage() {
   return (
     <Layout>
       <div className="content">
-        <p>You could <a href={`${etherscanLinkOfToken}#writeContract`}>claim</a> it directly the contract at a cost of 0.01 Ether.</p>
+        <p>You could <a href={`${etherscanLinkOfToken}#writeContract`}>claim</a> it directly the contract at a cost of 0.05 Ether.</p>
+
+        <div className="faq__item">
+
+          exists(tokenId)
+          claim(tokenId)
+
+        <p>For unclaimed past The Date, you can claim it directly in the contract. 
+          Select an available date to claim, 
+          and note that only one The Date will be available for each date. Each claim costs Ξ 0.05.
+        </p>
+        <p>
+        As an metadata-based NFT project, to respect the first of its kind, Loot, all the Loot holders are free to claim The Date.
+        </p>
+        </div>
       </div>
     </Layout>
   );
