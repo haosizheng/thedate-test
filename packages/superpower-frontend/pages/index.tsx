@@ -1,4 +1,3 @@
-import Auction from "@/components/Auction";
 import Layout from "@/components/Layout";
 import ArtworkSVG from "@/components/ArtworkSVG";
 import Link from "next/link";
@@ -9,7 +8,7 @@ export default function HomePage() {
         <div className="content">
           <figure>
             <a href="">
-              <ArtworkSVG tokenId="1" />
+              <ArtworkSVG tokenId={1} />
             </a>
           </figure>
           <div className="mt-10 text-center">

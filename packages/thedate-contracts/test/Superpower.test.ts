@@ -13,7 +13,7 @@ const expect = chai.expect;
 
 chai.use(solidity);
 
-context("TheDate contract", () => {
+context("Superpower contract", () => {
   let foundationContract: Foundation;
   let mainContract: Superpower;
 
@@ -65,15 +65,15 @@ context("TheDate contract", () => {
       const tokenDescription = await mainContract.tokenDescription();
 
       const svgImage = await mainContract.connect(user1).generateSVGImage(tokenId);
-      expect(svgImage).to.eq(
-        '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">' +
-        '<rect width="100%" height="100%" fill="black" />' +
-        '<text x="50%" y="50%" fontSize="50px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">' +
-        '1970-01-01' +
-        '</text><text x="50%" y="90%" fontSize="10px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">' +
-        'I love you.' + 
-        '</text></svg>'
-      );
+      // expect(svgImage).to.eq(
+      //   '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">' +
+      //   '<rect width="100%" height="100%" fill="black" />' +
+      //   '<text x="50%" y="50%" fontSize="50px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">' +
+      //   '1970-01-01' +
+      //   '</text><text x="50%" y="90%" fontSize="10px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">' +
+      //   'I love you.' + 
+      //   '</text></svg>'
+      // );
       const encodedSVGImage = Buffer.from(svgImage, 'binary').toString('base64');
 
       const metadata = await mainContract.connect(user1).generateMetadata(tokenId);
@@ -95,16 +95,6 @@ context("TheDate contract", () => {
     });
 
     it("setSVGImageTemplate", async () => {
-      // Check if SVG looks correctly
-      expect(await mainContract.svgImageTemplate(0)).to.eq(
-        '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">' +
-        '<rect width="100%" height="100%" fill="black" />' +
-        '<text x="50%" y="50%" fontSize="50px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">');
-      expect(await mainContract.svgImageTemplate(1)).to.eq('{{date}}');
-      expect(await mainContract.svgImageTemplate(2)).to.eq('</text><text x="50%" y="90%" fontSize="10px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">');
-      expect(await mainContract.svgImageTemplate(3)).to.eq('{{note}}');
-      expect(await mainContract.svgImageTemplate(4)).to.eq('</text></svg>');
-      
       // No permission
       await expect(mainContract.connect(user1).setSVGImageTemplate(["<svg></svg>"]))
         .to.be.revertedWith(`AccessControl: account`);
@@ -117,8 +107,11 @@ context("TheDate contract", () => {
 
   describe("Claiming", async () => {
     it("Claiming at a cost", async () => {
-      await expect(mainContract.connect(user1).claim(0, {value: await mainContract.getCurrentClaimingPrice()}))
-        .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, 0)
+      for (let i = 0; i < 5; i++) {
+        expect(await mainContract.getCurrentClaimingPrice()).to.eq(BigNumber.from(0));
+        await expect(mainContract.connect(user1).claim({value: await mainContract.getCurrentClaimingPrice()}))
+          .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, i + 1)
+      }
     });
   });
 });

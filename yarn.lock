@@ -1902,11 +1902,6 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@quant-finance/solidity-datetime@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@quant-finance/solidity-datetime/-/solidity-datetime-2.0.0.tgz#9f89c2d919f54f038c4560d117e7e546a02d1ce7"
-  integrity sha512-1phdoJRCV4mBtpDfotN1oFJF8p6BS4KEAqhiPfRJuhSvBr73nrptwwIG8lrhj1vFWhasF79aZMzV782qhll0ag==
-
 "@react-three/cannon@^2.6.1":
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/@react-three/cannon/-/cannon-2.6.1.tgz#60b46810888d4ef936eac54ed30f6c873e5c6d74"
@@ -12595,11 +12590,6 @@ murmurhash3js@^3.0.1:
   resolved "https://registry.yarnpkg.com/murmurhash3js/-/murmurhash3js-3.0.1.tgz#3e983e5b47c2a06f43a713174e7e435ca044b998"
   integrity sha1-Ppg+W0fCoG9DpxMXTn5DXKBEuZg=
 
-mustache@^3.1.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/mustache/-/mustache-3.2.1.tgz#89e78a9d207d78f2799b1e95764a25bf71a28322"
-  integrity sha512-RERvMFdLpaFfSRIEe632yDm5nsd0SDKn8hGmcUwswnyiE5mtdZLDybtHAz6hjJhawokF0hXvGLtx9mrQfm6FkA==
-
 mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
@@ -19090,11 +19080,6 @@ zen-observable@0.8.15:
   version "0.8.15"
   resolved "https://registry.yarnpkg.com/zen-observable/-/zen-observable-0.8.15.tgz#96415c512d8e3ffd920afd3889604e30b9eaac15"
   integrity sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==
-
-zokrates-js@^1.0.34:
-  version "1.0.35"
-  resolved "https://registry.yarnpkg.com/zokrates-js/-/zokrates-js-1.0.35.tgz#d6f9c5ced28dcd54e23c312c585a2040c907f356"
-  integrity sha512-6eBChB7nRBNL+uty4oBLdbKZEwrW0Q+FTN5dxCTdAjWPLuWs72AeI0FBvF256++F6H6t+8TpQnGL4hnRD5BOXQ==
 
 zstddec@^0.0.2:
   version "0.0.2"

@@ -1,13 +1,17 @@
-import useActiveWeb3React from "@/hooks/useActiveWeb3React";
-import { NETWORK_NAMES } from "@/utils/chains";
-import { useMemo } from "react";
+import { useState } from "react";
+import { useAsync } from "react-use";
+import useSuperpowerContract from "@/hooks/useSuperpowerContract";
 
 export default function ArtworkSVG({ tokenId }: { tokenId: number }) {
-  const {chainId} = useActiveWeb3React();
   const Superpower = useSuperpowerContract();
-      
-  Superpower.generateSVG
-  return (
+  const [svgImage, setSVGImage] = useState<string | undefined>(undefined);
+  
+  useAsync(async () => {
+    if (!Superpower) {
+      return; 
+    }
+    setSVGImage(await Superpower?.generateSVGImage(tokenId));
+  }, [Superpower]);
 
-  );
+  return (svgImage ? svgImage : "");
 }

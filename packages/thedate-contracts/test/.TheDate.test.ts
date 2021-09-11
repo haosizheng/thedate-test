@@ -8,7 +8,6 @@ import { Foundation, Foundation__factory,
   TheDate, TheDate__factory } from "../typechain";
 import type { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber } from "@ethersproject/bignumber";
-import exp from "constants";
 
 type Address = string;
 const expect = chai.expect;
@@ -55,7 +54,7 @@ context("TheDate contract", () => {
   beforeEach(async () => {
     // Deploy the main contract
     mainContract = await (await new TheDate__factory(deployer)
-      .deploy(foundationContract.address, mockWETHContract.address, mockLootContract.address)).deployed();
+      .deploy(foundationContract.address, mockWETHContract.address)).deployed();
 
     testReentrantAttackContract = await (await new TestReentrantAttack__factory(deployer)
       .deploy(mainContract.address)).deployed();
@@ -118,7 +117,7 @@ context("TheDate contract", () => {
 
       const engravingPrice = await mainContract.engravingPrice();
       const erasingPrice = await mainContract.erasingPrice();
-      const claimingPrice = await mainContract.claimingPrice();
+      const claimingPrice = await mainContract.getCur();
 
       await expect(mainContract.connect(user1).claim(tokenId, {value: claimingPrice}))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(tokenId, user1.address);

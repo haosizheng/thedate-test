@@ -6,4 +6,3 @@ export function getSuperpowerContractAddress(chainId: number) {
     (<any>deployments)[`${chainId}`][NETWORK_NAMES[chainId]].contracts.Superpower.address : undefined;
   return Superpower_address;
 }
-

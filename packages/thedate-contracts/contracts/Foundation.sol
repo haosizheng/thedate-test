@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0;
+pragma solidity ^0.8.0;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -10,7 +10,6 @@ import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721H
 import { ERC1155Holder } from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 contract Foundation is PaymentSplitter, ERC721Holder, ERC1155Holder {
-
     // ==== Events ====
     event ERC20PaymentReleased(address to, uint256 amount, address currency);
     event ERC721PaymentReleased(address to, address token, uint256 id);

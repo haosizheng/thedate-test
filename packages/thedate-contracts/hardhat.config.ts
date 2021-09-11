@@ -75,6 +75,11 @@ const config: HardhatUserConfig = {
       default: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
       mainnet: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
       rinkeby: '0xc778417e063141139fce010982780140aa0cd5ab'
+    },
+    loot: {
+      default: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      mainnet: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      rinkeby: '0x79e2d470f950f2cf78eef41720e8ff2cf4b3cd78'
     }
   },
   networks: {

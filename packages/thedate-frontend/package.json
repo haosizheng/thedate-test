@@ -20,7 +20,7 @@
     "@react-three/drei": "^7.4.0",
     "@react-three/fiber": "^7.0.6",
     "@tailwindcss/typography": "^0.4.1",
-    "@thefoundation/contracts": "*",
+    "@thedate/contracts": "*",
     "@web3-react/core": "latest",
     "@web3-react/injected-connector": "latest",
     "@web3-react/network-connector": "latest",

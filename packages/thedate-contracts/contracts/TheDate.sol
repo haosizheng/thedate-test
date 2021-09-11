@@ -47,7 +47,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     
     // ==== Events ====
     // == Parameter-related Events ==
-    event ClaimingPriceChanged(uint256 claimingPrice);
+    event ClaimingStairstepPriceChanged(uint256 claimingStairstepPrice);
     event AuctionReservePriceChanged(uint256 reservePrice);
     event AuctionMinBidIncrementBpsChanged(uint256 minBidIncrementBps);
     event EngravingPriceChanged(uint256 amount);
@@ -77,9 +77,9 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
     // ==== Parameter Related Functions ==== 
     // == DAO controlled parameters ==
-    function setClaimingPrice(uint256 claimingPrice_) external onlyRole(DAO_ROLE) {
-        claimingPrice = claimingPrice_;
-        emit ClaimingPriceChanged(claimingPrice);
+    function setClaimingStairstepPrice(uint256 claimingStairstepPrice_) external onlyRole(DAO_ROLE) {
+        claimingStairstepPrice = claimingStairstepPrice_;
+        emit ClaimingStairstepPriceChanged(claimingStairstepPrice);
     }
 
     function setAuctionReservePrice(uint256 reservePrice_) external onlyRole(DAO_ROLE) {
@@ -230,7 +230,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     // ==== Claiming related functions ====
     modifier enoughFund() {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
-            msg.value >= (totalSupply() / 1000) * claimingPrice, "Should pay by claiming price * stairstep");
+            msg.value >= (totalSupply() / 1000) * claimingStairstepPrice, "Should pay by claiming price * stairstep");
         _;
     }
 

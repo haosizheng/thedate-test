@@ -1,12 +1,9 @@
 import Layout from "@/components/Layout";
 import Link from "next/link";
 import { formatEtherscanLink, formatOpenSeaLink } from "@/utils/ethers";
-import useTheDateContract from "@/hooks/useTheDateContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import { NETWORK_CHAIN_ID } from "@/utils/connectors";
 import ArtworkSVG from "@/components/ArtworkSVG";
-import { tokenIdToDateString, jsDateToDate } from "@/utils/thedate";
-import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 
 export default function FAQPage() {
   const {chainId} = useActiveWeb3React();
