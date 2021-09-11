@@ -26,7 +26,7 @@ export default function FAQPage() {
         <div className="faq__item">
           <h3>What’s The Date?</h3>
           <p>
-            The Date is a metadata-based NFT art experiment about time and blockchain. 
+            The Date is a metadata-based NFT art experiment about memorizing and celebrating our past.
           </p>
           <p>
             Each fleeting day would be imprinted into a metadata-based NFT artwork on blockchain immutably.
@@ -34,12 +34,12 @@ export default function FAQPage() {
           </p>
           <p>
             The Date is metadata. It could be a building block of future Metaverse ecosystem. 
-            You can use it in anyway you wants, such as storytelling, gifting, memorization, building an artwork, use it in some metaverse. 
+            You can use it in anyway you wants, such as storytelling, gifting, memorization, building an artwork, or use it in metaverses. 
           </p>
         </div>
 
         <div className="faq__item">
-          <h3>How can I get The Date of today? </h3>
+          <h3>How can I own The Date of today? </h3>
           <p>
           The Date of today will be minted as a non-fungible token through an auction 
           opening from 00:00:00 UTC to 23:59:59 UTC each day. 
@@ -48,7 +48,7 @@ export default function FAQPage() {
 
           <p>
           You could <a href={`${etherscanLinkOfToken}#writeContract`}>place your bid</a> via calling placeBid() function in the contract on Etherscan. 
-          You can get the auction status, such as current price and biding history, by visiting <Link href="/auction"><a>Auction</a></Link> page .
+          You can see the auction status, such as current price and biding history, by visiting <Link href="/auction"><a>Auction</a></Link> page .
           </p>
         </div>
 
@@ -63,19 +63,17 @@ export default function FAQPage() {
         </div>
         
         <div className="faq__item">
-          <h3>How can I get past The Date? </h3>
+          <h3>How can I own past The Date? </h3>
 
           <p>
             For claimed past The Date, you can purchase it on the secondary market <a href={openseaLink}>OpenSea</a>.
           </p>
           <p>
-            For unclaimed past The Date, you could <a href={`${etherscanLinkOfToken}#writeContract`}>claim</a> it directly the contract at a cost of 0.01 Ether. 
-            A random unchaimed date will be assigned to you.
+            For unclaimed past The Date, you could <a href={`${etherscanLinkOfToken}#writeContract`}>claim</a> it directly the contract. Select an available date to claim, and note that only one The Date will be available for each date. Each initial claim will cost Ξ 0.01
           </p>
           <p>
-            As an metadata-based NFT project, to respect the first of its kind, <a href="https://lootproject.com/">Loot</a>, on the launch date, 
-            random unchaimed the Date will be airdroped to holders of Loot NFT from Bag #1 to #7777. 
-            Additionally, holders of Loot NFT could <a href={`${etherscanLinkOfToken}#writeContract`}>claim</a> the Date at no cost. 
+            As an metadata-based NFT project, to respect the first of its kind, <a href="https://lootproject.com/">Loot</a>, all the Loot holders are free to  <a href={`${etherscanLinkOfToken}#writeContract`}>claim</a> The Date. 
+            
           </p>
         </div>
 
