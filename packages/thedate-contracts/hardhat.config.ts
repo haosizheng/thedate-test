@@ -10,13 +10,9 @@ import "hardhat-deploy";
 import "hardhat-deploy-ethers";
 import "solidity-coverage";
 import "hardhat-contract-sizer";
-
 import { HardhatUserConfig, NetworkUserConfig } from "hardhat/types";
-
 import * as dotenv from "dotenv";
 dotenv.config();
-
-import "./tasks/accounts";
 
 const chainIds = {
   ganache: 1337,
@@ -74,22 +70,12 @@ const config: HardhatUserConfig = {
       default: FOUNDATION_MEMBER_2_PUBLIC_KEY,
       mainnet: FOUNDATION_MEMBER_2_PUBLIC_KEY, 
       rinkeby: FOUNDATION_MEMBER_2_PUBLIC_KEY,
+    },
+    weth: {
+      default: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      mainnet: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      rinkeby: '0xc778417e063141139fce010982780140aa0cd5ab'
     }
-  },
-  paths: {
-    deploy: "./deploy",
-    deployments: "./deployments",
-    sources: "./contracts",
-    cache: "./cache",
-    artifacts: "./artifacts",
-    tests: "./test",
-  },
-  abiExporter: {
-    path: "./abis",
-    only: [":The"],
-    clear: true,
-    flat: true,
-    spacing: 2,
   },
   networks: {
     localhost: {
@@ -111,15 +97,16 @@ const config: HardhatUserConfig = {
       },
     },
     mainnet: createTestnetConfig("mainnet"),
+    rinkeby: createTestnetConfig("rinkeby"),
+    
     goerli: createTestnetConfig("goerli"),
     kovan: createTestnetConfig("kovan"),
-    rinkeby: createTestnetConfig("rinkeby"),
     ropsten: createTestnetConfig("ropsten"),
   },
   solidity: {
     compilers: [
       {
-        version: "0.8.4",
+        version: "0.8.7",
         settings: {
           optimizer: {
             enabled: true,
@@ -135,8 +122,23 @@ const config: HardhatUserConfig = {
   gasReporter: {
     currency: "USD",
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
-    gasPrice: 1,
+    gasPrice: 100,
     enabled: process.env.REPORT_GAS ? true : false,
+  },
+  paths: {
+    deploy: "./deploy",
+    deployments: "./deployments",
+    sources: "./contracts",
+    cache: "./cache",
+    artifacts: "./artifacts",
+    tests: "./test",
+  },
+  abiExporter: {
+    path: "./abis",
+    only: [":The"],
+    clear: true,
+    flat: true,
+    spacing: 2,
   },
   typechain: {
     outDir: "typechain",

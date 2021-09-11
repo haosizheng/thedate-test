@@ -47,11 +47,9 @@ context("TheDate contract", () => {
     foundationContract = await (await new Foundation__factory(deployer).deploy(foundationMembers, foundationShares)).deployed();
     mockWETHContract = await (await new MockWETH__factory(deployer).deploy()).deployed();
     mockLootContract = await (await new MockERC721__factory(deployer).deploy()).deployed();
-    // User 5 and User 6 has Loot
-    for (let i = 0; i < 10; i += 2) { 
-      mockLootContract.mint(user5.address, i);
-      mockLootContract.mint(user6.address, i + 1);
-    }
+  
+    mockLootContract.mint(user5.address, 0);
+    mockLootContract.mint(user6.address, 1);
   });
   
   beforeEach(async () => {
@@ -67,6 +65,7 @@ context("TheDate contract", () => {
     // Grant user5 to be a DAO members
     await expect(mainContract.grantRole(daoRole, user5.address))
       .to.emit(mainContract, "RoleGranted").withArgs(daoRole, user5.address, deployer.address);
+
   });
 
   describe("Royalty", async () => {
@@ -182,7 +181,7 @@ context("TheDate contract", () => {
       const engravingPrice = await mainContract.engravingPrice();
 
       await expect(mainContract.connect(user1).generateMetadata(tokenId))
-        .to.revertedWith("tokenId is non-existent");
+        .to.be.revertedWith("tokenId is non-existent");
 
       await expect(mainContract.connect(user1).claim(tokenId, {value: await mainContract.claimingPrice()}))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(tokenId, user1.address);
@@ -276,35 +275,12 @@ context("TheDate contract", () => {
       // Admin claims for free
       await expect(mainContract.connect(deployer).claim(2))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(2, deployer.address);
-
-      // Claims for next available 
-      await expect(mainContract.connect(deployer).claimNextAvailable())
-        .to.emit(mainContract, "ArtworkClaimed").withArgs(3, deployer.address);
+      
+      await expect(mainContract.connect(user5).claim(2))
+        .to.be.revertedWith("tokenId should not be claimed");
     });
 
-    it("Claiming next available", async () => {
-      const amount = await mainContract.claimingPrice();
-
-      await expect(mainContract.connect(user1).claimNextAvailable())
-        .to.be.revertedWith("Should pay >= claiming price or own a Loot NFT");
-
-      await expect(mainContract.connect(user1).claimNextAvailable({value: amount}))
-        .to.emit(mainContract, "ArtworkClaimed").withArgs(0, user1.address);
-
-      await expect(mainContract.connect(user2).claimNextAvailable({value: amount}))
-        .to.emit(mainContract, "ArtworkClaimed").withArgs(1, user2.address);
-
-      await expect(mainContract.connect(deployer).claim(1))
-        .to.revertedWith("tokenId should not be claimed");
-
-      await expect(mainContract.connect(deployer).claim(2))
-        .to.emit(mainContract, "ArtworkClaimed").withArgs(2, deployer.address);
-
-      await expect(mainContract.connect(deployer).claimNextAvailable())
-        .to.emit(mainContract, "ArtworkClaimed").withArgs(3, deployer.address);
-    });
-
-    it("Claiming next available after airdropping", async () => {
+    it("Claiming after airdropping", async () => {
       const amount = await mainContract.claimingPrice();
 
       await expect(mainContract.connect(deployer).airdrop([user1.address, user2.address, user3.address], [1, 3, 5]))
@@ -313,20 +289,18 @@ context("TheDate contract", () => {
         .to.emit(mainContract, "ArtworkAirdropped").withArgs(5, user3.address);
         
       const previousBalance = await ethers.provider.getBalance(foundationContract.address);
-      await expect(mainContract.connect(user1).claimNextAvailable({value: amount}))
+      await expect(mainContract.connect(user1).claim(0, {value: amount}))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(0, user1.address);
 
       // Loot user
-      await expect(mainContract.connect(user5).claimNextAvailable())
+      await expect(mainContract.connect(user5).claim(2))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(2, user5.address);
-
-      await expect(mainContract.connect(user1).claimNextAvailable({value: amount}))
+    
+      await expect(mainContract.connect(user1).claim(4, {value: amount}))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(4, user1.address);
 
-      await expect(mainContract.connect(user1).claimNextAvailable({value: amount}))
-        .to.emit(mainContract, "ArtworkClaimed").withArgs(6, user1.address);
       const latestBalance = await ethers.provider.getBalance(foundationContract.address);
-      expect(latestBalance).eq(previousBalance.add(amount.mul(3)));
+      expect(latestBalance).eq(previousBalance.add(amount.mul(2)));
     });
 
     it("Claiming an auctioned or future one", async () => {
@@ -389,12 +363,12 @@ context("TheDate contract", () => {
       await expect(mainContract.connect(deployer).claim(1))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(1, deployer.address);
       await expect(mainContract.connect(deployer).airdrop([user1.address, user2.address], [1, 2]))
-        .to.revertedWith("tokenId should not be claimed");
+        .to.be.revertedWith("tokenId should not be claimed");
     });
 
     it("Airdrop duplicated ones", async () => {
       await expect(mainContract.connect(deployer).airdrop([user1.address, user2.address], [1, 1]))
-        .to.revertedWith("tokenId should not be claimed");
+        .to.be.revertedWith("tokenId should not be claimed");
     });
 
     it("Airdrop a lot at once", async () => {
@@ -513,13 +487,12 @@ context("TheDate contract", () => {
   });
 
   describe("Auction", async () => {
-
-    it.only("Existence", async () => {
-      expect(await mainContract.connect(user1).exists(1)).to.eq(false);
-
+    it("Existence", async () => {
       const tokenId = BigNumber.from(
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
       ).div(SECONDS_IN_A_DAY);
+
+      expect(await mainContract.connect(user1).exists(tokenId)).to.eq(false);
 
       const amount = await mainContract.getCurrentMinimumBid();
       await expect(mainContract.connect(user1).placeBid({ value: amount}))
@@ -553,6 +526,7 @@ context("TheDate contract", () => {
       await mainContract.connect(user1).settleLastAuction();
       await mainContract.connect(user1).settleLastAuction();
       expect(await mainContract.connect(user1).exists(0)).to.eq(false);
+      expect(await mainContract.connect(user1).exists(tokenId)).to.eq(false);
     });
 
     it("Test reentrant attack", async () => {
@@ -567,6 +541,8 @@ context("TheDate contract", () => {
       await expect(testReentrantAttackContract.startReentrantAttack())
         .to.emit(mainContract, "BidPlaced").withArgs(tokenId, testReentrantAttackContract.address, minBid)
         .to.emit(mainContract, "BidPlaced").withArgs(tokenId, testReentrantAttackContract.address, nextMidBid);
+
+      // The contract will wrap ETH into WETH to prevent the attack.
       expect(await mockWETHContract.balanceOf(testReentrantAttackContract.address)).to.eq(minBid);
 
       expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(testReentrantAttackContract.address);
@@ -574,17 +550,21 @@ context("TheDate contract", () => {
 
       // 1 day passed
       await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
-
+      
       expect(await mainContract.placeBid({value: minBid}))
         .to.emit(mainContract, "AuctionSettled").withArgs(tokenId, testReentrantAttackContract.address, nextMidBid)
         .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, testReentrantAttackContract.address, tokenId);
     });
+
 
     it("Place Bid", async () => {
       const tokenId = BigNumber.from(
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
       ).div(SECONDS_IN_A_DAY);
 
+      const claimingPrice = await mainContract.claimingPrice();
+      
+      // == Day 1
       await mainContract.setAuctionReservePrice(ethers.utils.parseEther("0.1"));
       await mainContract.setAuctionMinBidIncrementBps(5000); //50%
 
@@ -610,52 +590,76 @@ context("TheDate contract", () => {
         .to.be.revertedWith("Must send more than last bid by minBidIncrementBps");
 
       // The second bid is placed by User1 by directly send ether to the contract
-      await expect(await user1.sendTransaction({ to: mainContract.address, value: ethers.utils.parseEther("0.15")  }))
-        .to.changeEtherBalance(mainContract.address, ethers.utils.parseEther("0.15") );
-
-      // The second bid is placed by User1
-      // await expect(await mainContract.connect(user1).placeBid({ value: ethers.utils.parseEther("0.15") }))
-      //   .to.changeEtherBalance(mainContract.address, ethers.utils.parseEther("0.05"))
-      //   // .to.emit(mainContract, "BidPlaced")
-        // .withArgs(tokenId, user1.address, ethers.utils.parseEther("0.15"))
+      await expect(await user1.sendTransaction({ to: mainContract.address, value: ethers.utils.parseEther("0.15") }))
+        .to.emit(mainContract, "BidPlaced").withArgs(tokenId, user1.address, ethers.utils.parseEther("0.15"))
+        .to.changeEtherBalance(mainContract, ethers.utils.parseEther("0.15").sub(ethers.utils.parseEther("0.10")));
         
-      // // The third bid is placed by User2
-      // await expect(async () => await expect(mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.25") }))
-      //   .to.emit(mainContract, "BidPlaced")
-      //   .withArgs(tokenId, user2.address, ethers.utils.parseEther("0.25")))
-      //   .to.changeEtherBalance(user1, ethers.utils.parseEther("0.15"));
+      // The third bid is placed by User2
+      await expect(await mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.25") }))
+        .to.emit(mainContract, "BidPlaced").withArgs(tokenId, user2.address, ethers.utils.parseEther("0.25"))
+        .to.changeEtherBalance(user1, ethers.utils.parseEther("0.15"));
 
       // // Check the highest bid
-      // expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(user2.address);
-      // expect((await mainContract.getHighestBid(tokenId)).amount).to.eq(ethers.utils.parseEther("0.25"));
+      expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(user2.address);
+      expect((await mainContract.getHighestBid(tokenId)).amount).to.eq(ethers.utils.parseEther("0.25"));
 
-      // // The fourth bid is placed by User 3
-      // await expect(mainContract.connect(user3).placeBid({ value: ethers.utils.parseEther("0.5") }))
-      //   .emit(mainContract, "BidPlaced")
-      //   .withArgs(tokenId, user3.address, ethers.utils.parseEther("0.5"));
+      // The fourth bid is placed by User 3
+      expect(await mainContract.connect(user3).placeBid({ value: ethers.utils.parseEther("0.5") }))
+        .to.emit(mainContract, "BidPlaced").withArgs(tokenId, user3.address, ethers.utils.parseEther("0.5"))
+        .to.changeEtherBalance(user2, ethers.utils.parseEther("0.25"));
 
-      // // 1 day passed
-      // await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(user3.address);
+
+      // == Day 2
+      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
       
-      // // The first bid for day 2 with auto auction settled for day 1
-      // await expect(mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.3") }))
-      //   .emit(mainContract, "BidPlaced")
-      //   .withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.3"))
-      //   .emit(mainContract, "AuctionSettled")
-      //   .withArgs(tokenId, user2.address, ethers.utils.parseEther("0.25"));
+      // The first bid for day 2 with auto auction settled for day 1
+      expect(await mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.3") }))
+        .to.emit(mainContract, "BidPlaced").withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.3"))
+        .to.emit(mainContract, "AuctionSettled").withArgs(tokenId, user3.address, ethers.utils.parseEther("0.5"))
+        .to.changeEtherBalance(foundationContract, ethers.utils.parseEther("0.5"));
 
-      // // Manually auction settlement before auction ends.
-      // await expect(() => mainContract.connect(user2).settleLastAuction())
-      //     .changeEtherBalance(foundationContract.address, 0);
+      // Manually auction settlement before auction ends. But no auction has ended.
+      await expect(() => mainContract.connect(user2).settleLastAuction())
+          .to.changeEtherBalance(foundationContract, ethers.constants.Zero);
         
-      // // 1 more day passed
-      // await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      expect((await mainContract.getHighestBid(tokenId.add(1))).bidder).to.eq(user2.address);
+      // == Day 3
+      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
 
-      // // Manually auction settlement after auction ends.
-      // await expect(async () => await expect(mainContract.connect(user2).settleLastAuction())
-      //   .emit(mainContract, "AuctionSettled")
-      //   .withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.3")))
-      //   .changeEtherBalance(foundationContract.address, ethers.utils.parseEther("0.3"));
+      // Manually auction settlement after auction ends.
+      await expect(await mainContract.connect(user2).settleLastAuction())
+        .to.emit(mainContract, "AuctionSettled").withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.3"))
+        .to.changeEtherBalance(foundationContract, ethers.utils.parseEther("0.3"));
+
+      expect((await mainContract.getHighestBid(tokenId.add(2))).bidder).to.eq(ethers.constants.AddressZero);
+      // No one bid today.
+
+      // == Day 4
+      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+
+      // The first bid for day 4
+      expect(await mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.3") }))
+        .to.emit(mainContract, "BidPlaced").withArgs(tokenId.add(3), user2.address, ethers.utils.parseEther("0.3"))
+        .to.changeEtherBalance(mainContract, ethers.utils.parseEther("0.3"));
+
+      // Claiming the missing day 3
+      expect(await mainContract.connect(user2).claim(tokenId.add(2), { value: claimingPrice }))
+        .to.emit(mainContract, "ArtworkClaimed").withArgs(tokenId.add(2), user2.address)
+        .to.changeEtherBalance(foundationContract, claimingPrice);
+        
+      // Day 5
+      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+
+      // Claiming the missing day 4 but it's auctioned. It's reverted. So it does not triggers settleAuction.
+      await expect(mainContract.connect(user2).claim(tokenId.add(3), { value: claimingPrice }))
+        .to.be.revertedWith("tokenId should not be auctioned");
+
+      // Place Bid to trigger settleAuction for Day 4
+      expect(await mainContract.connect(user3).placeBid({ value: ethers.utils.parseEther("0.3") }))
+        .to.emit(mainContract, "BidPlaced").withArgs(tokenId.add(4), user3.address, ethers.utils.parseEther("0.3"))
+        .to.emit(mainContract, "AuctionSettled").withArgs(tokenId.add(3), user2.address, ethers.utils.parseEther("0.3"))
+        .to.changeEtherBalance(foundationContract, ethers.utils.parseEther("0.3"));
     });
   });
 });

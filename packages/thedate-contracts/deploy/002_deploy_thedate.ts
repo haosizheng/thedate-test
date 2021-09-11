@@ -2,21 +2,17 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts, getChainId} = hre;
-  const { deploy } = deployments;
-  const { deployer } = await getNamedAccounts();
-  const chainId = await getChainId();
+  const { deployer, weth } = await hre.getNamedAccounts();
+  const foundation = (await hre.deployments.get("Foundation")).address;
 
-  const foundationAddress = (await deployments.get("TheFoundation")).address;
-
-  await deploy("TheDate", {
+  await hre.deployments.deploy("TheDate", {
     from: deployer,
-    args: [foundationAddress],
+    args: [foundation, weth],
     log: true
   });
 };
 
-func.tags = ["MainContract", "deploy"];
+func.tags = ["deploy", "TheDateContract"];
 func.dependencies = ["FoundationContract"];
 
 export default func;

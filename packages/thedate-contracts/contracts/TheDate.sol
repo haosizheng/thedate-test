@@ -5,6 +5,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Base64 } from "base64-sol/base64.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
@@ -12,13 +13,13 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import { IWETH } from "./interfaces/IWETH.sol";
 
-contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
+contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     // ==== Roles ====
     bytes32 public constant DAO_ROLE = keccak256("DAO_ROLE");
 
     // ==== Parameters ====
     // == DAO controlled parameters ==
-    uint256 public claimingPrice = 0.1 ether;
+    uint256 public claimingStairstepPrice = 0.01 ether;
     uint256 public reservePrice = 0.1 ether;
     uint256 public minBidIncrementBps = 1000;
     uint256 public engravingPrice = 0.01 ether;
@@ -43,8 +44,7 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
     // == External contracts ==
     address payable private immutable _foundation;
     address private immutable _weth;
-    address private immutable _loot;
-
+    
     // ==== Events ====
     // == Parameter-related Events ==
     event ClaimingPriceChanged(uint256 claimingPrice);
@@ -73,8 +73,7 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
     mapping(uint256 => uint256) private _highestBid;
 
     // There is at most one unchaimed and auctioned token.
-    uint256 _lastUnchaimedAuctionedTokenId = 0;
-    uint256 _nextUnchaimedTokenId = 0;
+    uint256 private _lastUnchaimedAuctionedTokenId = 0;
 
     // ==== Parameter Related Functions ==== 
     // == DAO controlled parameters ==
@@ -136,7 +135,7 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function engraveNote(uint256 tokenId, string memory note) external payable onlyOwner(tokenId) validNote(note) {
-        require(msg.value >= engravingPrice, "Should pay >= engravingPrice");
+        require(msg.value >= engravingPrice, "Should pay by engravingPrice");
         require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving");
 
         _notes[tokenId] = note;
@@ -145,7 +144,7 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function eraseNote(uint256 tokenId) external payable onlyOwner(tokenId) {
-        require(msg.value >= erasingPrice, "Should pay >= erasingPrice");
+        require(msg.value >= erasingPrice, "Should pay by erasingPrice");
         require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing");
 
         _notes[tokenId] = "";
@@ -229,34 +228,28 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
     }
     
     // ==== Claiming related functions ====
-    function _claim(address to, uint256 tokenId) internal {
+    modifier enoughFund() {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
+            msg.value >= (totalSupply() / 1000) * claimingPrice, "Should pay by claiming price * stairstep");
+        _;
+    }
+
+    function _mintUnclaimedAndUnauctioned(address to, uint256 tokenId) internal {
         require(tokenId < block.timestamp / 1 days, "Only past tokenId is claimable");
         require(_highestBidder[tokenId] == address(0) && _highestBid[tokenId] == 0, "tokenId should not be auctioned");
         require(!_exists(tokenId), "tokenId should not be claimed");
 
         _mint(to, tokenId);
-        _moveToNextAvailable();
     }
 
-    function claimNextAvailable() external nonReentrant payable {
+    function claim(uint256 tokenId) external payable nonReentrant enoughFund {
         settleLastAuction();
-        if (!_exists(_nextUnchaimedTokenId) && _nextUnchaimedTokenId < block.timestamp / 1 days) {
-            claim(_nextUnchaimedTokenId);
-        }
-    }
 
-    function claim(uint256 tokenId) public payable {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
-                IERC721(_loot).balanceOf(msg.sender) > 0 || 
-                msg.value >= claimingPrice, "Should pay >= claiming price or own a Loot NFT");
-
-        settleLastAuction();
-        _claim(msg.sender, tokenId);
+        _mintUnclaimedAndUnauctioned(msg.sender, tokenId);
 
         if (msg.value > 0) {
             _foundation.transfer(msg.value);
         }
-
         emit ArtworkClaimed(tokenId, msg.sender);
     }
 
@@ -266,15 +259,9 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
         for (uint i = 0; i < tokenIds.length; ++i) {
             address to = addresses[i];
             uint256 tokenId = tokenIds[i];
-            _claim(to, tokenId);
+            _mintUnclaimedAndUnauctioned(to, tokenId);
 
             emit ArtworkAirdropped(tokenId, to);
-        }
-    }
-
-    function _moveToNextAvailable() internal  {
-        while (_exists(_nextUnchaimedTokenId) && _nextUnchaimedTokenId < block.timestamp / 1 days) {
-            ++_nextUnchaimedTokenId;
         }
     }
 
@@ -351,13 +338,11 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
 
     // ==== Constructor ====
     constructor(address foundation_,
-                address weth_,
-                address loot_) 
+                address weth_) 
         ERC721("The Date", "DATE")
     {
         _foundation = payable(foundation_);
         _weth = weth_;
-        _loot = loot_;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(DAO_ROLE, msg.sender);
     }
@@ -371,9 +356,9 @@ contract TheDate is ERC721, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function supportsInterface(bytes4 interfaceId) 
-        public view override(ERC721, AccessControl, IERC165) returns (bool) 
+        public view override(ERC721Enumerable, AccessControl, IERC165) returns (bool) 
     {
-        return ERC721.supportsInterface(interfaceId) ||
+        return ERC721Enumerable.supportsInterface(interfaceId) ||
             AccessControl.supportsInterface(interfaceId) || 
             type(IERC2981).interfaceId == interfaceId ||
             type(IERC165).interfaceId == interfaceId;
