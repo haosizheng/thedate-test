@@ -19,7 +19,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
     // ==== Parameters ====
     // == DAO controlled parameters ==
-    uint256 public claimingStairstepPrice = 0.01 ether;
+    uint256 public claimingPrice = 0.05 ether;
     uint256 public reservePrice = 0.1 ether;
     uint256 public minBidIncrementBps = 1000;
     uint256 public engravingPrice = 0.01 ether;
@@ -44,10 +44,11 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     // == External contracts ==
     address payable private immutable _foundation;
     address private immutable _weth;
-    
+    address private immutable _loot;
+
     // ==== Events ====
     // == Parameter-related Events ==
-    event ClaimingStairstepPriceChanged(uint256 claimingStairstepPrice);
+    event ClaimingPriceChanged(uint256 claimingPrice);
     event AuctionReservePriceChanged(uint256 reservePrice);
     event AuctionMinBidIncrementBpsChanged(uint256 minBidIncrementBps);
     event EngravingPriceChanged(uint256 amount);
@@ -77,9 +78,9 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
     // ==== Parameter Related Functions ==== 
     // == DAO controlled parameters ==
-    function setClaimingStairstepPrice(uint256 claimingStairstepPrice_) external onlyRole(DAO_ROLE) {
-        claimingStairstepPrice = claimingStairstepPrice_;
-        emit ClaimingStairstepPriceChanged(claimingStairstepPrice);
+    function setClaimingPrice(uint256 claimingPrice_) external onlyRole(DAO_ROLE) {
+        claimingPrice = claimingPrice_;
+        emit ClaimingPriceChanged(claimingPrice);
     }
 
     function setAuctionReservePrice(uint256 reservePrice_) external onlyRole(DAO_ROLE) {
@@ -135,7 +136,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function engraveNote(uint256 tokenId, string memory note) external payable onlyOwner(tokenId) validNote(note) {
-        require(msg.value >= engravingPrice, "Should pay by engravingPrice");
+        require(msg.value >= engravingPrice, "Should pay >= engravingPrice");
         require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving");
 
         _notes[tokenId] = note;
@@ -144,7 +145,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function eraseNote(uint256 tokenId) external payable onlyOwner(tokenId) {
-        require(msg.value >= erasingPrice, "Should pay by erasingPrice");
+        require(msg.value >= erasingPrice, "Should pay >= erasingPrice");
         require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing");
 
         _notes[tokenId] = "";
@@ -230,7 +231,8 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     // ==== Claiming related functions ====
     modifier enoughFund() {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
-            msg.value >= (totalSupply() / 1000) * claimingStairstepPrice, "Should pay by claiming price * stairstep");
+            IERC721(_loot).balanceOf(msg.sender) > 0 || 
+            msg.value >= claimingPrice, "Should pay >= claiming price or own a Loot NFT");
         _;
     }
 
@@ -338,11 +340,13 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
     // ==== Constructor ====
     constructor(address foundation_,
-                address weth_) 
+                address weth_,
+                address loot_) 
         ERC721("The Date", "DATE")
     {
         _foundation = payable(foundation_);
         _weth = weth_;
+        _loot = loot_;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(DAO_ROLE, msg.sender);
     }

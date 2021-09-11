@@ -77,8 +77,8 @@ const config: HardhatUserConfig = {
       rinkeby: '0xc778417e063141139fce010982780140aa0cd5ab'
     },
     loot: {
-      default: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-      mainnet: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      default: '0xFF9C1b15B16263C61d017ee9F65C50e4AE0113D7',
+      mainnet: '0xFF9C1b15B16263C61d017ee9F65C50e4AE0113D7',
       rinkeby: '0x79e2d470f950f2cf78eef41720e8ff2cf4b3cd78'
     }
   },
@@ -140,7 +140,6 @@ const config: HardhatUserConfig = {
   },
   abiExporter: {
     path: "./abis",
-    only: [":The"],
     clear: true,
     flat: true,
     spacing: 2,

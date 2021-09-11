@@ -28,7 +28,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "claim(uint256)": FunctionFragment;
-    "claimingStairstepPrice()": FunctionFragment;
+    "claimingPrice()": FunctionFragment;
     "daysToDate(uint256)": FunctionFragment;
     "engraveNote(uint256,string)": FunctionFragment;
     "engravingPrice()": FunctionFragment;
@@ -60,7 +60,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setAuctionMinBidIncrementBps(uint256)": FunctionFragment;
     "setAuctionReservePrice(uint256)": FunctionFragment;
-    "setClaimingStairstepPrice(uint256)": FunctionFragment;
+    "setClaimingPrice(uint256)": FunctionFragment;
     "setEngravingPrice(uint256)": FunctionFragment;
     "setErasingPrice(uint256)": FunctionFragment;
     "setNoteSizeLimit(uint256)": FunctionFragment;
@@ -95,7 +95,7 @@ interface TheDateInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "claim", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "claimingStairstepPrice",
+    functionFragment: "claimingPrice",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -217,7 +217,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setClaimingStairstepPrice",
+    functionFragment: "setClaimingPrice",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -292,7 +292,7 @@ interface TheDateInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "claimingStairstepPrice",
+    functionFragment: "claimingPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "daysToDate", data: BytesLike): Result;
@@ -384,7 +384,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setClaimingStairstepPrice",
+    functionFragment: "setClaimingPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -455,7 +455,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "AuctionReservePriceChanged(uint256)": EventFragment;
     "AuctionSettled(uint256,address,uint256)": EventFragment;
     "BidPlaced(uint256,address,uint256)": EventFragment;
-    "ClaimingStairstepPriceChanged(uint256)": EventFragment;
+    "ClaimingPriceChanged(uint256)": EventFragment;
     "EngravingPriceChanged(uint256)": EventFragment;
     "ErasingPriceChanged(uint256)": EventFragment;
     "NoteEngraved(uint256,address,string)": EventFragment;
@@ -477,9 +477,7 @@ interface TheDateInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "AuctionReservePriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AuctionSettled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BidPlaced"): EventFragment;
-  getEvent(
-    nameOrSignatureOrTopic: "ClaimingStairstepPriceChanged"
-  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ClaimingPriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "EngravingPriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ErasingPriceChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NoteEngraved"): EventFragment;
@@ -558,7 +556,7 @@ export class TheDate extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    claimingStairstepPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+    claimingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     daysToDate(
       _days: BigNumberish,
@@ -715,8 +713,8 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setClaimingStairstepPrice(
-      claimingStairstepPrice_: BigNumberish,
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -817,7 +815,7 @@ export class TheDate extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  claimingStairstepPrice(overrides?: CallOverrides): Promise<BigNumber>;
+  claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
   daysToDate(
     _days: BigNumberish,
@@ -960,8 +958,8 @@ export class TheDate extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setClaimingStairstepPrice(
-    claimingStairstepPrice_: BigNumberish,
+  setClaimingPrice(
+    claimingPrice_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1056,7 +1054,7 @@ export class TheDate extends BaseContract {
 
     claim(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    claimingStairstepPrice(overrides?: CallOverrides): Promise<BigNumber>;
+    claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     daysToDate(
       _days: BigNumberish,
@@ -1194,8 +1192,8 @@ export class TheDate extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setClaimingStairstepPrice(
-      claimingStairstepPrice_: BigNumberish,
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1329,9 +1327,9 @@ export class TheDate extends BaseContract {
       { tokenId: BigNumber; bidder: string; amount: BigNumber }
     >;
 
-    ClaimingStairstepPriceChanged(
-      claimingStairstepPrice?: null
-    ): TypedEventFilter<[BigNumber], { claimingStairstepPrice: BigNumber }>;
+    ClaimingPriceChanged(
+      claimingPrice?: null
+    ): TypedEventFilter<[BigNumber], { claimingPrice: BigNumber }>;
 
     EngravingPriceChanged(
       amount?: null
@@ -1423,7 +1421,7 @@ export class TheDate extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    claimingStairstepPrice(overrides?: CallOverrides): Promise<BigNumber>;
+    claimingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     daysToDate(
       _days: BigNumberish,
@@ -1573,8 +1571,8 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setClaimingStairstepPrice(
-      claimingStairstepPrice_: BigNumberish,
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1681,9 +1679,7 @@ export class TheDate extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    claimingStairstepPrice(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    claimingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     daysToDate(
       _days: BigNumberish,
@@ -1837,8 +1833,8 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setClaimingStairstepPrice(
-      claimingStairstepPrice_: BigNumberish,
+    setClaimingPrice(
+      claimingPrice_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

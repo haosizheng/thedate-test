@@ -21,7 +21,6 @@ context("TheDate contract", () => {
   let mockLootContract: MockERC721;
   let testReentrantAttackContract: TestReentrantAttack;
 
-  let foundationUsers: SignerWithAddress[];
   let foundationMembers: Address[];
   let foundationShares: number[];
   let deployer: SignerWithAddress;
@@ -39,7 +38,6 @@ context("TheDate contract", () => {
     [deployer, user1, user2, user3, user4, user5, user6] = await ethers.getSigners();
 
     // Setup the foundation
-    foundationUsers = [user1, user2];
     foundationMembers = [user1.address, user2.address];
     foundationShares = [70, 30];
 
@@ -54,7 +52,7 @@ context("TheDate contract", () => {
   beforeEach(async () => {
     // Deploy the main contract
     mainContract = await (await new TheDate__factory(deployer)
-      .deploy(foundationContract.address, mockWETHContract.address)).deployed();
+      .deploy(foundationContract.address, mockWETHContract.address, mockLootContract.address)).deployed();
 
     testReentrantAttackContract = await (await new TestReentrantAttack__factory(deployer)
       .deploy(mainContract.address)).deployed();
@@ -64,7 +62,6 @@ context("TheDate contract", () => {
     // Grant user5 to be a DAO members
     await expect(mainContract.grantRole(daoRole, user5.address))
       .to.emit(mainContract, "RoleGranted").withArgs(daoRole, user5.address, deployer.address);
-
   });
 
   describe("Royalty", async () => {
@@ -117,7 +114,7 @@ context("TheDate contract", () => {
 
       const engravingPrice = await mainContract.engravingPrice();
       const erasingPrice = await mainContract.erasingPrice();
-      const claimingPrice = await mainContract.getCur();
+      const claimingPrice = await mainContract.claimingPrice();
 
       await expect(mainContract.connect(user1).claim(tokenId, {value: claimingPrice}))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(tokenId, user1.address);
@@ -419,7 +416,7 @@ context("TheDate contract", () => {
   describe("DAO controlled parameters", async () => {
     it("setClaimingPrice", async () => {
 
-     expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("0.1"));
+     expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("0.05"));
      await expect(mainContract.connect(deployer).setClaimingPrice(ethers.utils.parseEther("3.0")))
        .to.emit(mainContract, "ClaimingPriceChanged").withArgs(ethers.utils.parseEther("3.0"));
      await expect(mainContract.connect(user5).setClaimingPrice(ethers.utils.parseEther("2.0")))

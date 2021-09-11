@@ -422,18 +422,24 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Paper Mimicry",
         "Digital Form",
         "Tachyon Mimicry",
-        "Electromagnetic Wave Physiology",
         "Ice Mimicry",
         "Stellar Physiology",
         "Spatial Mimicry",
-        "Artificially Enhanced Physiology",
         "Energy Physiology",
         "Dust Mimicry",
-        "Ash Mimicry"
+        "Ash Mimicry",
+        "Plant Mimicry",
+        "Flower Mimicry",
+        "Fungal Mimicry",
+        "Wood Mimicry",
+        "Chimerism",
+        "Hybrid Soul",
+        "Unicellular Mimicry"
     ];
 
     string[] private organicMimicry = [
-        "Animal Morphing",
+        "Electromagnetic Wave Physiology",
+        "Artificially Enhanced Physiology",
         "Amphibian Physiology",
         "Arachnid Physiology",
         "Scorpion Physiology",
@@ -489,8 +495,6 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Snake Physiology",
         "Tortoise Physiology",
         "Turtle Physiology",
-        "Chimerism",
-        "Hybrid Soul",
         "Mythic Physiology",
         "Alien Physiology",
         "Angel Physiology",
@@ -527,11 +531,6 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Vampire Physiology",
         "Wendigo Physiology",
         "Werewolf Physiology",
-        "Plant Mimicry",
-        "Flower Mimicry",
-        "Fungal Mimicry",
-        "Wood Mimicry",
-        "Unicellular Mimicry",
         "Transcendent Physiology",
         "Cosmic Entity Physiology",
         "Cthulhu Mythos Deity Physiology",
@@ -567,17 +566,8 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Vodou Deity Physiology",
         "Zoroastrian Deity Physiology"];
 
-    string[] private levels = [
-        "of Basic Level",
-        "of Advanced Level",
-        "of Expert Level",
-        "of Master Level",
-        "of Ultimate Level",
-        "of Absolute Level"
-    ];
-    
     function getVision(uint256 tokenId) public view returns (string memory) {
-        return pluck(tokenId, "vision", vision);
+        return string(abi.encodePacked(pluck(tokenId, "vision", vision), " Vision"));
     }
     
     function getMentalityBasedPower(uint256 tokenId) public view returns (string memory) {
@@ -630,19 +620,6 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         uint256 greatness = rand % 10000;
         if (greatness > 2000) {
             output = string(abi.encodePacked(output, sourceArray[rand % sourceArray.length]));
-            if (greatness > 9990) {
-                output = string(abi.encodePacked(output, " ", levels[5]));
-            } else if (greatness > 9900) {
-                output = string(abi.encodePacked(output, " ", levels[4]));
-            } else if (greatness > 8900) {
-                output = string(abi.encodePacked(output, " ", levels[3]));
-            } else if (greatness > 7500) {
-                output = string(abi.encodePacked(output, " ", levels[2]));
-            } else if (greatness > 6000) {
-                output = string(abi.encodePacked(output, " ", levels[1]));
-            } else if (greatness > 3000) {
-                output = string(abi.encodePacked(output, " ", levels[0]));
-            }
         } else {
             output = string(abi.encodePacked(output, "(none)"));
         }
@@ -715,46 +692,20 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         return output;
     }
 
-    string public tokenDescription = "The Superpower is a metadata-based NFT art experiment. "
-      "Feel free to use the Superpower in any way you want.";
+    string public tokenDescription = "Superpower is a metadata-based NFT art experiment. "
+      "Feel free to use Superpower in any way you want.";
 
     string[] public svgImageTemplate = [''
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">'
-        '<rect width="100%" height="100%" fill="black" />'
-        '<style>.base { fill: white; font-family: serif; font-size: 14px; }</style>'
-        '<text x="10" y="20" class="base">',
-        '{{vision}}',
-        '</text>'
-        '<text x="10" y="40" class="base">',
-        '{{mentalityBasedPower}}',
-        '</text>'
-        '<text x="10" y="60" class="base">',
-        '{{personalPhysicalPower}}',
-        '</text>'
-        '<text x="10" y="80" class="base">',
-        '{{emission}}',
-        '</text>'
-        '<text x="10" y="100" class="base">',
-        '{{adaptation}}',
-        '</text>'
-        '<text x="10" y="120" class="base">',
-        '{{enhancedPhysicalSkills}}',
-        '</text>'
-        '<text x="10" y="140" class="base">',
-        '{{supernaturalPhysicalSkills}}',
-        '</text>'
-        '<text x="10" y="160" class="base">',
-        '{{realityManipulation}}',
-        '</text>'
-        '<text x="10" y="180" class="base">',
-        '{{travel}}',
-        '</text>'
-        '<text x="10" y="200" class="base">',
-        '{{elementMimicry}}',
-        '</text>'
-        '<text x="10" y="220" class="base">',
-        '{{organicMimicry}}',
-        '</text>'
+        '<rect width="100%" height="100%" fill="black"></rect>'
+        '<style>.base { fill: white; dominant-baseline: middle; text-anchor: start; font-family: "EB Garamond", serif; font-size: 14px; } '
+        '.title {fill: white; dominant-baseline: middle; text-anchor: end; font-family: "EB Garamond", serif; font-size: 12px; }'
+        '</style>'
+        '<text x="95%" y="20" class="title">Superpower Set #',
+        '{{tokenId}}'
+        '</text>',
+        '<text x="10%" y="35%" class="base">'
+        '</text>',
         '</svg>'
     ];
 
@@ -784,12 +735,12 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
     uint256 private _claimingStairstepPrice = 0.01 ether;
 
     function getCurrentClaimingPrice() public view returns (uint256) {
-        return (currentTokenId / 1000) * _claimingStairstepPrice;
+        return (currentTokenId / 1111) * _claimingStairstepPrice;
     }
 
     function claim() external payable nonReentrant {
         require(currentTokenId + 1 <= 11111, "Limited to 11111 tokens");
-        require(msg.value >= getCurrentClaimingPrice(), "Should pay by claimingStairstepPrice * stairstep");
+        require(msg.value >= getCurrentClaimingPrice(), "Should pay >= claimingStairstepPrice * stairstep");
 
         currentTokenId += 1;
         _safeMint(_msgSender(), currentTokenId);

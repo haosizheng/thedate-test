@@ -31,7 +31,7 @@ export default function Auction() {
   const [ highestBidder, setHighestBidder] = useState<string | undefined>(undefined);
   const [ highestBid, setHighestBid] = useState<BigNumber | undefined>(undefined);
   const [ reservePrice, setReservePrice] = useState<BigNumber | undefined>(undefined);
-  const [ minBidIncrementPermyriad, setMinBidIncrementPermyriad] = useState<BigNumber | undefined>(undefined);
+  const [ minBidIncrementBps, setMinBidIncrementBps] = useState<BigNumber | undefined>(undefined);
   const [ bidPrice, setBidPrice] = useState<BigNumber | undefined>(undefined);
   const [ bidHistory, setBidHistory ] = useState<BidHistoryItem[]>([]);
   const { data: etherPrice } = useEtherPrice();
@@ -41,9 +41,9 @@ export default function Auction() {
       return;
     }
     try {
-      const reservePrice_ = await TheDate.getAuctionReservePrice();
-      const minBidIncrementPermyriad_ = await TheDate.getAuctionMinBidIncrementPermyriad();
-      setMinBidIncrementPermyriad(minBidIncrementPermyriad_);
+      const reservePrice_ = await TheDate.reservePrice();
+      const minBidIncrementBps_ = await TheDate.minBidIncrementBps();
+      setMinBidIncrementBps(minBidIncrementBps_);
       setReservePrice(reservePrice_);
       setMinBidPrice(reservePrice_);
 
@@ -61,7 +61,7 @@ export default function Auction() {
       const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId_);
       
       if (!!highestBidder_ && highestBidder_ !== ethers.constants.AddressZero ) {
-        setMinBidPrice(highestBid_.mul(minBidIncrementPermyriad_.add(10000)).div(10000));
+        setMinBidPrice(highestBid_.mul(minBidIncrementBps_.add(10000)).div(10000));
       }
 
       setHighestBid(highestBid_);
@@ -203,7 +203,7 @@ export default function Auction() {
               { bidHistory.length == 0 && <> No bid is placed yet. <br/></> }
               { !!reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. <br/></> } 
               { !!highestBid  && <>Current highest bid is Ξ{parseBalance(highestBid)}. <br/> </>}
-              { !!minBidIncrementPermyriad && <>Bidding {minBidIncrementPermyriad.div(100).toNumber()}% more is required. </>} 
+              { !!minBidIncrementBps && <>Bidding {minBidIncrementBps.div(100).toNumber()}% more is required. </>} 
             </div>
         </div>
       </div>

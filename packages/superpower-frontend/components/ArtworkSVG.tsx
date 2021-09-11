@@ -13,5 +13,7 @@ export default function ArtworkSVG({ tokenId }: { tokenId: number }) {
     setSVGImage(await Superpower?.generateSVGImage(tokenId));
   }, [Superpower]);
 
-  return (svgImage ? svgImage : "");
+  return (
+    <div dangerouslySetInnerHTML={{__html: svgImage ? svgImage : ""}}/>
+  );
 }

@@ -1,7 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ERC721Enumerable, TheDate } from "../typechain";
-import { BigNumber } from "@ethersproject/bignumber";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer: deployerAddress, loot: lootAddress } = await hre.getNamedAccounts();
@@ -18,6 +17,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 func.tags = ["promote", "AirdropToLootHolder"];
 func.dependencies = ["reserve"];
+func.skip = async ({ getChainId }) => {
+  const chainId = await getChainId();
+  return true; // chainId !== "31337";
+}
 
 export default func;
 
