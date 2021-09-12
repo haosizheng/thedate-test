@@ -64,6 +64,14 @@ context("TheDate contract", () => {
       .to.emit(mainContract, "RoleGranted").withArgs(daoRole, user5.address, deployer.address);
   });
 
+  describe("EscapeHTML", async () => {
+    it("Escape <>'\"&", async () => {
+      expect(await mainContract.escapeHTML('<text x="10" y="10" class="base">ASDASDa</text>Hello</text>'))
+        .to.eq('&lt;text x=&quot;10&quot; y=&quot;10&quot; class=&quot;base&quot;&gt;ASDASDa&lt;/text&gt;Hello&lt;/text&gt;');
+      expect(await mainContract.escapeHTML('&')).to.eq('&amp;');
+    });
+  });
+
   describe("Royalty", async () => {
     it("Get/Set Royalty Bps", async () => {
       expect(await mainContract.royaltyBps()).to.eq(1000);
@@ -206,7 +214,7 @@ context("TheDate contract", () => {
     });
 
     it("setTokenDescription", async () => {
-      expect(await mainContract.tokenDescription()).to.eq("The Date is a metadata-based NFT art experiment about time and blockchain. " +
+      expect(await mainContract.tokenDescription()).to.eq("The Date is a metadata-based NFT art project about time. " +
         "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " +
         "The owner can engrave or erase a note on the artwork as an additional metadata. "  +
         "The Date is metadata. Feel free to use The Date in any way you want.");

@@ -28,7 +28,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
     // == Admin controlled parameters ==
     uint256 public royaltyBps = 1000;
-    string public tokenDescription = "The Date is a metadata-based NFT art experiment about time and blockchain. " 
+    string public tokenDescription = "The Date is a metadata-based NFT art project about time. " 
         "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " 
         "The owner can engrave or erase a note on the artwork as an additional metadata. " 
         "The Date is metadata. Feel free to use The Date in any way you want.";

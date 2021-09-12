@@ -35,7 +35,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const addresses = reservedDateList.map( _ => deployer.address);
 
+  console.log(`Airdrop ${tokenIds.length} tokens`);
   await theDate.airdrop(addresses, tokenIds);
+  console.log(`Airdropped ${tokenIds.length} tokens`);
 
   // for (const {date, note} of reservedDateList) {
   //   const tokenId = BigNumber.from(new Date(date).valueOf()).div(SECONDS_IN_A_DAY).div(1000);
@@ -52,7 +54,9 @@ func.dependencies = ["deploy"];
 
 func.skip = async ({ getChainId }) => {
   const chainId = await getChainId();
-  return chainId !== "31337";
+//  return false;
+  return true;
+//  return chainId !== "31337";
 }
 
 export default func;

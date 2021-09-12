@@ -43,6 +43,7 @@ func.dependencies = ["deploy"];
 func.skip = async ({ getChainId }) => {
   const chainId = await getChainId();
   return chainId === "1";
+//  return true;
 }
 
 export default func;
