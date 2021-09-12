@@ -9,6 +9,9 @@ import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import { useState } from "react";
 import { useAsync } from "react-use";
 import { useRouter } from "next/router";
+import ArtworkCatalogue from "@/components/ArtworkCatalogue";
+import ArtworkHistory from "@/components/ArtworkHistory";
+import useTheDateArtwork from "@/hooks/useTheDateArtwork";
 
 export default function ArtworkPage() {
   const router = useRouter();
@@ -26,13 +29,13 @@ export default function ArtworkPage() {
     setExists((await TheDate?.exists(tokenId)));
   }, [TheDate, tokenId]);
 
-  if (tokenId === undefined || !Number.isInteger(tokenId)) {
+  if (tokenId === undefined || exists === undefined ) {
     return (
       <Layout>
-        <div className="content text-center">Error - Wrong Token ID</div>
+        <div className="content text-center">Loading...</div>
       </Layout>
     );
-  } else if (exists === undefined || !exists) {
+  } else if (!exists) {
     return (
       <Layout>
         <div className="content text-center">Error - Token ID does not exist.</div>
@@ -45,6 +48,12 @@ export default function ArtworkPage() {
           <figure>
             <ArtworkSVGOnChain tokenId={tokenId} />
           </figure>
+          {/* <div className="content-item">
+            <ArtworkCatalogue tokenId={tokenId} editable />
+          </div>
+          <div className="content-item">
+            <ArtworkHistory tokenId={tokenId} />
+          </div> */}
         </div>
       </Layout>
     );

@@ -1,4 +1,3 @@
-import Auction from "@/components/Auction";
 import Layout from "@/components/Layout";
 import ArtworkSVG from "@/components/ArtworkSVG";
 import Link from "next/link";

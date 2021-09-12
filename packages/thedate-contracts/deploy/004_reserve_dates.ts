@@ -65,7 +65,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   for (const {date, note} of reservedDateList) {
     const tokenId = BigNumber.from(new Date(date).valueOf()).div(SECONDS_IN_A_DAY).div(1000);
-    await theDate.airdrop([deployer.address], [tokenId]);
+    await theDate.claim(tokenId);
     if (note.length > 0) {
       await theDate.engraveNote(tokenId, note, {value: engravingPrice});
     }
@@ -78,7 +78,6 @@ func.dependencies = ["deploy"];
 
 func.skip = async ({ getChainId }) => {
   const chainId = await getChainId();
-  return true;
   return chainId !== "31337";
 }
 

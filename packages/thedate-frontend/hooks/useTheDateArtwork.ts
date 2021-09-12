@@ -54,32 +54,6 @@ export default function useTheDateArtwork(tokenId: number) {
   }, [library, chainId, TheDate]);
 
   return useMemo(() => {
-    const engraveNote = async (newNoteString: string) => {
-      if (!library || !TheDate || !account || !owner || owner !== account || !exists 
-        || noteString === undefined || noteString.length > 0 
-        || newNoteString.length == 0  || newNoteString.length > 100) {
-        return;
-      }
-      await TheDate?.engraveNote(tokenId, newNoteString);
-    };
-  
-    const eraseNote = async () => {
-      if (!library || !TheDate || !account || !exists || !owner || owner !== account 
-        || noteString == undefined || noteString.length == 0 ) {
-        return;
-      }
-      await TheDate?.eraseNote(tokenId, { value: ethers.utils.parseEther("1") });
-    };
-  
-    const claimArtwork = async () => {
-      if (!library || !TheDate || !account || !exists  || !owner || owner !== TheDate.address) {
-        return;
-      }
-      await TheDate?.settleLastAuction();
-    };
-
-    return {exists, owner, dateString, noteString, auctionEnded, highestBidder, highestBid, 
-      engraveNote, eraseNote, claimArtwork};
-  }, 
-  [dateString, exists, noteString, owner, auctionEnded, highestBidder, highestBid, TheDate, account, library, tokenId]);
+    return {exists, owner, dateString, noteString, auctionEnded, highestBidder, highestBid};
+  }, [dateString, exists, noteString, owner, auctionEnded, highestBidder, highestBid]);
 }

@@ -29,7 +29,7 @@ export function formatOpenSeaLink(
       return `${linkPrefix}/collection/${contractOrCollectionName}`;
     }
     case "Asset": {
-      return `assets/${contractOrCollectionName}/${tokenId}`;
+      return `${linkPrefix}/assets/${contractOrCollectionName}/${tokenId}`;
     }
   }
 }

@@ -75,8 +75,7 @@
     "dev": "npx next dev",
     "build": "npx next build",
     "start": "npx next start",
-    "lint": "npx next lint",
-    "bmgenerate": "node scripts/generateBM.js"
+    "lint": "npx next lint"
   },
   "eslintConfig": {
     "extends": "react-app"

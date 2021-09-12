@@ -1,7 +1,7 @@
 import ArtworkSVG from '@/components/ArtworkSVG';
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useTheDateContract from '@/hooks/useTheDateContract';
-import { formatEtherscanLink, parseBalance, shortenHex, toPriceFormat } from '@/utils/ethers';
+import { formatEtherscanLink, formatOpenSeaLink, parseBalance, shortenHex, toPriceFormat } from '@/utils/ethers';
 import { blockTimestampToUTC, SECONDS_IN_A_DAY, tokenIdToDateString, tokenIdToISODateString } from "@/utils/thedate";
 import { BigNumber } from "@ethersproject/bignumber";
 import { formatEther } from "@ethersproject/units";
@@ -31,6 +31,7 @@ export default function Auction() {
   const [ reservePrice, setReservePrice] = useState<BigNumber | undefined>(undefined);
   const [ minBidIncrementBps, setMinBidIncrementBps] = useState<BigNumber | undefined>(undefined);
   const [ bidHistory, setBidHistory ] = useState<BidHistoryItem[]>([]);
+  const [ auctionHistory, setAuctionHistory ] = useState<BidHistoryItem[]>([]);
 
   useAsync(async () => {
     if (!library || !TheDate) {
@@ -62,6 +63,18 @@ export default function Auction() {
       })));
       bidHistory_.sort((a, b) => (b.blockNumber - a.blockNumber));
       setBidHistory(bidHistory_);
+
+      const auctionFilter = TheDate.filters.AuctionSettled(null, null, null);
+      const auctionHistory_ = await Promise.all((await TheDate.queryFilter(auctionFilter)).map(async (x) => ({
+        tokenId: x.args.tokenId.toNumber(),
+        bidder: x.args.winner,
+        amount: x.args.amount,
+        transactionHash: x.transactionHash,
+        blockNumber: x.blockNumber,
+        timestamp: (await x.getBlock()).timestamp
+      })));
+      auctionHistory_.sort((a, b) => (b.blockNumber - a.blockNumber));
+      setAuctionHistory(auctionHistory_);
 
     } catch (error) {
       console.log(error);
@@ -121,16 +134,14 @@ export default function Auction() {
         
         { bidHistory.length > 0 && (
           <div className="content_item pt-10">
-              <p>Bidding History for Today &quot;{ tokenIdToISODateString(tokenId) }&quot;:</p> 
+              <h3>Bidding History for Today &quot;{ tokenIdToISODateString(tokenId) }&quot;:</h3> 
               <table className="text-xs text-left mx-auto text-neutral-content">
                 <thead>
-                  {bidHistory.length > 0 &&
-                    <tr>
-                      <th className="w-52 text-left">Time</th>
-                      <th className="w-40 text-left">From</th>
-                      <th className="w-44 text-left">Price</th>        
-                    </tr>
-                  }
+                  <tr>
+                    <th className="w-52 text-left">Time</th>
+                    <th className="w-40 text-left">From</th>
+                    <th className="w-44 text-left">Bid</th>        
+                  </tr>
                 </thead>
                 <tbody>
                     {bidHistory.map((x, i) => (
@@ -147,6 +158,42 @@ export default function Auction() {
                         </td>
                         <td>
                           Ξ{ parseBalance(x.amount) } 
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+          </div>
+        )}
+
+        { auctionHistory.length > 0 && (
+          <div className="content_item pt-10">
+              <h3>History for Past Auctions</h3> 
+              <table className="text-xs text-left mx-auto text-neutral-content">
+                <thead>
+                  <tr>
+                    <th className="w-52 text-left">Date</th>
+                    <th className="w-40 text-left">Winner</th>
+                    <th className="w-44 text-left">Price</th>        
+                  </tr>
+                </thead>
+                <tbody>
+                    {auctionHistory.map((x, i) => (
+                      <tr key={i}>
+                        <td>
+                          <a href={formatOpenSeaLink("Asset", chainId, PROJECT_INFO.contract_address, x.tokenId)}>
+                          { `${tokenIdToISODateString(x.tokenId)} (Token #${x.tokenId})` }
+                          </a>
+                        </td>
+                        <td>
+                          <a href={formatEtherscanLink("Account", [chainId, x.bidder])}>
+                            { shortenHex(x.bidder) } { account === x.bidder && <> (you)</>}
+                          </a>
+                        </td>
+                        <td>
+                          <a href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
+                          Ξ{ parseBalance(x.amount) } 
+                          </a>
                         </td>
                       </tr>
                     ))}

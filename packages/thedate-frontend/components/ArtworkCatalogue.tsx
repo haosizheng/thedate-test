@@ -8,15 +8,9 @@ import { useRef } from "react";
 export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
   const {library, account} = useActiveWeb3React();
   const TheDate = useTheDateContract();
-  const {exists, owner, dateString, noteString, highestBidder, auctionEnded, 
-    engraveNote, eraseNote, claimArtwork } = useTheDateArtwork(tokenId);
+  const {exists, owner, dateString, noteString, highestBidder, auctionEnded } = useTheDateArtwork(tokenId);
   
   const noteInputBox = useRef<HTMLInputElement>(null!);
-  const onClickEngrave = () => {
-    if (noteInputBox.current?.textContent) {
-      engraveNote(noteInputBox.current.textContent);
-    }
-  };
 
   return  (<>
     { exists !== undefined && owner != undefined && dateString !== undefined && noteString !== undefined && (
@@ -26,7 +20,6 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
         </div>
       : (
         <div>
-          {/* <ArtworkModelViewer tokenId={tokenId} noteString="" /> */}
           <p>Token ID: {" "}
             <Link href={`/artwork/${tokenId}`}>
               <a className="hover:link">#{tokenId}</a>
@@ -46,11 +39,11 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
                   className="border-none focus:border-black-300 w-96 
                   focus:outline-none outline-none focus:border-black focus:underline bg-transparent" placeholder="(unset)" />
                   <br></br>
-                <button className="link" onClick={onClickEngrave}>Engrave</button>
+                <button className="link" >Engrave</button>
               </>
             )}
             {account === owner && editable && noteString.length > 0 && (
-              <button className="link" onClick={eraseNote}>Erase</button>
+              <button className="link" >Erase</button>
             )}
           </p>
           <p>
@@ -59,7 +52,7 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
                 !auctionEnded ? 
                   <>Auction not ended yet</>
                 : (editable && highestBidder === account) ? 
-                  <button className="link" onClick={claimArtwork}>Claim your artwork</button>
+                  <button className="link">Claim your artwork</button>
                 : <Link href={`/artwork/${tokenId}`}>
                     <a className="link">Not claimed yet</a>
                   </Link>

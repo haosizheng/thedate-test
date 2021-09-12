@@ -127,6 +127,7 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Pheromone",
         "Poison",
         "Scald",
+        "Laser",
         "Smoke",
         "Sonic",
         "Stench",
@@ -329,10 +330,6 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         return pluck(tokenId, "enhancedPhysicalSkills", enhancedPhysicalSkills);
     }
     
-    function getSupernaturalPhysicalSkills(uint256 tokenId) public view returns (string memory) {
-        return pluck(tokenId, "supernaturalPhysicalSkills", supernaturalPhysicalSkills);
-    }
-    
     function getRealityManipulation(uint256 tokenId) public view returns (string memory) {
         return pluck(tokenId, "realityManipulation", realityManipulation);
     }
@@ -357,21 +354,8 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         uint256 rand = random(string(abi.encodePacked(keyPrefix, Strings.toString(tokenId))));
         string memory output = string(abi.encodePacked(keyPrefix, ": "));
         uint256 greatness = rand % 10000;
-        if (greatness > 2000) {
+        if (greatness > 5000) {
             output = string(abi.encodePacked(output, sourceArray[rand % sourceArray.length]));
-            if (greatness > 9990) {
-                output = string(abi.encodePacked(output, " ", levels[5]));
-            } else if (greatness > 9900) {
-                output = string(abi.encodePacked(output, " ", levels[4]));
-            } else if (greatness > 8900) {
-                output = string(abi.encodePacked(output, " ", levels[3]));
-            } else if (greatness > 7500) {
-                output = string(abi.encodePacked(output, " ", levels[2]));
-            } else if (greatness > 6000) {
-                output = string(abi.encodePacked(output, " ", levels[1]));
-            } else if (greatness > 3000) {
-                output = string(abi.encodePacked(output, " ", levels[0]));
-            }
         } else {
             output = string(abi.encodePacked(output, "(none)"));
         }
@@ -398,8 +382,6 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
                 part = getAdaptation(tokenId);
             } else if (_stringEquals(svgImageTemplate[i], "{{enhancedPhysicalSkills}}")) {
                 part = getEnhancedPhysicalSkills(tokenId);
-            } else if (_stringEquals(svgImageTemplate[i], "{{supernaturalPhysicalSkills}}")) {
-                part = getSupernaturalPhysicalSkills(tokenId);
             } else if (_stringEquals(svgImageTemplate[i], "{{realityManipulation}}")) {
                 part = getRealityManipulation(tokenId);
             } else if (_stringEquals(svgImageTemplate[i], "{{travel}}")) {
@@ -451,38 +433,9 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">'
         '<rect width="100%" height="100%" fill="black" />'
         '<style>.base { fill: white; font-family: serif; font-size: 14px; }</style>'
+        '<style>.title { fill: white; font-family: serif; font-size: 14px; }</style>'
         '<text x="10" y="20" class="base">',
         '{{vision}}',
-        '</text>'
-        '<text x="10" y="40" class="base">',
-        '{{mentalityBasedPower}}',
-        '</text>'
-        '<text x="10" y="60" class="base">',
-        '{{personalPhysicalPower}}',
-        '</text>'
-        '<text x="10" y="80" class="base">',
-        '{{emission}}',
-        '</text>'
-        '<text x="10" y="100" class="base">',
-        '{{adaptation}}',
-        '</text>'
-        '<text x="10" y="120" class="base">',
-        '{{enhancedPhysicalSkills}}',
-        '</text>'
-        '<text x="10" y="140" class="base">',
-        '{{supernaturalPhysicalSkills}}',
-        '</text>'
-        '<text x="10" y="160" class="base">',
-        '{{realityManipulation}}',
-        '</text>'
-        '<text x="10" y="180" class="base">',
-        '{{travel}}',
-        '</text>'
-        '<text x="10" y="200" class="base">',
-        '{{elementMimicry}}',
-        '</text>'
-        '<text x="10" y="220" class="base">',
-        '{{organicMimicry}}',
         '</text>'
         '</svg>'
     ];
