@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PROJECT_INFO } from "@/utils/constants";
+import Wallet from "@/components/Wallet";
 
 export default function Footer() {
   return (

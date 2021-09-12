@@ -17,10 +17,12 @@ const Web3ReactProviderNetwork = dynamic(
 
 export default function AppProviders({ children }: {children: JSX.Element}) {
   return (
-    <Web3ReactProviderNetwork getLibrary={getLibrary}>
-      <Web3ReactManager>
-        {children}
-      </Web3ReactManager>
-    </Web3ReactProviderNetwork>
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <Web3ReactProviderNetwork getLibrary={getLibrary}>
+        <Web3ReactManager>
+          {children}
+        </Web3ReactManager>
+      </Web3ReactProviderNetwork>
+    </Web3ReactProvider>
   );
 }

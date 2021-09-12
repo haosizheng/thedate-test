@@ -7,7 +7,7 @@ import AppProviders from "@/components/AppProviders";
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AppProviders>
-    <Component {...pageProps} />
+      <Component {...pageProps} />
     </AppProviders>
   );
 }
