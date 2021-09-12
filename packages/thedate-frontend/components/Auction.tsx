@@ -128,7 +128,7 @@ export default function Auction() {
                 </>
               }
               <br/>
-              Place your bid via <a href={`${PROJECT_INFO.etherscan_url}#writeContract`}>the contract</a> via calling placeBid() function. 
+              Place your bid via <a target="_blank" rel="noreferrer" href={`${PROJECT_INFO.etherscan_url}#writeContract`}>the contract</a> via calling placeBid() function. 
           </p>
         </div>
         
@@ -147,12 +147,12 @@ export default function Auction() {
                     {bidHistory.map((x, i) => (
                       <tr key={i} className={ i > 0 ? "line-through" : ""}>
                         <td>
-                          <a href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
+                          <a target="_blank" rel="noreferrer" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                             { blockTimestampToUTC(x.timestamp) }
                           </a>
                         </td>
                         <td>
-                            <a href={formatEtherscanLink("Account", [chainId, x.bidder])}>
+                            <a target="_blank" rel="noreferrer" href={formatEtherscanLink("Account", [chainId, x.bidder])}>
                             { shortenHex(x.bidder) } { account === x.bidder && <> (you)</>}
                           </a>
                         </td>
@@ -181,17 +181,17 @@ export default function Auction() {
                     {auctionHistory.map((x, i) => (
                       <tr key={i}>
                         <td>
-                          <a href={formatOpenSeaLink("Asset", chainId, PROJECT_INFO.contract_address, x.tokenId)}>
+                          <a target="_blank" rel="noreferrer" href={formatOpenSeaLink("Asset", chainId, PROJECT_INFO.contract_address, x.tokenId)}>
                           { `${tokenIdToISODateString(x.tokenId)} (Token #${x.tokenId})` }
                           </a>
                         </td>
                         <td>
-                          <a href={formatEtherscanLink("Account", [chainId, x.bidder])}>
+                          <a target="_blank" rel="noreferrer" href={formatEtherscanLink("Account", [chainId, x.bidder])}>
                             { shortenHex(x.bidder) } { account === x.bidder && <> (you)</>}
                           </a>
                         </td>
                         <td>
-                          <a href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
+                          <a target="_blank" rel="noreferrer" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                           Ξ{ parseBalance(x.amount) } 
                           </a>
                         </td>

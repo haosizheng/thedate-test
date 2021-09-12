@@ -61,14 +61,14 @@ export default function FAQPage() {
           </p>
 
           <p>
-          You could <a href={`${etherscanLinkOfToken}#writeContract`}>place your bid</a> via calling placeBid() function in the contract on Etherscan. 
+          You could <a target="_blank" rel="noreferrer" href={`${etherscanLinkOfToken}#writeContract`}>place your bid</a> via calling placeBid() function in the contract on Etherscan. 
           You can see the auction status, such as current price and biding history, by visiting <Link href="/auction"><a>Auction</a></Link> page .
           </p>
         </div>
 
         <div className="content_item">
           <h3>How many The Date are there? </h3>
-          <p>Since <a href="https://en.wikipedia.org/wiki/Unix_time">Unix Epoch</a>, one The Date each day was generated. </p>
+          <p>Since <a target="_blank" rel="noreferrer" href="https://en.wikipedia.org/wiki/Unix_time">Unix Epoch</a>, one The Date each day was generated. </p>
 
           <p>
           The earliest date generated was <b>{tokenIdToISODateString(0)}</b> (Token #0).
@@ -85,15 +85,15 @@ export default function FAQPage() {
           <h3>How can I own past The Date? </h3>
 
           <p>
-            For claimed past The Date, you can trade it on the secondary market <a href={PROJECT_INFO.opensea_url}>OpenSea</a>.
+            For claimed past The Date, you can trade it on the secondary market <a target="_blank" rel="noreferrer" href={PROJECT_INFO.opensea_url}>OpenSea</a>.
           </p>
           <p>
             For unclaimed past The Date, you can <Link href="/claim"><a>claim</a></Link> it via calling <i>claim(tokenId)</i> in the contract at price Ξ0.05. 
             Note that only one The Date will be available for each date. 
-            Check carefully via <i>exists(tokenId)</i> function to see if the date you chosen is claimable.
+            Check carefully via <i>available(tokenId)</i> function to see if the date you chosen is claimable.
           </p>
           <p>
-            As an metadata-based NFT project, to respect the first of its kind, <a href="https://lootproject.com/">Loot</a>, 
+            As an metadata-based NFT project, to respect the first of its kind, <a target="_blank" rel="noreferrer" href="https://lootproject.com/">Loot</a>, 
             all the Loot holders are free to claim The Date. 
           </p>
         </div>
@@ -101,11 +101,11 @@ export default function FAQPage() {
         <div className="content_item">
           <h3>What can I do with The Date as an owner? </h3>
           <p>
-            As the owner of The Date, you could optionally <a href={`${etherscanLinkOfToken}#writeContract`}>engrave</a> {" "}
+            As the owner of The Date, you could optionally <a target="_blank" rel="noreferrer" href={`${etherscanLinkOfToken}#writeContract`}>engrave</a> {" "}
             a note (100 bytes at max with printable characters) at Ξ0.01 via calling <i>engraveNote()</i>.
           </p>
           <p>
-            However, you have to pay Ξ0.1 to <a href={`${etherscanLinkOfToken}#writeContract`}>erase</a> the existing 
+            However, you have to pay Ξ0.1 to <a target="_blank" rel="noreferrer" href={`${etherscanLinkOfToken}#writeContract`}>erase</a> the existing 
             engraved note via calling <i>eraseNote()</i> before a new one can be engraved. 
           </p>
         </div>
@@ -117,7 +117,7 @@ export default function FAQPage() {
             It could be a building block for stories, experiements, and metaverses. 
           </p>
           <p>
-            To inspire you, based on the metadata of the Date, we make this <Link href="/model/6209"><a>
+            To inspire you, based on the metadata of the Date, we make this <Link href="/model/6209"><a target="_blank" rel="noreferrer">
               3D artwork</a></Link> as an sample artwork.
           </p>
           <div className="artwork-3d">
@@ -129,7 +129,7 @@ export default function FAQPage() {
           <h3>What is The Date DAO for? </h3>
           <p>
             The holders of The Date NFT will automatically became the members of The Date DAO.{" "}
-            <a href={PROJECT_INFO.snapshot_url}>The Date DAO</a> members can vote on Snapshot to decide where this project to go.
+            <a target="_blank" rel="noreferrer" href={PROJECT_INFO.snapshot_url}>The Date DAO</a> members can vote on Snapshot to decide where this project to go.
           </p>
           <p>
             For example, a proposal can be proposed to change the claiming price <i>claimingPrice</i>, the reserved price for auction <i>reservedPrice</i>, 

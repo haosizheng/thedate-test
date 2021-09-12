@@ -10,7 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     foundationMember1,
     foundationMember2,
   ];
-  const FOUNDATION_SHARES: number[] = [700000, 300000];
+  const FOUNDATION_SHARES: number[] = [600000, 400000];
   
   await hre.deployments.deploy("Foundation", {
     from: deployer,

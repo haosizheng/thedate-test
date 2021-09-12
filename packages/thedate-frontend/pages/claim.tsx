@@ -54,7 +54,7 @@ export default function ClaimPage() {
       <div className="content">
         <div className="content_item">
           <p>
-            Since <a href="https://en.wikipedia.org/wiki/Unix_time">Unix Epoch</a>, only one The Date would be available each date. 
+            Since <a target="_blank" rel="noreferrer" href="https://en.wikipedia.org/wiki/Unix_time">Unix Epoch</a>, only one The Date would be available each date. 
             {currentAuctionTokenId !== undefined && 
               <>
               The earliest date to be claimable was <b>{tokenIdToISODateString(0)}</b> (Token #0).
@@ -65,9 +65,9 @@ export default function ClaimPage() {
           </p>
 
           <p>
-            You can claim the past date via calling <a href={`${etherscanLinkOfToken}#writeContract`}><i>claim(tokenId)</i></a>{" "}
+            You can claim the past date via calling <a target="_blank" rel="noreferrer" href={`${etherscanLinkOfToken}#writeContract`}><i>claim(tokenId)</i></a>{" "}
             in the contract at price Ξ0.05. {" "}
-            Check carefully via calling <a href={`${etherscanLinkOfToken}#readContract`}><i>exists(tokenId)</i></a> function to see if the date you chosen were claimed by others.
+            Check carefully via calling <a target="_blank" rel="noreferrer" href={`${etherscanLinkOfToken}#readContract`}><i>available(tokenId)</i></a> function to see if the date you chosen were claimed by others.
           </p>
 
 
@@ -79,7 +79,7 @@ export default function ClaimPage() {
         { claimingHistory.length > 0 && (
           <div className="content_item pt-10">
               <h3>History of Claiming</h3> 
-              <table className="text-xs text-left mx-auto text-neutral-content">
+              <table className="text-xs text-left text-neutral-content">
                 <thead>
                   <tr>
                     <th className="w-52 text-left">Date</th>
@@ -91,17 +91,17 @@ export default function ClaimPage() {
                     {claimingHistory.map((x, i) => (
                       <tr key={i}>
                         <td>
-                          <a href={formatOpenSeaLink("Asset", chainId, PROJECT_INFO.contract_address, x.tokenId)}>
+                          <a target="_blank" rel="noreferrer" href={formatOpenSeaLink("Asset", chainId, PROJECT_INFO.contract_address, x.tokenId)}>
                           { `${tokenIdToISODateString(x.tokenId)} (Token #${x.tokenId})` }
                           </a>
                         </td>
                         <td>
-                          <a href={formatEtherscanLink("Account", [chainId, x.owner])}>
+                          <a target="_blank" rel="noreferrer" href={formatEtherscanLink("Account", [chainId, x.owner])}>
                             { shortenHex(x.owner) } 
                           </a>
                         </td>
                         <td>
-                          <a href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
+                          <a target="_blank" rel="noreferrer" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                             { blockTimestampToUTC(x.timestamp) }
                           </a>
                         </td>

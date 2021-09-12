@@ -287,6 +287,12 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
         _mint(to, tokenId);
     }
+    
+    function available(uint256 tokenId) external view returns (bool) {
+        return (tokenId < block.timestamp / 1 days) && 
+            (_highestBidder[tokenId] == address(0) && _highestBid[tokenId] == 0) &&
+            (!_exists(tokenId));
+    }
 
     function claim(uint256 tokenId) external payable nonReentrant enoughFund {
         settleLastAuction();

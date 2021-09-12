@@ -36,7 +36,7 @@ export const ETHERSCAN_PREFIXES: Record<SupportedChainId | number, string> = {
 
 export const OPENSEA_PREFIXES: Record<SupportedChainId | number, string> = {
   [SupportedChainId.MAINNET]: '',
-  [SupportedChainId.RINKEBY]: 'testnet.',
+  [SupportedChainId.RINKEBY]: 'testnets.',
   [SupportedChainId.HARDHAT]: ''
 }
 
