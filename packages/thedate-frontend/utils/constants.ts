@@ -12,7 +12,7 @@ export const PROJECT_INFO = {
   twitter_account: "thedate_nft",
   twitter_url: "https://twitter.com/@thedate_nft",
   discord_url: "https://discord.gg/CZQdyvuKwj",
-  opensea_url: formatOpenSeaLink("Collection", NETWORK_CHAIN_ID, "thedate_art"),
+  opensea_url: formatOpenSeaLink("Collection", NETWORK_CHAIN_ID, "the-date-v2"),
   contract_address: getTheDateContractAddress(NETWORK_CHAIN_ID),
   etherscan_url: formatEtherscanLink("Token", [NETWORK_CHAIN_ID, getTheDateContractAddress(NETWORK_CHAIN_ID)]),
   snapshot_url: "https://snapshot.org/#/thedate.eth"

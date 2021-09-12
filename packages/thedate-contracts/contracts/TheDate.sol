@@ -8,15 +8,12 @@ import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Base64 } from "base64-sol/base64.sol";
-import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import { IWETH } from "./interfaces/IWETH.sol";
 
-contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
-    // ==== Roles ====
-    bytes32 public constant DAO_ROLE = keccak256("DAO_ROLE");
-
+contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
     // ==== Parameters ====
     // == DAO controlled parameters ==
     uint256 public claimingPrice = 0.01 ether;
@@ -31,7 +28,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     string public tokenDescription = "The Date is a metadata-based NFT art project about time. " 
         "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " 
         "The owner can engrave or erase a note on the artwork as an additional metadata. " 
-        "The Date is metadata. Feel free to use The Date in any way you want.";
+        "The Date is metadata. Feel free to use The Date in any way you want. See more: https://thedate.art";
     string[] public svgImageTemplate = [''
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">'
         '<rect width="100%" height="100%" fill="black" />'
@@ -79,53 +76,53 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
     // ==== Parameter Related Functions ==== 
     // == DAO controlled parameters ==
-    function setClaimingPrice(uint256 claimingPrice_) external onlyRole(DAO_ROLE) {
+    function setClaimingPrice(uint256 claimingPrice_) external onlyOwner {
         claimingPrice = claimingPrice_;
         emit ClaimingPriceChanged(claimingPrice);
     }
 
-    function setAuctionReservePrice(uint256 reservePrice_) external onlyRole(DAO_ROLE) {
+    function setAuctionReservePrice(uint256 reservePrice_) external onlyOwner {
         reservePrice = reservePrice_;
         emit AuctionReservePriceChanged(reservePrice);
     }
 
-    function setAuctionMinBidIncrementBps(uint256 minBidIncrementBps_) external onlyRole(DAO_ROLE) {
+    function setAuctionMinBidIncrementBps(uint256 minBidIncrementBps_) external onlyOwner {
         minBidIncrementBps = minBidIncrementBps_;
         emit AuctionMinBidIncrementBpsChanged(minBidIncrementBps);
     }
 
-    function setEngravingPrice(uint256 engravingPrice_) external onlyRole(DAO_ROLE) {
+    function setEngravingPrice(uint256 engravingPrice_) external onlyOwner {
         engravingPrice = engravingPrice_;
         emit EngravingPriceChanged(engravingPrice);
     }
 
-    function setErasingPrice(uint256 erasingPrice_) external onlyRole(DAO_ROLE) {
+    function setErasingPrice(uint256 erasingPrice_) external onlyOwner {
         erasingPrice = erasingPrice_;
         emit ErasingPriceChanged(erasingPrice);
     }
     
-    function setNoteSizeLimit(uint256 noteSizeLimit_) external onlyRole(DAO_ROLE) {
+    function setNoteSizeLimit(uint256 noteSizeLimit_) external onlyOwner {
         noteSizeLimit = noteSizeLimit_;
         emit NoteSizeLimitChanged(noteSizeLimit);
     }
 
     // == Admin controlled parameters ==
-    function setRoyaltyBps(uint256 royaltyBps_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setRoyaltyBps(uint256 royaltyBps_) external onlyOwner {
         require(royaltyBps_ <= 10000, "royaltyBps should be within [0, 10000]");
         royaltyBps = royaltyBps_;
     }
 
-    function setTokenDescription(string memory tokenDescription_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setTokenDescription(string memory tokenDescription_) external onlyOwner {
         tokenDescription = tokenDescription_;
     }
 
-    function setSVGImageTemplate(string[] memory svgImageTemplate_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setSVGImageTemplate(string[] memory svgImageTemplate_) external onlyOwner {
         svgImageTemplate = svgImageTemplate_;
     }
 
     // ==== Owner related functions ==== 
     // == Owner related modifiers ==
-    modifier onlyOwner(uint256 tokenId) {
+    modifier onlyTokenOwner(uint256 tokenId) {
         require(ownerOf(tokenId) == msg.sender, "Caller should be the owner of the artwork");
         _;
     }
@@ -136,8 +133,8 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
         _;
     }
 
-    function engraveNote(uint256 tokenId, string memory note) external payable onlyOwner(tokenId) validNote(note) {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || msg.value >= engravingPrice, "Should pay engravingPrice");
+    function engraveNote(uint256 tokenId, string memory note) external payable onlyTokenOwner(tokenId) validNote(note) {
+        require(owner() == msg.sender || msg.value >= engravingPrice, "Should pay engravingPrice");
         require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving");
 
         _notes[tokenId] = note;
@@ -145,8 +142,8 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
         emit NoteEngraved(tokenId, ownerOf(tokenId), note);
     }
 
-    function eraseNote(uint256 tokenId) external payable onlyOwner(tokenId) {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || msg.value >= erasingPrice, "Should pay erasingPrice");
+    function eraseNote(uint256 tokenId) external payable onlyTokenOwner(tokenId) {
+        require(owner() == msg.sender || msg.value >= erasingPrice, "Should pay erasingPrice");
         require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing");
 
         _notes[tokenId] = "";
@@ -274,7 +271,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     
     // ==== Claiming related functions ====
     modifier enoughFund() {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
+        require(owner() == msg.sender || 
             IERC721(_loot).balanceOf(msg.sender) > 0 || 
             msg.value >= claimingPrice, "Should pay claimingPrice or own a Loot NFT");
         _;
@@ -305,7 +302,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
         emit ArtworkClaimed(tokenId, msg.sender);
     }
 
-    function airdrop(address[] memory addresses, uint256[] memory tokenIds) external nonReentrant onlyRole(DEFAULT_ADMIN_ROLE) {
+    function airdrop(address[] memory addresses, uint256[] memory tokenIds) external nonReentrant onlyOwner {
         settleLastAuction();
         
         for (uint i = 0; i < tokenIds.length; ++i) {
@@ -396,13 +393,11 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     constructor(address foundation_,
                 address weth_,
                 address loot_) 
-        ERC721("The Date", "DATE")
+        ERC721("The Date", "DATE") Ownable()
     {
         _foundation = payable(foundation_);
         _weth = weth_;
         _loot = loot_;
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(DAO_ROLE, msg.sender);
     }
 
     function exists(uint256 tokenId) external view returns (bool) {
@@ -414,10 +409,9 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function supportsInterface(bytes4 interfaceId) 
-        public view override(ERC721Enumerable, AccessControl, IERC165) returns (bool) 
+        public view override(ERC721Enumerable, IERC165) returns (bool) 
     {
         return ERC721Enumerable.supportsInterface(interfaceId) ||
-            AccessControl.supportsInterface(interfaceId) || 
             type(IERC2981).interfaceId == interfaceId ||
             type(IERC165).interfaceId == interfaceId;
     }

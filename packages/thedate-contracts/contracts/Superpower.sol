@@ -6,11 +6,11 @@ import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Base64 } from "base64-sol/base64.sol";
-import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 
-contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
+contract Superpower is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
     // ==== Superpower ====
     string[] private vision = [
         "Astral",
@@ -449,16 +449,16 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         return (_foundation, (salePrice * royaltyBps) / 10000);
     }
 
-    function setRoyaltyBps(uint256 royaltyBps_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setRoyaltyBps(uint256 royaltyBps_) external onlyOwner {
         require(royaltyBps_ <= 10000, "royaltyBps should be within [0, 10000]");
         royaltyBps = royaltyBps_;
     }
 
-    function setTokenDescription(string memory tokenDescription_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setTokenDescription(string memory tokenDescription_) external onlyOwner {
         tokenDescription = tokenDescription_;
     }
 
-    function setSVGImageTemplate(string[] memory svgImageTemplate_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setSVGImageTemplate(string[] memory svgImageTemplate_) external onlyOwner {
         svgImageTemplate = svgImageTemplate_;
     }
 
@@ -479,16 +479,14 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
     }
     
     function supportsInterface(bytes4 interfaceId) 
-        public view override(ERC721Enumerable, AccessControl, IERC165) returns (bool) 
+        public view override(ERC721Enumerable, IERC165) returns (bool) 
     {
         return ERC721Enumerable.supportsInterface(interfaceId) ||
-            AccessControl.supportsInterface(interfaceId) || 
             type(IERC2981).interfaceId == interfaceId ||
             type(IERC165).interfaceId == interfaceId;
     }
 
-    constructor(address foundation_) ERC721("Superpower", "SPWR") {
+    constructor(address foundation_) ERC721("Superpower", "SPWR") Ownable() {
         _foundation = payable(foundation_);
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 }

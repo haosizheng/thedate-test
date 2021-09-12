@@ -30,7 +30,6 @@ context("TheDate contract", () => {
   let user4: SignerWithAddress;
   let user5: SignerWithAddress;
   let user6: SignerWithAddress;
-  let daoRole: string;
 
   const SECONDS_IN_A_DAY = 86400;
 
@@ -57,11 +56,6 @@ context("TheDate contract", () => {
     testReentrantAttackContract = await (await new TestReentrantAttack__factory(deployer)
       .deploy(mainContract.address)).deployed();
     await testReentrantAttackContract.deposit({value: ethers.utils.parseEther("100.0")});
-
-    daoRole = await mainContract.DAO_ROLE();
-    // Grant user5 to be a DAO members
-    await expect(mainContract.grantRole(daoRole, user5.address))
-      .to.emit(mainContract, "RoleGranted").withArgs(daoRole, user5.address, deployer.address);
   });
 
   describe("EscapeHTML", async () => {
@@ -78,7 +72,7 @@ context("TheDate contract", () => {
       await expect(mainContract.setRoyaltyBps(50000))
         .to.be.revertedWith("royaltyBps should be within [0, 10000]");
       await expect(mainContract.connect(user1).setRoyaltyBps(500))
-        .to.be.revertedWith(`AccessControl: account ${user1.address.toLowerCase()} is missing role ${await mainContract.DEFAULT_ADMIN_ROLE()}`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
     });
       
     it("Royalty splits correctly", async () => {
@@ -217,13 +211,13 @@ context("TheDate contract", () => {
       expect(await mainContract.tokenDescription()).to.eq("The Date is a metadata-based NFT art project about time. " +
         "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " +
         "The owner can engrave or erase a note on the artwork as an additional metadata. "  +
-        "The Date is metadata. Feel free to use The Date in any way you want.");
+        "The Date is metadata. Feel free to use The Date in any way you want. See more: https://thedate.art");
       
       await mainContract.connect(deployer).setTokenDescription("I love the Date!");
       await expect(mainContract.connect(user5).setTokenDescription("I love the Date!!"))
-        .to.be.revertedWith(`AccessControl: account`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
       await expect(mainContract.connect(user6).setTokenDescription("I love the Date!!!"))
-        .to.be.revertedWith(`AccessControl: account`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
       expect(await mainContract.tokenDescription()).to.eq("I love the Date!");
     });
 
@@ -246,9 +240,9 @@ context("TheDate contract", () => {
       
       // No permission
       await expect(mainContract.connect(user5).setSVGImageTemplate(["<svg></svg>"]))
-        .to.be.revertedWith(`AccessControl: account`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
       await expect(mainContract.connect(user6).setSVGImageTemplate(["<svg></svg>"]))
-        .to.be.revertedWith(`AccessControl: account`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
       
       // Set 
       await mainContract.connect(deployer).setSVGImageTemplate(["<svg></svg>"]);
@@ -350,7 +344,7 @@ context("TheDate contract", () => {
   describe("Airdrop", async () => {
     it("Airdrop with no permission issues", async () => {
       await expect(mainContract.connect(user1).airdrop([user1.address, user2.address], [1, 2]))
-        .to.be.revertedWith(`AccessControl: account ${user1.address.toLowerCase()} is missing role ${await mainContract.DEFAULT_ADMIN_ROLE()}`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
     });
 
     it("Airdrop without issues", async () => {
@@ -428,66 +422,54 @@ context("TheDate contract", () => {
      expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("0.01"));
      await expect(mainContract.connect(deployer).setClaimingPrice(ethers.utils.parseEther("3.0")))
        .to.emit(mainContract, "ClaimingPriceChanged").withArgs(ethers.utils.parseEther("3.0"));
-     await expect(mainContract.connect(user5).setClaimingPrice(ethers.utils.parseEther("2.0")))
-       .to.emit(mainContract, "ClaimingPriceChanged").withArgs(ethers.utils.parseEther("2.0"));
      await expect(mainContract.connect(user6).setClaimingPrice(ethers.utils.parseEther("5.0")))
-       .to.be.revertedWith(`AccessControl: account ${user6.address.toLowerCase()} is missing role ${daoRole}`);
-     expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("2.0"));
+       .to.be.revertedWith("Ownable: caller is not the owner");
+     expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("3.0"));
     });
 
     it("setAuctionReservePrice", async () => {
       expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("0.01"));
       await expect(mainContract.connect(deployer).setAuctionReservePrice(ethers.utils.parseEther("1.0")))
         .to.emit(mainContract, "AuctionReservePriceChanged").withArgs(ethers.utils.parseEther("1.0"));
-      await expect(mainContract.connect(user5).setAuctionReservePrice(ethers.utils.parseEther("2.0")))
-        .to.emit(mainContract, "AuctionReservePriceChanged").withArgs(ethers.utils.parseEther("2.0"));
       await expect(mainContract.connect(user6).setAuctionReservePrice(ethers.utils.parseEther("5.0")))
-        .to.be.revertedWith(`AccessControl: account ${user6.address.toLowerCase()} is missing role ${daoRole}`);
-      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("2.0"));
+        .to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("1.0"));
     });
 
     it("setAuctionMinBidIncrementBps", async () => {
       expect(await mainContract.minBidIncrementBps()).to.eq(BigNumber.from(1000));
       await expect(mainContract.connect(deployer).setAuctionMinBidIncrementBps(2000))
         .to.emit(mainContract, "AuctionMinBidIncrementBpsChanged").withArgs(2000);
-      await expect(mainContract.connect(user5).setAuctionMinBidIncrementBps(3000))
-        .to.emit(mainContract, "AuctionMinBidIncrementBpsChanged").withArgs(3000);
       await expect(mainContract.connect(user6).setAuctionMinBidIncrementBps(5000))
-        .to.be.revertedWith(`AccessControl: account ${user6.address.toLowerCase()} is missing role ${daoRole}`);
-      expect(await mainContract.minBidIncrementBps()).to.eq(BigNumber.from(3000));
+        .to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await mainContract.minBidIncrementBps()).to.eq(BigNumber.from(2000));
     });
     
     it("setEngravingPrice", async () => {
       expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("0.05"));
       await expect(mainContract.connect(deployer).setEngravingPrice(ethers.utils.parseEther("2.0")))
         .to.emit(mainContract, "EngravingPriceChanged").withArgs(ethers.utils.parseEther("2.0"));
-      await expect(mainContract.connect(user5).setEngravingPrice(ethers.utils.parseEther("3.0")))
-        .to.emit(mainContract, "EngravingPriceChanged").withArgs(ethers.utils.parseEther("3.0"));
       await expect(mainContract.connect(user6).setEngravingPrice(ethers.utils.parseEther("5.0")))
-        .to.be.revertedWith(`AccessControl: account ${user6.address.toLowerCase()} is missing role ${daoRole}`);
-      expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("3.0"));
+        .to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("2.0"));
     });
     
     it("setErasingPrice", async () => {
       expect(await mainContract.erasingPrice()).to.eq(ethers.utils.parseEther("0.1"));
       await expect(mainContract.connect(deployer).setErasingPrice(ethers.utils.parseEther("1.0")))
         .to.emit(mainContract, "ErasingPriceChanged").withArgs(ethers.utils.parseEther("1.0"));
-      await expect(mainContract.connect(user5).setErasingPrice(ethers.utils.parseEther("3.0")))
-        .to.emit(mainContract, "ErasingPriceChanged").withArgs(ethers.utils.parseEther("3.0"));
       await expect(mainContract.connect(user6).setErasingPrice(ethers.utils.parseEther("5.0")))
-        .to.be.revertedWith(`AccessControl: account ${user6.address.toLowerCase()} is missing role ${daoRole}`);
-      expect(await mainContract.erasingPrice()).to.eq(ethers.utils.parseEther("3.0"));
+        .to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await mainContract.erasingPrice()).to.eq(ethers.utils.parseEther("1.0"));
     });
     
     it("setNoteSizeLimit", async () => {
       expect(await mainContract.noteSizeLimit()).to.eq(BigNumber.from(100));
       await expect(mainContract.connect(deployer).setNoteSizeLimit(120))
         .to.emit(mainContract, "NoteSizeLimitChanged").withArgs(120);
-      await expect(mainContract.connect(user5).setNoteSizeLimit(200))
-        .to.emit(mainContract, "NoteSizeLimitChanged").withArgs(200);
       await expect(mainContract.connect(user6).setNoteSizeLimit(100))
-        .to.be.revertedWith(`AccessControl: account ${user6.address.toLowerCase()} is missing role ${daoRole}`);
-      expect(await mainContract.noteSizeLimit()).to.eq(BigNumber.from(200));
+        .to.be.revertedWith("Ownable: caller is not the owner");
+      expect(await mainContract.noteSizeLimit()).to.eq(BigNumber.from(120));
     });
   });
 
