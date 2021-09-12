@@ -16,14 +16,19 @@ export default function HomePage() {
             <Link href="/auction"><a>Auction Today</a></Link>
           </div> 
 
-          <div className="mt-10 text-center">
+          <div className="mt-10 text-left">
             <p>
-              Each fleeting day would be imprinted into a metadata-based NFT immutably forever.
-              <br/>
-              The owner can engrave or erase a note on The Date as an additional metadata.
+              The Date is a fully on-chain interactable metadata NFT project. 
+              Each fleeting day would be imprinted into an NFT immutably lasting forever. 
+            </p>
+            <p>
+              The owner can interact with The Date by engraving or erasing a note as an additional metadata. 
+            </p>
+            <p>
+              
             </p>
             <p>   
-              The Date is metadata. Use it anyway you want. For more detail, see <Link href="/faq"><a>FAQ</a></Link>
+              For more detail, see <Link href="/faq"><a>FAQ</a></Link>
             </p>
           </div>
         </div>

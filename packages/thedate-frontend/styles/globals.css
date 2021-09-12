@@ -39,15 +39,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  @apply text-3xl;
+  @apply text-4xl;
 }
 
 h2 {
-  @apply text-xl;
+  @apply text-2xl;
 }
 
 h3 {
-  @apply text-lg;
+  @apply text-xl;
 }
 
 .content {
@@ -87,7 +87,7 @@ h3 {
 
 p {
   @apply text-neutral-content;
-  @apply text-base;
+  @apply text-lg;
   @apply mb-5;
 }
 
