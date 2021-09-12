@@ -14,5 +14,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 func.tags = ["deploy", "SuperpowerContract"];
 func.dependencies = ["FoundationContract"];
+func.skip = async ({ getChainId }) => {
+  return true;
+}
 
 export default func;

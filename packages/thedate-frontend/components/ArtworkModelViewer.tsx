@@ -36,13 +36,13 @@ function CreateCanvasTexture(date: string, note: string = "", backgroundColor: s
   }
 
   ctx.fillStyle = textColor;
-  ctx.font = 200 + 'px Roboto mono';
+  ctx.font = 200 + 'px Roboto Mono';
   ctx.fillText(date, 1800, 1840)
 
-  ctx.font = 54 + 'px Roboto mono';
+  ctx.font = 54 + 'px Roboto Mono';
   ctx.fillText(note, 1800, 3960);
 
-  ctx.font = 54 + 'px Roboto mono';
+  ctx.font = 54 + 'px Roboto Mono';
   ctx.fillText('THE DATE', 1800, 2440);
 
   const texture = new THREE.CanvasTexture(canvas);

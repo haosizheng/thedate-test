@@ -78,6 +78,7 @@ func.dependencies = ["deploy"];
 
 func.skip = async ({ getChainId }) => {
   const chainId = await getChainId();
+  return true;
   return chainId !== "31337";
 }
 

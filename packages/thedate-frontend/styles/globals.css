@@ -74,7 +74,7 @@ h3 {
 
 }
 
-.faq__item {
+.content_item {
   @apply mx-auto;
   @apply my-5;
 }

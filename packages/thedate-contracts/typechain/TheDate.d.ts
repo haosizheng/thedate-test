@@ -34,6 +34,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "engravingPrice()": FunctionFragment;
     "eraseNote(uint256)": FunctionFragment;
     "erasingPrice()": FunctionFragment;
+    "escapeHTML(string)": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "generateMetadata(uint256)": FunctionFragment;
     "generateSVGImage(uint256)": FunctionFragment;
@@ -119,6 +120,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "erasingPrice",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "escapeHTML", values: [string]): string;
   encodeFunctionData(
     functionFragment: "exists",
     values: [BigNumberish]
@@ -314,6 +316,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "erasingPrice",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "escapeHTML", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "generateMetadata",
@@ -593,6 +596,8 @@ export class TheDate extends BaseContract {
 
     erasingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    escapeHTML(s: string, overrides?: CallOverrides): Promise<[string]>;
+
     exists(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -854,6 +859,8 @@ export class TheDate extends BaseContract {
 
   erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
+  escapeHTML(s: string, overrides?: CallOverrides): Promise<string>;
+
   exists(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
   generateMetadata(
@@ -1091,6 +1098,8 @@ export class TheDate extends BaseContract {
     eraseNote(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    escapeHTML(s: string, overrides?: CallOverrides): Promise<string>;
 
     exists(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
@@ -1458,6 +1467,8 @@ export class TheDate extends BaseContract {
 
     erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
+    escapeHTML(s: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     exists(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1717,6 +1728,11 @@ export class TheDate extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     erasingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    escapeHTML(
+      s: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     exists(
       tokenId: BigNumberish,

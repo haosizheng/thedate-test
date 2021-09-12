@@ -21,33 +21,14 @@ export default function UpdatesPage() {
        
         <h2>Updates</h2>
 
-        <div className="faq__item">
-          <h3>2021-09-06</h3>
-          <p>
-            We sent to the owner of Steven Curry. 
-          </p>
-          <figure>
-            <ArtworkSVG dateString="2021-09-08" noteString="On the date, Loot was released." />
-          </figure>
-        </div>
 
-        <div className="faq__item">
-          <h3>2021-09-06</h3>
+        <div className="content_item">
+          <h3>2021-09-12</h3>
           <p>
-            Owner to Steven Curry. 
+            We lanuched the Date. 
           </p>
           <figure>
-            <ArtworkSVG dateString="2021-09-08" noteString="On the date, Loot was released." />
-          </figure>
-        </div>
-
-        <div className="faq__item">
-          <h3>2021-09-05</h3>
-          <p>
-            We lanuched the Date . 
-          </p>
-          <figure>
-            <ArtworkSVG dateString="2021-09-08" noteString="On the date, Loot was released." />
+            <ArtworkSVG dateString="2021-09-12" noteString="The Date was launched." />
           </figure>
         </div>
 

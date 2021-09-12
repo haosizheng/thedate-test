@@ -5,34 +5,54 @@ import useTheDateContract from "@/hooks/useTheDateContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import { NETWORK_CHAIN_ID } from "@/utils/connectors";
 import ArtworkSVG from "@/components/ArtworkSVG";
-import { tokenIdToDateString, jsDateToDate } from "@/utils/thedate";
+import { tokenIdToISODateString, jsDateToDate } from "@/utils/thedate";
 import ArtworkModelViewer from "@/components/ArtworkModelViewer";
+import { useState } from "react";
+import { useAsync } from "react-use";
 
+import { PROJECT_INFO } from "@/utils/constants";
 export default function ClaimPage() {
   const {chainId} = useActiveWeb3React();
   const TheDate = useTheDateContract();
+  const [ currentAuctionTokenId, setCurrentAuctionTokenId ] = useState<number | undefined>(undefined);
+  const [ totalSupply, setTotalSupply ] = useState<number | undefined>(undefined);
 
   const etherscanLinkOfToken = formatEtherscanLink("Token", [chainId, TheDate?.address]);
-  const openseaLink = formatEtherscanLink("Token", [chainId, TheDate?.address]);
+
+  useAsync(async () => {
+    if (!TheDate) {
+      return; 
+    }
+    setCurrentAuctionTokenId((await TheDate?.getCurrentAuctionTokenId()).toNumber());
+    setTotalSupply((await TheDate?.totalSupply()).toNumber());
+
+  }, [TheDate]);
 
   return (
     <Layout>
       <div className="content">
-        <p>You could <a href={`${etherscanLinkOfToken}#writeContract`}>claim</a> it directly the contract at a cost of 0.05 Ether.</p>
 
-        <div className="faq__item">
+        <p>Since <a href="https://en.wikipedia.org/wiki/Unix_time">Unix Epoch</a>, only one The Date would be available each date. 
 
-          exists(tokenId)
-          claim(tokenId)
+      {currentAuctionTokenId !== undefined && 
+        <>
+        The earliest date to be claimable was <b>{tokenIdToISODateString(0)}</b> (Token #0).
+        The latest date was <b>{tokenIdToISODateString(currentAuctionTokenId - 1)}</b> (Token #{currentAuctionTokenId - 1}). 
+        Any date in-between were claimable. {totalSupply !==undefined && <>Currently in total {totalSupply} tokens of The Date  were claimed.</>}
+        </>
+      }
+      </p>
 
-        <p>For unclaimed past The Date, you can claim it directly in the contract. 
-          Select an available date to claim, 
-          and note that only one The Date will be available for each date. Each claim costs Ξ 0.05.
-        </p>
         <p>
-        As an metadata-based NFT project, to respect the first of its kind, Loot, all the Loot holders are free to claim The Date.
+          You can claim the past date via calling <a href={`${etherscanLinkOfToken}#writeContract`}><i>claim(tokenId)</i></a>{" "}
+          in the contract at price Ξ0.05. {" "}
+          Check carefully via calling <a href={`${etherscanLinkOfToken}#readContract`}><i>exists(tokenId)</i></a> function to see if the date you chosen were claimed by others.
         </p>
-        </div>
+
+
+        <p>
+          For getting The Date of Today, you can join <Link href="/auction"><a>the auction</a></Link> of Today.
+        </p>
       </div>
     </Layout>
   );

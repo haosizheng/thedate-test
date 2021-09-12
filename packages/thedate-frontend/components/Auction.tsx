@@ -1,6 +1,5 @@
 import ArtworkSVG from '@/components/ArtworkSVG';
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
-import useEtherPrice from '@/hooks/useEtherPrice';
 import useTheDateContract from '@/hooks/useTheDateContract';
 import { formatEtherscanLink, parseBalance, shortenHex, toPriceFormat } from '@/utils/ethers';
 import { blockTimestampToUTC, SECONDS_IN_A_DAY, tokenIdToDateString, tokenIdToISODateString } from "@/utils/thedate";
@@ -32,7 +31,6 @@ export default function Auction() {
   const [ reservePrice, setReservePrice] = useState<BigNumber | undefined>(undefined);
   const [ minBidIncrementBps, setMinBidIncrementBps] = useState<BigNumber | undefined>(undefined);
   const [ bidHistory, setBidHistory ] = useState<BidHistoryItem[]>([]);
-  const { data: etherPrice } = useEtherPrice();
 
   useAsync(async () => {
     if (!library || !TheDate) {
@@ -48,12 +46,6 @@ export default function Auction() {
       setReservePrice(reservePrice_);
       setMinBidPrice(minBidPrice_);
       setTokenId(tokenId_);
-
-      const exists_ = await TheDate.exists(tokenId_);
-      setExists(exists_);
-      if (!exists_) {
-        return;
-      }
 
       const { bidder: highestBidder_, amount: highestBid_ } = await TheDate.getHighestBid(tokenId_);
       setHighestBid(highestBid_);
@@ -92,9 +84,9 @@ export default function Auction() {
         <figure>
           <ArtworkSVG dateString={tokenIdToISODateString(tokenId)} noteString="(to be engraved by the note owner)" />
         </figure>
-        <div className="faq__item">
-          <p>
-            The Date of today &quot;<span className="text-neutral-base">{ tokenIdToISODateString(tokenId) }</span>&quot; (Token #{tokenId}) is 
+        <div className="content_item">
+          <p className="pb-10">
+            The Date of Today &quot;<span className="text-neutral-base">{ tokenIdToISODateString(tokenId) }</span>&quot; (Token #{tokenId}) is 
             available to be auctioned and minted into Ethernum network immutably in remaining {" "}
             <span className="text-neutral-base"> 
             <Countdown intervalDelay={1000} 
@@ -111,23 +103,26 @@ export default function Auction() {
             />
             </span>.
           </p>
+          
           <p>
-              { bidHistory.length == 0 && <> No bid is placed yet. </> }
-              { !!reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. </> } 
-
-              { !!highestBid  && <>Current highest bid is Ξ{parseBalance(highestBid)}. </>}
-              { !!minBidPrice && <>Bidding <span className="text-neutral-base">Ξ{parseBalance(minBidPrice)}</span> or more is required. </>} 
-          </p>
-          <p>
-            Place your bid via <a href={`${PROJECT_INFO.etherscan_url}#writeContract`}>the contract</a>. 
+              { bidHistory.length == 0 ?
+               <> No bid is placed yet. 
+               { !!reservePrice && <> Reserve Price is Ξ{parseBalance(reservePrice)}. </> } 
+               </> 
+              : <>
+                { !!highestBid  && <>Current highest bid is Ξ{parseBalance(highestBid)}. </>}
+                { !!minBidPrice && <>Bidding <span className="text-neutral-base">Ξ{parseBalance(minBidPrice)}</span> or more is required. </>} 
+                </>
+              }
+              <br/>
+              Place your bid via <a href={`${PROJECT_INFO.etherscan_url}#writeContract`}>the contract</a> via calling placeBid() function. 
           </p>
         </div>
         
         { bidHistory.length > 0 && (
-          <div className="faq__item">
-            <h3>Auction for Today &quot;{ tokenIdToDateString(tokenId) }&quot;:</h3>
-            <div className="flex items-start flex-col px-5 py-16 md:px-0 max-w-prose w-full">
-              <table className="text-xs text-left">
+          <div className="content_item pt-10">
+              <p>Bidding History for Today &quot;{ tokenIdToISODateString(tokenId) }&quot;:</p> 
+              <table className="text-xs text-left mx-auto text-neutral-content">
                 <thead>
                   {bidHistory.length > 0 &&
                     <tr>
@@ -139,29 +134,26 @@ export default function Auction() {
                 </thead>
                 <tbody>
                     {bidHistory.map((x, i) => (
-                      <tr key={i} className={ i > 0 ? "line-through text-gray-400" : ""}>
+                      <tr key={i} className={ i > 0 ? "line-through" : ""}>
                         <td>
-                          <a className="hover:link" href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
+                          <a href={formatEtherscanLink("Transaction", [chainId, x.transactionHash])}>
                             { blockTimestampToUTC(x.timestamp) }
                           </a>
                         </td>
                         <td>
-                            <a className="hover:link" href={formatEtherscanLink("Account", [chainId, x.bidder])}>
+                            <a href={formatEtherscanLink("Account", [chainId, x.bidder])}>
                             { shortenHex(x.bidder) } { account === x.bidder && <> (you)</>}
                           </a>
                         </td>
                         <td>
-                          Ξ{ parseBalance(x.amount) } { 
-                            etherPrice !== undefined ? `(\$${toPriceFormat(Number(formatEther(x.amount)) * etherPrice)})` : "" }
+                          Ξ{ parseBalance(x.amount) } 
                         </td>
                       </tr>
                     ))}
                 </tbody>
               </table>
-            </div>
           </div>
         )}
-
       </div>
     );
 }

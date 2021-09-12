@@ -20,7 +20,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     // ==== Parameters ====
     // == DAO controlled parameters ==
     uint256 public claimingPrice = 0.05 ether;
-    uint256 public reservePrice = 0.1 ether;
+    uint256 public reservePrice = 0.05 ether;
     uint256 public minBidIncrementBps = 1000;
     uint256 public engravingPrice = 0.01 ether;
     uint256 public erasingPrice = 0.1 ether;
@@ -29,15 +29,16 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     // == Admin controlled parameters ==
     uint256 public royaltyBps = 1000;
     string public tokenDescription = "The Date is a metadata-based NFT art experiment about time and blockchain. " 
-        "Each fleeting day would be imprinted into an NFT artwork on blockchain immutably. " 
-        "Optionally, the owner can engrave or erase a note on the artwork as an additional metadata. " 
-        "Feel free to use the Date in any way you want.";
+        "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " 
+        "The owner can engrave or erase a note on the artwork as an additional metadata. " 
+        "The Date is metadata. Feel free to use the Date in any way you want.";
     string[] public svgImageTemplate = [''
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">'
         '<rect width="100%" height="100%" fill="black" />'
-        '<text x="50%" y="50%" fontSize="50px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">',
+        '<style>.base { fill: white; font-family: monospace; dominant-baseline: middle; text-anchor: middle; }</style>'
+        '<text x="50%" y="50%" font-size="50px" class="base">',
         '{{date}}',
-        '</text><text x="50%" y="90%" fontSize="10px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">',
+        '</text><text x="50%" y="90%" font-size="10px" class="base">',
         '{{note}}',
         '</text></svg>'];
 
@@ -136,7 +137,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function engraveNote(uint256 tokenId, string memory note) external payable onlyOwner(tokenId) validNote(note) {
-        require(msg.value >= engravingPrice, "Should pay >= engravingPrice");
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || msg.value >= engravingPrice, "Should pay engravingPrice");
         require(bytes(_notes[tokenId]).length == 0, "Note should be empty before engraving");
 
         _notes[tokenId] = note;
@@ -145,7 +146,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     }
 
     function eraseNote(uint256 tokenId) external payable onlyOwner(tokenId) {
-        require(msg.value >= erasingPrice, "Should pay >= erasingPrice");
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || msg.value >= erasingPrice, "Should pay erasingPrice");
         require(bytes(_notes[tokenId]).length > 0, "Note should be nonempty before erasing");
 
         _notes[tokenId] = "";
@@ -173,7 +174,50 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     }
     
     function _stringEquals(string memory a, string memory b) internal pure returns (bool) {
-        return bytes(a).length == bytes(b).length && keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b)));
+        return bytes(a).length == bytes(b).length && keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+    }
+
+    function escapeHTML(string memory s) public view returns (string memory) {
+        bytes memory b = bytes(s);
+        string memory output = ""; 
+        for (uint8 i = 0; i < b.length; i++) {
+            if (b[i] == '<') {
+                output = string(abi.encodePacked(output, "&lt;"));
+            } else if (b[i] == '>') {
+                output = string(abi.encodePacked(output, "&gt;"));
+            } else if (b[i] == '&') {
+                output = string(abi.encodePacked(output, "&amp;"));
+            } else if (b[i] == '"') {
+                output = string(abi.encodePacked(output, "&quot;"));
+            } else if (b[i] == "'") {
+                output = string(abi.encodePacked(output, "&apos;"));
+            } else {
+                output = string(abi.encodePacked(output, b[i]));
+            }
+        }
+        return output;
+    }
+
+    function escapeQuotes(string memory symbol) internal pure returns (string memory) {
+        bytes memory symbolBytes = bytes(symbol);
+        uint8 quotesCount = 0;
+        for (uint8 i = 0; i < symbolBytes.length; i++) {
+            if (symbolBytes[i] == '"') {
+                quotesCount++;
+            }
+        }
+        if (quotesCount > 0) {
+            bytes memory escapedBytes = new bytes(symbolBytes.length + (quotesCount));
+            uint256 index;
+            for (uint8 i = 0; i < symbolBytes.length; i++) {
+                if (symbolBytes[i] == '"') {
+                    escapedBytes[index++] = '\\';
+                }
+                escapedBytes[index++] = symbolBytes[i];
+            }
+            return string(escapedBytes);
+        }
+        return symbol;
     }
 
     function generateSVGImage(uint256 tokenId) public view returns (string memory) {
@@ -187,7 +231,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
             if (_stringEquals(svgImageTemplate[i], "{{date}}")) {
                 part = date;
             } else if (_stringEquals(svgImageTemplate[i], "{{note}}")) {
-                part = note;
+                part = escapeHTML(note);
             } else {
                 part = svgImageTemplate[i];
             }
@@ -209,8 +253,8 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
             ': ', 
             getDate(tokenId), 
             '", "description": "',
-            tokenDescription,
-            '", "image": "data:image/svg+xml;base64,', 
+            escapeQuotes(tokenDescription),
+            '", "image": "data:image/svg+xml;charset=utf-8;base64,', 
             image, 
             '"}'
         ));
@@ -221,7 +265,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), "tokenId is nonexistent");
         string memory output = string(abi.encodePacked(
-            'data:application/json;base64,', 
+            'data:application/json;charset=utf-8;base64,', 
             Base64.encode(bytes(generateMetadata(tokenId)))
         ));
 
@@ -232,7 +276,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     modifier enoughFund() {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || 
             IERC721(_loot).balanceOf(msg.sender) > 0 || 
-            msg.value >= claimingPrice, "Should pay >= claiming price or own a Loot NFT");
+            msg.value >= claimingPrice, "Should pay claimingPrice or own a Loot NFT");
         _;
     }
 

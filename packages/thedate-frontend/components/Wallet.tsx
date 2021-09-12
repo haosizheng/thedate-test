@@ -1,4 +1,3 @@
-import PendingReturns from "@/components/PendingReturns";
 import useENSName from "@/hooks/useENSName";
 import { NETWORK_NAMES } from "@/utils/chains";
 import { injected, NETWORK_CHAIN_ID } from "@/utils/connectors";
@@ -25,7 +24,6 @@ export default function Wallet() {
                   {ensName || `${shortenHex(account, 4)}`}
                 </a>
               </Link>
-              <PendingReturns />
             </div>
           :
             <div className="text-xs">Please switch your Metamask network to {NETWORK_NAMES[Number(process.env.NETWORK_CHAIN_ID || "1")]}!

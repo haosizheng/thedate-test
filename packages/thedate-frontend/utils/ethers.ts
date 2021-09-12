@@ -22,7 +22,6 @@ export function formatOpenSeaLink(
   if (!type || !chainId) {
     return "";
   }
-
   let linkPrefix = `https://${OPENSEA_PREFIXES[chainId]}opensea.io`;
   let linkType;
   switch (type) {

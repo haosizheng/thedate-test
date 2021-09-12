@@ -75,7 +75,7 @@ export default function useTheDateArtwork(tokenId: number) {
       if (!library || !TheDate || !account || !exists  || !owner || owner !== TheDate.address) {
         return;
       }
-      await TheDate?.endAuction(tokenId);
+      await TheDate?.settleLastAuction();
     };
 
     return {exists, owner, dateString, noteString, auctionEnded, highestBidder, highestBid, 
