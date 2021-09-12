@@ -7,7 +7,7 @@ const SECONDS_IN_A_DAY = 86400;
 
 const reservedDateList = [
   {date:"2021-08-27", note:"On the date Loot was launched."}, 
-  {date:"2001-09-11",note:"September 11 Attacks"}, 
+  {date:"2001-09-11", note:"September 11 Attacks"}, 
   {date:"2015-07-30",note:"Ethereum Initial Released"}, 
   {date:"2007-06-29",note:"The first iPhone was released"}, 
   {date:"2016-11-08",note:"Trump was elected"}, 
@@ -54,8 +54,8 @@ func.dependencies = ["deploy"];
 
 func.skip = async ({ getChainId }) => {
   const chainId = await getChainId();
-//  return false;
-  return true;
+  return false;
+//  return true;
 //  return chainId !== "31337";
 }
 
