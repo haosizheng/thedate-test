@@ -40,7 +40,6 @@ interface SuperpowerInterface extends ethers.utils.Interface {
     "getPersonalPhysicalPower(uint256)": FunctionFragment;
     "getRealityManipulation(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
-    "getSupernaturalPhysicalSkills(uint256)": FunctionFragment;
     "getTravel(uint256)": FunctionFragment;
     "getVision(uint256)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
@@ -133,10 +132,6 @@ interface SuperpowerInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
     values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getSupernaturalPhysicalSkills",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getTravel",
@@ -294,10 +289,6 @@ interface SuperpowerInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getRoleAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getSupernaturalPhysicalSkills",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getTravel", data: BytesLike): Result;
@@ -507,11 +498,6 @@ export class Superpower extends BaseContract {
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
-    getSupernaturalPhysicalSkills(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     getTravel(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -720,11 +706,6 @@ export class Superpower extends BaseContract {
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
-  getSupernaturalPhysicalSkills(
-    tokenId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   getTravel(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   getVision(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
@@ -918,11 +899,6 @@ export class Superpower extends BaseContract {
     ): Promise<string>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-    getSupernaturalPhysicalSkills(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     getTravel(
       tokenId: BigNumberish,
@@ -1186,11 +1162,6 @@ export class Superpower extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getSupernaturalPhysicalSkills(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getTravel(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1405,11 +1376,6 @@ export class Superpower extends BaseContract {
 
     getRoleAdmin(
       role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getSupernaturalPhysicalSkills(
-      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

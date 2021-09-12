@@ -79,12 +79,12 @@ export default function ClaimPage() {
         { claimingHistory.length > 0 && (
           <div className="content_item pt-10">
               <h3>History of Claiming</h3> 
-              <table className="text-xs text-left text-neutral-content">
+              <table className="text-xs text-left mx-auto text-neutral-content">
                 <thead>
                   <tr>
-                    <th className="w-52 text-left">Date</th>
-                    <th className="w-40 text-left">Claimer</th>
-                    <th className="w-40 text-left">Time</th>
+                    <th className="w-60 text-left">Date</th>
+                    <th className="w-44 text-left">Claimer</th>
+                    <th className="w-44 text-left">Time</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -417,7 +417,7 @@ context("TheDate contract", () => {
   describe("DAO controlled parameters", async () => {
     it("setClaimingPrice", async () => {
 
-     expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("0.05"));
+     expect(await mainContract.claimingPrice()).to.eq(ethers.utils.parseEther("0.01"));
      await expect(mainContract.connect(deployer).setClaimingPrice(ethers.utils.parseEther("3.0")))
        .to.emit(mainContract, "ClaimingPriceChanged").withArgs(ethers.utils.parseEther("3.0"));
      await expect(mainContract.connect(user5).setClaimingPrice(ethers.utils.parseEther("2.0")))
@@ -428,7 +428,7 @@ context("TheDate contract", () => {
     });
 
     it("setAuctionReservePrice", async () => {
-      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("0.05"));
+      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("0.01"));
       await expect(mainContract.connect(deployer).setAuctionReservePrice(ethers.utils.parseEther("1.0")))
         .to.emit(mainContract, "AuctionReservePriceChanged").withArgs(ethers.utils.parseEther("1.0"));
       await expect(mainContract.connect(user5).setAuctionReservePrice(ethers.utils.parseEther("2.0")))
@@ -450,7 +450,7 @@ context("TheDate contract", () => {
     });
     
     it("setEngravingPrice", async () => {
-      expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("0.01"));
+      expect(await mainContract.engravingPrice()).to.eq(ethers.utils.parseEther("0.05"));
       await expect(mainContract.connect(deployer).setEngravingPrice(ethers.utils.parseEther("2.0")))
         .to.emit(mainContract, "EngravingPriceChanged").withArgs(ethers.utils.parseEther("2.0"));
       await expect(mainContract.connect(user5).setEngravingPrice(ethers.utils.parseEther("3.0")))

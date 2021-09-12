@@ -26,6 +26,7 @@ interface TheDateInterface extends ethers.utils.Interface {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "airdrop(address[],uint256[])": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
+    "available(uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "claim(uint256)": FunctionFragment;
     "claimingPrice()": FunctionFragment;
@@ -94,6 +95,10 @@ interface TheDateInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "available",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "claim", values: [BigNumberish]): string;
@@ -301,6 +306,7 @@ interface TheDateInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "airdrop", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "available", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
@@ -570,6 +576,11 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    available(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     claim(
@@ -835,6 +846,8 @@ export class TheDate extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  available(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   claim(
@@ -1082,6 +1095,11 @@ export class TheDate extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    available(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1453,6 +1471,11 @@ export class TheDate extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    available(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     claim(
@@ -1712,6 +1735,11 @@ export class TheDate extends BaseContract {
       to: string,
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    available(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     balanceOf(

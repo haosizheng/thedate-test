@@ -138,8 +138,8 @@ export default function Auction() {
               <table className="text-xs text-left mx-auto text-neutral-content">
                 <thead>
                   <tr>
-                    <th className="w-52 text-left">Time</th>
-                    <th className="w-40 text-left">From</th>
+                    <th className="w-60 text-left">Time</th>
+                    <th className="w-44 text-left">From</th>
                     <th className="w-44 text-left">Bid</th>        
                   </tr>
                 </thead>
@@ -172,8 +172,8 @@ export default function Auction() {
               <table className="text-xs text-left mx-auto text-neutral-content">
                 <thead>
                   <tr>
-                    <th className="w-52 text-left">Date</th>
-                    <th className="w-40 text-left">Winner</th>
+                    <th className="w-60 text-left">Date</th>
+                    <th className="w-44 text-left">Winner</th>
                     <th className="w-44 text-left">Price</th>        
                   </tr>
                 </thead>

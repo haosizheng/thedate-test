@@ -19,8 +19,8 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
 
     // ==== Parameters ====
     // == DAO controlled parameters ==
-    uint256 public claimingPrice = 0.05 ether;
-    uint256 public reservePrice = 0.05 ether;
+    uint256 public claimingPrice = 0.01 ether;
+    uint256 public reservePrice = 0.01 ether;
     uint256 public minBidIncrementBps = 1000;
     uint256 public engravingPrice = 0.05 ether;
     uint256 public erasingPrice = 0.1 ether;
