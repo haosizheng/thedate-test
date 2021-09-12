@@ -4,10 +4,10 @@ import { NETWORK_CHAIN_ID } from "@/utils/connectors";
 
 export const PROJECT_INFO = {
   name: "The Date",
-  description: "The Date is a metadata-based NFT art experiment about time and blockchain. " +
+  description: "The Date is a fully on-chain interactable metadata NFT project. " +
     "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " +
-    "The owner can engrave or erase a note on the artwork as an additional metadata. " +
-    "The Date is metadata. Feel free to use the Date in any way you want.",
+    "The owner can interact with The Date by engraving or erasing a note on The Date artwork as an additional metadata." +
+    "As an interactable on-chain NFT, it's the first of its kind. ",
   website_url: "https://thedate.art",
   twitter_account: "thedate_nft",
   twitter_url: "https://twitter.com/@thedate_nft",

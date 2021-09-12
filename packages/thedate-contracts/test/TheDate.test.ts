@@ -208,10 +208,10 @@ context("TheDate contract", () => {
     });
 
     it("setTokenDescription", async () => {
-      expect(await mainContract.tokenDescription()).to.eq("The Date is a metadata-based NFT art project about time. " +
-        "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " +
-        "The owner can engrave or erase a note on the artwork as an additional metadata. "  +
-        "The Date is metadata. Feel free to use The Date in any way you want. See more: https://thedate.art");
+      expect(await mainContract.tokenDescription()).to.eq("The Date is a fully on-chain interactable metadata NFT project. " +
+      "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " +
+      "The owner can interact with The Date by engraving or erasing a note on The Date artwork as an additional metadata." +
+      "As an interactable on-chain NFT, it's the first of its kind. See more: https://thedate.art");
       
       await mainContract.connect(deployer).setTokenDescription("I love the Date!");
       await expect(mainContract.connect(user5).setTokenDescription("I love the Date!!"))

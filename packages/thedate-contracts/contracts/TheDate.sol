@@ -25,10 +25,12 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
 
     // == Admin controlled parameters ==
     uint256 public royaltyBps = 1000;
-    string public tokenDescription = "The Date is a metadata-based NFT art project about time. " 
-        "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " 
-        "The owner can engrave or erase a note on the artwork as an additional metadata. " 
-        "The Date is metadata. Feel free to use The Date in any way you want. See more: https://thedate.art";
+    
+    string public tokenDescription = "The Date is a fully on-chain interactable metadata NFT project. "
+        "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. "
+        "The owner can interact with The Date by engraving or erasing a note on The Date artwork as an additional metadata."
+        "As an interactable on-chain NFT, it's the first of its kind. See more: https://thedate.art";
+
     string[] public svgImageTemplate = [''
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">'
         '<rect width="100%" height="100%" fill="black" />'
