@@ -31,7 +31,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     string public tokenDescription = "The Date is a metadata-based NFT art experiment about time and blockchain. " 
         "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " 
         "The owner can engrave or erase a note on the artwork as an additional metadata. " 
-        "The Date is metadata. Feel free to use the Date in any way you want.";
+        "The Date is metadata. Feel free to use The Date in any way you want.";
     string[] public svgImageTemplate = [''
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">'
         '<rect width="100%" height="100%" fill="black" />'
@@ -177,10 +177,10 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
         return bytes(a).length == bytes(b).length && keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 
-    function escapeHTML(string memory s) public view returns (string memory) {
+    function escapeHTML(string memory s) public pure returns (string memory) {
         bytes memory b = bytes(s);
         string memory output = ""; 
-        for (uint8 i = 0; i < b.length; i++) {
+        for (uint i = 0; i < b.length; i++) {
             if (b[i] == '<') {
                 output = string(abi.encodePacked(output, "&lt;"));
             } else if (b[i] == '>') {
@@ -198,10 +198,10 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
         return output;
     }
 
-    function escapeQuotes(string memory symbol) internal pure returns (string memory) {
+    function escapeQuotes(string memory symbol) public pure returns (string memory) {
         bytes memory symbolBytes = bytes(symbol);
-        uint8 quotesCount = 0;
-        for (uint8 i = 0; i < symbolBytes.length; i++) {
+        uint quotesCount = 0;
+        for (uint i = 0; i < symbolBytes.length; i++) {
             if (symbolBytes[i] == '"') {
                 quotesCount++;
             }
@@ -209,7 +209,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
         if (quotesCount > 0) {
             bytes memory escapedBytes = new bytes(symbolBytes.length + (quotesCount));
             uint256 index;
-            for (uint8 i = 0; i < symbolBytes.length; i++) {
+            for (uint i = 0; i < symbolBytes.length; i++) {
                 if (symbolBytes[i] == '"') {
                     escapedBytes[index++] = '\\';
                 }
@@ -254,7 +254,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
             getDate(tokenId), 
             '", "description": "',
             escapeQuotes(tokenDescription),
-            '", "image": "data:image/svg+xml;charset=utf-8;base64,', 
+            '", "image": "data:image/svg+xml;base64,', 
             image, 
             '"}'
         ));
@@ -265,7 +265,7 @@ contract TheDate is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuard {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), "tokenId is nonexistent");
         string memory output = string(abi.encodePacked(
-            'data:application/json;charset=utf-8;base64,', 
+            'data:application/json;base64,', 
             Base64.encode(bytes(generateMetadata(tokenId)))
         ));
 

@@ -129,7 +129,7 @@ context("TheDate contract", () => {
 
       // Exception case that without enough funds.
       await expect(mainContract.connect(user1).engraveNote(tokenId, userNote))
-        .to.be.revertedWith("Should pay >= engravingPrice");
+        .to.be.revertedWith("Should pay engravingPrice");
 
       // User 1 sets the note of his artwork.
       await expect(mainContract.connect(user1).engraveNote(tokenId, userNote, { value: engravingPrice }))
@@ -147,7 +147,7 @@ context("TheDate contract", () => {
 
       // Exception case that user 1 erases the note of his artwork with no fund.
       await expect(mainContract.connect(user1).eraseNote(tokenId, {value: ethers.utils.parseEther("0.001")}))
-        .to.be.revertedWith("Should pay >= erasingPrice");
+        .to.be.revertedWith("Should pay erasingPrice");
 
       // User 1 erases the note of his artwork.
       await expect(mainContract.connect(user1).eraseNote(tokenId, { value: erasingPrice}))
@@ -172,7 +172,7 @@ context("TheDate contract", () => {
 
     it("generateSVGImage, generateMetadata, tokenURI", async () => {
       const tokenId = 0;
-      const userNote = "I love you.";
+      const userNote = '😈 😈 <text x="50%" y="90%" font-size="10px" class="base"></text>';
       const tokenDescription = await mainContract.tokenDescription();
       const engravingPrice = await mainContract.engravingPrice();
 
@@ -189,27 +189,27 @@ context("TheDate contract", () => {
       expect(svgImage).to.eq(
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">' +
         '<rect width="100%" height="100%" fill="black" />' +
-        '<text x="50%" y="50%" fontSize="50px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">' +
-        '1970-01-01' +
-        '</text><text x="50%" y="90%" fontSize="10px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">' +
-        'I love you.' + 
+        '<style>.base { fill: white; font-family: monospace; dominant-baseline: middle; text-anchor: middle; }</style>' +
+        '<text x="50%" y="50%" font-size="50px" class="base">1970-01-01</text>' +
+        '<text x="50%" y="90%" font-size="10px" class="base">' +
+        "😈 😈 &lt;text x=&quot;50%&quot; y=&quot;90%&quot; font-size=&quot;10px&quot; class=&quot;base&quot;&gt;&lt;/text&gt;" + 
         '</text></svg>'
       );
-      const encodedSVGImage = Buffer.from(svgImage, 'binary').toString('base64');
+      const encodedSVGImage = Buffer.from(svgImage).toString('base64');
 
       const metadata = await mainContract.connect(user1).generateMetadata(tokenId);
       expect(metadata)
         .to.eq(`{"name": "The Date #0: 1970-01-01", "description": "${tokenDescription}", "image": "data:image/svg+xml;base64,${encodedSVGImage}"}`);
-      const encodedMetadata = Buffer.from(metadata, 'binary').toString('base64');
+      const encodedMetadata = Buffer.from(metadata).toString('base64');
       expect(await mainContract.connect(user1).tokenURI(tokenId))
         .to.eq(`data:application/json;base64,${encodedMetadata}`);
     });
 
     it("setTokenDescription", async () => {
       expect(await mainContract.tokenDescription()).to.eq("The Date is a metadata-based NFT art experiment about time and blockchain. " +
-        "Each fleeting day would be imprinted into an NFT artwork on blockchain immutably. " +
-        "Optionally, the owner can engrave or erase a note on the artwork as an additional metadata. " +
-        "Feel free to use the Date in any way you want.");
+        "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " +
+        "The owner can engrave or erase a note on the artwork as an additional metadata. "  +
+        "The Date is metadata. Feel free to use The Date in any way you want.");
       
       await mainContract.connect(deployer).setTokenDescription("I love the Date!");
       await expect(mainContract.connect(user5).setTokenDescription("I love the Date!!"))
@@ -229,9 +229,10 @@ context("TheDate contract", () => {
       expect(await mainContract.svgImageTemplate(0)).to.eq(
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">' +
         '<rect width="100%" height="100%" fill="black" />' +
-        '<text x="50%" y="50%" fontSize="50px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">');
+        '<style>.base { fill: white; font-family: monospace; dominant-baseline: middle; text-anchor: middle; }</style>' +
+        '<text x="50%" y="50%" font-size="50px" class="base">');
       expect(await mainContract.svgImageTemplate(1)).to.eq('{{date}}');
-      expect(await mainContract.svgImageTemplate(2)).to.eq('</text><text x="50%" y="90%" fontSize="10px" fill="white" fontFamily="monospace" dominantBaseline="middle" textAnchor="middle">');
+      expect(await mainContract.svgImageTemplate(2)).to.eq('</text><text x="50%" y="90%" font-size="10px" class="base">');
       expect(await mainContract.svgImageTemplate(3)).to.eq('{{note}}');
       expect(await mainContract.svgImageTemplate(4)).to.eq('</text></svg>');
       
@@ -259,7 +260,7 @@ context("TheDate contract", () => {
     it("Claiming at a cost", async () => {
       // Users claims at a cost
       await expect(mainContract.connect(user1).claim(0))
-        .to.be.revertedWith("Should pay >= claiming price or own a Loot NFT");
+        .to.be.revertedWith("Should pay claimingPrice or own a Loot NFT");
       await expect(mainContract.connect(user1).claim(0, {value: await mainContract.claimingPrice()}))
         .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, 0)
         .to.emit(mainContract, "ArtworkClaimed").withArgs(0, user1.address);
@@ -355,7 +356,7 @@ context("TheDate contract", () => {
         .to.emit(mainContract, "ArtworkAirdropped").withArgs(3, user3.address);
     });
 
-    it("Airdrop an claimed one", async () => {
+    it("Airdrop a claimed one", async () => {
       await expect(mainContract.connect(deployer).claim(1))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(1, deployer.address);
       await expect(mainContract.connect(deployer).airdrop([user1.address, user2.address], [1, 2]))
@@ -427,7 +428,7 @@ context("TheDate contract", () => {
     });
 
     it("setAuctionReservePrice", async () => {
-      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("0.1"));
+      expect(await mainContract.reservePrice()).to.eq(ethers.utils.parseEther("0.05"));
       await expect(mainContract.connect(deployer).setAuctionReservePrice(ethers.utils.parseEther("1.0")))
         .to.emit(mainContract, "AuctionReservePriceChanged").withArgs(ethers.utils.parseEther("1.0"));
       await expect(mainContract.connect(user5).setAuctionReservePrice(ethers.utils.parseEther("2.0")))

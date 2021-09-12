@@ -109,6 +109,7 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Vampire Physiology",
         "Wallcrawling"
     ];
+
     //add "Generation" in the end
     string[] private emission = [
         "Acid",
@@ -148,7 +149,7 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
     ];
     
     // add "Enhanced" in front
-    string[] private EnhancedPhysicalSkills = [
+    string[] private enhancedPhysicalSkills = [
         "Accuracy",
         "Agility",
         "Combat",
@@ -165,10 +166,10 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Vision",
         "Stamina",
         "Strength",
-        "Swordsmanship",
+        "Swordsmanship"
     ];
 
-// add "Manipulation" in the end
+    // add "Manipulation" in the end
     string[] private realityManipulation = [
         "Dimensional",
         "Emotion",
@@ -238,8 +239,7 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Wing Manifestation"
     ];
 
-
-// add "Mimicry" in the end
+    // add "Mimicry" in the end
     string[] private elementMimicry = [
         "Air",
         "Darkness",
@@ -260,7 +260,7 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Ice",
         "Spatial",
         "Energy",
-        "Dust",
+        "Dust"
     ];
 
     // add "Physiology" in the end
@@ -303,10 +303,8 @@ contract Superpower is ERC721Enumerable, AccessControl, IERC2981, ReentrancyGuar
         "Werewolf",
         "Transcendent",
         "Cosmic Entity"
-        ];
+    ];
 
-    
-    
     function getVision(uint256 tokenId) public view returns (string memory) {
         return pluck(tokenId, "vision", vision);
     }
