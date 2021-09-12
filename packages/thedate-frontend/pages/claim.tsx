@@ -59,7 +59,7 @@ export default function ClaimPage() {
               <>
               The earliest date to be claimable was <b>{tokenIdToISODateString(0)}</b> (Token #0).
               The latest date was <b>{tokenIdToISODateString(currentAuctionTokenId - 1)}</b> (Token #{currentAuctionTokenId - 1}). 
-              Any date in-between were claimable. {totalSupply !== undefined && <>Currently in total {currentAuctionTokenId - totalSupply} tokens of The Date were available to be claimed.</>}
+              Any date in-between were claimable. {totalSupply !== undefined && <>Currently {currentAuctionTokenId - totalSupply} tokens of The Date in total were available to be claimed.</>}
               </>
             }
           </p>

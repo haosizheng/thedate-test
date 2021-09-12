@@ -2,6 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { TheDate } from "../typechain";
 import { BigNumber } from "@ethersproject/bignumber";
+import { ethers } from "hardhat";
 
 const SECONDS_IN_A_DAY = 86400;
 
@@ -30,13 +31,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const tokenIds = reservedDateList.map( ({date, note}) => {
     const tokenId = BigNumber.from(new Date(date).valueOf()).div(SECONDS_IN_A_DAY).div(1000);
-    return tokenId;
+    return tokenId.toNumber();
   })
 
   const addresses = reservedDateList.map( _ => deployer.address);
 
   console.log(`Airdrop ${tokenIds.length} tokens`);
-  await theDate.airdrop(addresses, tokenIds);
+  console.log(tokenIds);
+//  console.log( (await hre.ethers.provider.getGasPrice()).toNumber());
+  await theDate.airdrop(addresses, tokenIds, {gasPrice: 60000000000});
   console.log(`Airdropped ${tokenIds.length} tokens`);
 
   // for (const {date, note} of reservedDateList) {
@@ -54,8 +57,8 @@ func.dependencies = ["deploy"];
 
 func.skip = async ({ getChainId }) => {
   const chainId = await getChainId();
-  return false;
-//  return true;
+//  return false;
+  return true;
 //  return chainId !== "31337";
 }
 
