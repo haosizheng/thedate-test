@@ -25,7 +25,7 @@ export default function UpdatesPage() {
         <div className="content_item">
           <h3>2021-09-12</h3>
           <p>
-            We lanuched the Date. 
+            The Date was launched today.
           </p>
           <figure>
             <ArtworkSVG dateString="2021-09-12" noteString="The Date was launched." />

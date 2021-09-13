@@ -33,6 +33,11 @@ context("TheDate contract", () => {
 
   const SECONDS_IN_A_DAY = 86400;
 
+  const passOneDay = async () => {
+    await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+    await ethers.provider.send('evm_mine', []);
+  };
+
   before(async () => {
     [deployer, user1, user2, user3, user4, user5, user6] = await ethers.getSigners();
 
@@ -58,11 +63,30 @@ context("TheDate contract", () => {
     await testReentrantAttackContract.deposit({value: ethers.utils.parseEther("100.0")});
   });
 
-  describe("EscapeHTML", async () => {
+  describe("String related", async () => {
     it("Escape <>'\"&", async () => {
-      expect(await mainContract.escapeHTML('<text x="10" y="10" class="base">ASDASDa</text>Hello</text>'))
-        .to.eq('&lt;text x=&quot;10&quot; y=&quot;10&quot; class=&quot;base&quot;&gt;ASDASDa&lt;/text&gt;Hello&lt;/text&gt;');
-      expect(await mainContract.escapeHTML('&')).to.eq('&amp;');
+      expect(await mainContract.escapeXML('<text x="10" y="10" class="base">ASDASDa&\'asd\'</text>Hello</text>'))
+        .to.eq('&lt;text x=&quot;10&quot; y=&quot;10&quot; class=&quot;base&quot;&gt;ASDASDa&amp;&apos;asd&apos;&lt;/text&gt;Hello&lt;/text&gt;');
+    });
+    
+    it("Escape \"", async () => {
+      expect(await mainContract.escapeQuotes('asdasd""'))
+        .to.eq('asdasd\\"\\"');
+    });
+  });
+
+  describe("Interface check", async () => {
+    it("Interface", async () => {
+      //_INTERFACE_ID_ERC165
+      expect(await mainContract.supportsInterface('0x01ffc9a7')).to.eq(true);
+      //_INTERFACE_ID_ERC721
+      expect(await mainContract.supportsInterface('0x80ac58cd')).to.eq(true);
+      //_INTERFACE_ID_ERC721_METADATA
+      expect(await mainContract.supportsInterface('0x5b5e139f')).to.eq(true);
+      //_INTERFACE_ID_ERC721_ENUMERABLE
+      expect(await mainContract.supportsInterface('0x780e9d63')).to.eq(true);
+      //_INTERFACE_ID_IERC2981
+      expect(await mainContract.supportsInterface('0x2a55205a')).to.eq(true);
     });
   });
 
@@ -106,8 +130,8 @@ context("TheDate contract", () => {
       const tokenId = 0;
       const userNote = "I love you.";
       const userNoteLong = "I love you. Long Long Long ...";
-      const userNoteUnicode = "哈哈哈哈哈哈";
-      const userNoteUnicodeLong = "哈哈哈哈哈哈哈";
+      const userNoteUnicode = "😈😈😈😈😈";
+      const userNoteUnicodeLong = "😈😈😈😈😈😈😈";
 
       const previousBalance = await ethers.provider.getBalance(foundationContract.address);
 
@@ -174,15 +198,29 @@ context("TheDate contract", () => {
 
     it("generateSVGImage, generateMetadata, tokenURI", async () => {
       const tokenId = 0;
-      const userNote = '😈 😈 <text x="50%" y="90%" font-size="10px" class="base"></text>';
+      // There is hidden character inside
+      // https://www.soscisurvey.de/tools/view-chars.php
+      const userNoteFailed = '😈 😈See what\'s hidden in your string…	or bbe​h​ind﻿ <text x="50%"></text>';
+      const userNote = '😈 😈See ¡¡āwhat\'s hidden in your string… or bbe​h​ind﻿ <text x="50%">asdasds</text>';
+      const userNoteWith100Bytes = "😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈😈";
       const tokenDescription = await mainContract.tokenDescription();
       const engravingPrice = await mainContract.engravingPrice();
+      const erasingPrice = await mainContract.erasingPrice();
 
       await expect(mainContract.connect(user1).generateMetadata(tokenId))
         .to.be.revertedWith("tokenId is non-existent");
 
       await expect(mainContract.connect(user1).claim(tokenId, {value: await mainContract.claimingPrice()}))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(tokenId, user1.address);
+
+      await expect(mainContract.connect(user1).engraveNote(tokenId, userNoteFailed, { value: engravingPrice }))
+        .to.be.revertedWith('There is C0 control character. Printable characters only.'); //Tab
+
+      await expect(mainContract.connect(user1).engraveNote(tokenId, userNoteWith100Bytes, { value: engravingPrice }))
+        .to.emit(mainContract, "NoteEngraved").withArgs(tokenId, user1.address, userNoteWith100Bytes);
+
+        await expect(mainContract.connect(user1).eraseNote(tokenId, { value: erasingPrice }))
+        .to.emit(mainContract, "NoteErased").withArgs(tokenId, user1.address);
 
       await expect(mainContract.connect(user1).engraveNote(tokenId, userNote, { value: engravingPrice }))
         .to.emit(mainContract, "NoteEngraved").withArgs(tokenId, user1.address, userNote);
@@ -194,10 +232,11 @@ context("TheDate contract", () => {
         '<style>.base { fill: white; font-family: monospace; dominant-baseline: middle; text-anchor: middle; }</style>' +
         '<text x="50%" y="50%" font-size="50px" class="base">1970-01-01</text>' +
         '<text x="50%" y="90%" font-size="10px" class="base">' +
-        "😈 😈 &lt;text x=&quot;50%&quot; y=&quot;90%&quot; font-size=&quot;10px&quot; class=&quot;base&quot;&gt;&lt;/text&gt;" + 
+        "😈 😈See ¡¡āwhat&apos;s hidden in your string… or bbe​h​ind﻿ &lt;text x=&quot;50%&quot;&gt;asdasds&lt;/text&gt;" + 
         '</text></svg>'
       );
       const encodedSVGImage = Buffer.from(svgImage).toString('base64');
+      console.log(encodedSVGImage);
 
       const metadata = await mainContract.connect(user1).generateMetadata(tokenId);
       expect(metadata)
@@ -208,10 +247,12 @@ context("TheDate contract", () => {
     });
 
     it("setTokenDescription", async () => {
-      expect(await mainContract.tokenDescription()).to.eq("The Date is a fully on-chain interactable metadata NFT project. " +
-      "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. " +
-      "The owner can interact with The Date by engraving or erasing a note on The Date artwork as an additional metadata." +
-      "As an interactable on-chain NFT, it's the first of its kind. See more: https://thedate.art");
+      expect(await mainContract.tokenDescription()).to.eq("The Date is an interactable on-chain metadata NFT project about time and meaning. " +
+      "Each fleeting day would be imprinted into an NFT as metadata immutably. " +
+      "Everyday, the Date of that day will be auctioned. One Date a day, running forever. " +
+      "The owner can interact with The Date by engraving or erasing a note attached as an additional metadata. " +
+      "Images, apperances, and other functionality are intentionally omitted for others to interpret. " +
+      "See more: https://thedate.art");
       
       await mainContract.connect(deployer).setTokenDescription("I love the Date!");
       await expect(mainContract.connect(user5).setTokenDescription("I love the Date!!"))
@@ -308,10 +349,12 @@ context("TheDate contract", () => {
       ).div(SECONDS_IN_A_DAY);
 
       // Claim a today's token
+      expect(await mainContract.available(tokenId)).to.eq(false);
       await expect(mainContract.connect(deployer).claim(tokenId))
         .to.be.revertedWith("Only past tokenId is claimable");
 
       // Claim a future token
+      expect(await mainContract.available(tokenId.add(1))).to.eq(false);
       await expect(mainContract.connect(deployer).claim(tokenId.add(1)))
         .to.be.revertedWith("Only past tokenId is claimable");
 
@@ -321,23 +364,27 @@ context("TheDate contract", () => {
         .to.emit(mainContract, "BidPlaced").withArgs(tokenId, user1.address, amount);
 
       // To Day 2
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
       
       // Claim day 1 on day 2
       await expect(mainContract.connect(deployer).claim(tokenId))
         .to.be.revertedWith("tokenId should not be auctioned");
+      expect(await mainContract.available(tokenId)).to.eq(false);
 
       // To Day 3
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
 
       // Claim Day 2 on day 3
+      expect(await mainContract.exists(tokenId.add(1))).to.eq(false);
+      expect(await mainContract.available(tokenId.add(1))).to.eq(true);
+
       await expect(mainContract.connect(deployer).claim(tokenId.add(1)))
         .to.emit(mainContract, "ArtworkClaimed").withArgs(tokenId.add(1), deployer.address)
         .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, deployer.address, tokenId.add(1))
         .to.emit(mainContract, "AuctionSettled").withArgs(tokenId, user1.address, amount)
         .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, tokenId)
 
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
     });
   });
   
@@ -393,7 +440,7 @@ context("TheDate contract", () => {
         .to.be.revertedWith("Only past tokenId is claimable");
 
       // Pass 1 day
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
 
       // Airdrop an auctioned one
       await expect(mainContract.connect(deployer).airdrop([user1.address], [tokenId]))
@@ -406,7 +453,7 @@ context("TheDate contract", () => {
         .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, tokenId);
       
       // Pass 1 more day
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
 
       // Airdrop will settle the last bid
       await expect(mainContract.connect(deployer).airdrop([user1.address], [0]))
@@ -490,7 +537,7 @@ context("TheDate contract", () => {
       expect(await mainContract.connect(user1).exists(tokenId)).to.eq(false);
 
       // Pass one day
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
 
       // TokenId does not exist even next Day without Auctioned.
       expect(await mainContract.connect(user1).exists(tokenId)).to.eq(false);
@@ -536,18 +583,20 @@ context("TheDate contract", () => {
       expect((await mainContract.getHighestBid(tokenId)).amount).to.eq(nextMidBid);
 
       // 1 day passed
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
       
       expect(await mainContract.placeBid({value: minBid}))
         .to.emit(mainContract, "AuctionSettled").withArgs(tokenId, testReentrantAttackContract.address, nextMidBid)
         .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, testReentrantAttackContract.address, tokenId);
     });
 
-
+    
     it("Place Bid", async () => {
       const tokenId = BigNumber.from(
         (await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp,
       ).div(SECONDS_IN_A_DAY);
+
+      expect(await mainContract.getCurrentAuctionTokenId()).to.eq(tokenId);
 
       const claimingPrice = await mainContract.claimingPrice();
       
@@ -598,8 +647,10 @@ context("TheDate contract", () => {
       expect((await mainContract.getHighestBid(tokenId)).bidder).to.eq(user3.address);
 
       // == Day 2
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
       
+      expect(await mainContract.getCurrentAuctionTokenId()).to.eq(tokenId.add(1));
+
       // The first bid for day 2 with auto auction settled for day 1
       expect(await mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.3") }))
         .to.emit(mainContract, "BidPlaced").withArgs(tokenId.add(1), user2.address, ethers.utils.parseEther("0.3"))
@@ -612,7 +663,7 @@ context("TheDate contract", () => {
         
       expect((await mainContract.getHighestBid(tokenId.add(1))).bidder).to.eq(user2.address);
       // == Day 3
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
 
       // Manually auction settlement after auction ends.
       await expect(await mainContract.connect(user2).settleLastAuction())
@@ -623,7 +674,7 @@ context("TheDate contract", () => {
       // No one bid today.
 
       // == Day 4
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
 
       // The first bid for day 4
       expect(await mainContract.connect(user2).placeBid({ value: ethers.utils.parseEther("0.3") }))
@@ -636,7 +687,7 @@ context("TheDate contract", () => {
         .to.changeEtherBalance(foundationContract, claimingPrice);
         
       // Day 5
-      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_A_DAY]);
+      passOneDay();
 
       // Claiming the missing day 4 but it's auctioned. It's reverted. So it does not triggers settleAuction.
       await expect(mainContract.connect(user2).claim(tokenId.add(3), { value: claimingPrice }))

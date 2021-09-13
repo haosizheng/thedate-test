@@ -33,8 +33,8 @@ interface TheDateInterface extends ethers.utils.Interface {
     "engravingPrice()": FunctionFragment;
     "eraseNote(uint256)": FunctionFragment;
     "erasingPrice()": FunctionFragment;
-    "escapeHTML(string)": FunctionFragment;
     "escapeQuotes(string)": FunctionFragment;
+    "escapeXML(string)": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "generateMetadata(uint256)": FunctionFragment;
     "generateSVGImage(uint256)": FunctionFragment;
@@ -117,11 +117,11 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "erasingPrice",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "escapeHTML", values: [string]): string;
   encodeFunctionData(
     functionFragment: "escapeQuotes",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "escapeXML", values: [string]): string;
   encodeFunctionData(
     functionFragment: "exists",
     values: [BigNumberish]
@@ -302,11 +302,11 @@ interface TheDateInterface extends ethers.utils.Interface {
     functionFragment: "erasingPrice",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "escapeHTML", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "escapeQuotes",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "escapeXML", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "generateMetadata",
@@ -581,9 +581,9 @@ export class TheDate extends BaseContract {
 
     erasingPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    escapeHTML(s: string, overrides?: CallOverrides): Promise<[string]>;
-
     escapeQuotes(symbol: string, overrides?: CallOverrides): Promise<[string]>;
+
+    escapeXML(s: string, overrides?: CallOverrides): Promise<[string]>;
 
     exists(
       tokenId: BigNumberish,
@@ -829,9 +829,9 @@ export class TheDate extends BaseContract {
 
   erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
-  escapeHTML(s: string, overrides?: CallOverrides): Promise<string>;
-
   escapeQuotes(symbol: string, overrides?: CallOverrides): Promise<string>;
+
+  escapeXML(s: string, overrides?: CallOverrides): Promise<string>;
 
   exists(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
@@ -1057,9 +1057,9 @@ export class TheDate extends BaseContract {
 
     erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
-    escapeHTML(s: string, overrides?: CallOverrides): Promise<string>;
-
     escapeQuotes(symbol: string, overrides?: CallOverrides): Promise<string>;
+
+    escapeXML(s: string, overrides?: CallOverrides): Promise<string>;
 
     exists(tokenId: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
@@ -1392,9 +1392,9 @@ export class TheDate extends BaseContract {
 
     erasingPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
-    escapeHTML(s: string, overrides?: CallOverrides): Promise<BigNumber>;
-
     escapeQuotes(symbol: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    escapeXML(s: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     exists(
       tokenId: BigNumberish,
@@ -1637,13 +1637,13 @@ export class TheDate extends BaseContract {
 
     erasingPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    escapeHTML(
-      s: string,
+    escapeQuotes(
+      symbol: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    escapeQuotes(
-      symbol: string,
+    escapeXML(
+      s: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

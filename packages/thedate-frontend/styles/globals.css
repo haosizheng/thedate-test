@@ -23,11 +23,12 @@ body {
   @apply max-w-screen-md;
   @apply my-10 sm:my-16;
   @apply p-10;
+  @apply text-lg;
 }
 
 .footer a {
   @apply text-neutral-focus;
-  @apply underline;
+  @apply hover:underline;
 }
 
 .footer__row {
@@ -50,6 +51,10 @@ h3 {
   @apply text-xl;
 }
 
+h4 {
+  @apply text-lg;
+}
+
 .content {
   @apply container;
   @apply max-w-screen-md;
@@ -58,12 +63,22 @@ h3 {
   @apply py-3;
 }
 
+.carousel >figure {
+  display: none;
+}
+
+.carousel >figure.visible {
+  display: block;    
+  position: relative;
+  overflow: hidden;  
+}
+
 .content figure {
   @apply mx-auto;
-  @apply max-w-xs;
+  @apply max-w-md;
   @apply justify-center;
   @apply mt-0;
-  @apply mb-12 sm:mb-16;
+  @apply mb-12 sm:mb-24 sm:mt-10;
   @apply hover:opacity-80;
 }
 
@@ -93,5 +108,5 @@ p {
 
 p a {
   @apply text-neutral-focus;
-  @apply underline;
+  @apply hover:underline;
 }

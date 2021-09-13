@@ -26,10 +26,12 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
     // == Admin controlled parameters ==
     uint256 public royaltyBps = 1000;
     
-    string public tokenDescription = "The Date is a fully on-chain interactable metadata NFT project. "
-        "Each fleeting day would be imprinted into an NFT artwork immutably lasting forever. "
-        "The owner can interact with The Date by engraving or erasing a note on The Date artwork as an additional metadata."
-        "As an interactable on-chain NFT, it's the first of its kind. See more: https://thedate.art";
+    string public tokenDescription = "The Date is an interactable on-chain metadata NFT project about time and meaning. " 
+        "Each fleeting day would be imprinted into an NFT as metadata immutably. "
+        "Everyday, the Date of that day will be auctioned. One Date a day, running forever. "
+        "The owner can interact with The Date by engraving or erasing a note attached as an additional metadata. "
+        "Images, apperances, and other functionality are intentionally omitted for others to interpret. "
+        "See more: https://thedate.art";
 
     string[] public svgImageTemplate = [''
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500">'
@@ -131,7 +133,19 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
 
     // == Note related operations ==
     modifier validNote(string memory note) {
-        require(bytes(note).length < noteSizeLimit, "Note should be shorter than noteSizeLimit");
+        bytes memory b = bytes(note);
+        require(b.length <= noteSizeLimit, "Note should be shorter than noteSizeLimit");
+
+        // Reference https://utf8-chartable.de/unicode-utf8-table.pl
+        // Ignore C0 and C1 control code https://en.wikipedia.org/wiki/C0_and_C1_control_codes
+        // Assume that note is utf-8 encoding.
+        for (uint i = 0; i < b.length; i++) {
+            require(b[i] >= 0x20 && b[i] != 0x7f, "There is C0 control character. Printable characters only.");
+            if (b[i] == 0xc2 && i + 1 < b.length) {
+                require(b[i + 1] >= 0xa0, "There is C1 control character. Printable characters only.");
+                i++;
+            }
+        }
         _;
     }
 
@@ -176,7 +190,7 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
         return bytes(a).length == bytes(b).length && keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 
-    function escapeHTML(string memory s) public pure returns (string memory) {
+    function escapeXML(string memory s) public pure returns (string memory) {
         bytes memory b = bytes(s);
         string memory output = ""; 
         for (uint i = 0; i < b.length; i++) {
@@ -230,7 +244,7 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
             if (_stringEquals(svgImageTemplate[i], "{{date}}")) {
                 part = date;
             } else if (_stringEquals(svgImageTemplate[i], "{{note}}")) {
-                part = escapeHTML(note);
+                part = escapeXML(note);
             } else {
                 part = svgImageTemplate[i];
             }
@@ -288,7 +302,7 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
     }
     
     function available(uint256 tokenId) external view returns (bool) {
-        return (tokenId < block.timestamp / 1 days) && 
+       return (tokenId < block.timestamp / 1 days) && 
             (_highestBidder[tokenId] == address(0) && _highestBid[tokenId] == 0) &&
             (!_exists(tokenId));
     }
@@ -395,7 +409,7 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
     constructor(address foundation_,
                 address weth_,
                 address loot_) 
-        ERC721("The Date", "DATE") Ownable()
+        ERC721("The Date", "DATE")
     {
         _foundation = payable(foundation_);
         _weth = weth_;
@@ -414,8 +428,7 @@ contract TheDate is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
         public view override(ERC721Enumerable, IERC165) returns (bool) 
     {
         return ERC721Enumerable.supportsInterface(interfaceId) ||
-            type(IERC2981).interfaceId == interfaceId ||
-            type(IERC165).interfaceId == interfaceId;
+            type(IERC2981).interfaceId == interfaceId;
     }
 
     // ==== Royalty Functions ====

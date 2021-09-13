@@ -11,12 +11,12 @@ export function blockTimestampToDate(timestamp: number) {
   return dateFormat(new Date(timestamp * 1000), "mmm d yyyy").toUpperCase();
 }
 
-export function jsDateToTokenId(date: Date) {
+export function jsDateToDate(date: Date) {
   return dateFormat(date, "mmm d yyyy").toUpperCase();
 }
 
-export function jsDateToDate(date: Date) {
-  return dateFormat(date, "mmm d yyyy").toUpperCase();
+export function ISODateToTokenId(isoDate: string) {
+  return Math.floor(new Date(isoDate).valueOf() / SECONDS_IN_A_DAY / 1000);
 }
 
 export function tokenIdToDateString(tokenId: number) {
@@ -24,5 +24,5 @@ export function tokenIdToDateString(tokenId: number) {
 }
 
 export function tokenIdToISODateString(tokenId: number) {
-  return dateFormat(new Date(tokenId * SECONDS_IN_A_DAY * 1000), "yyyy-mm-dd").toUpperCase();
+  return dateFormat(new Date(tokenId * SECONDS_IN_A_DAY * 1000), "yyyy-mm-dd");
 }
