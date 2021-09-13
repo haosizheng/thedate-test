@@ -85,8 +85,7 @@ export default function FAQPage() {
           NFT Token # is defined by the number of days passed since <a target="_blank" rel="noreferrer" href="https://en.wikipedia.org/wiki/Unix_time">Unix Epoch</a>. 
           The earliest The Date NFT was <b>{tokenIdToISODateString(0)}</b> (Token #0).
           {currentAuctionTokenId !== undefined && 
-            (currentAuctionTokenId - 1)
-            && <> The latest The Date NFT was <b>{tokenIdToISODateString(currentAuctionTokenId - 1)}</b> (Token #{currentAuctionTokenId - 1}). </>
+            <> The latest The Date NFT was <b>{tokenIdToISODateString(currentAuctionTokenId)}</b> (Token #{currentAuctionTokenId}). </>
           }
           </p>
         </div>
@@ -157,7 +156,7 @@ export default function FAQPage() {
               3D artwork</a></Link> as an sample artwork.
           </p>
           <div className="artwork-3d">
-            <ArtworkModelViewer tokenId={18882} noteString="The Date was launched." fov={30} />
+            <ArtworkModelViewer tokenId={18883} noteString="The Date was launched." fov={30} />
           </div>
         </div>
 

@@ -6,7 +6,7 @@ import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import { NETWORK_CHAIN_ID } from "@/utils/connectors";
 import ArtworkSVG from "@/components/ArtworkSVG";
 import ArtworkModelViewer from "@/components/ArtworkModelViewer";
-import { useState, useRef } from "react";
+import { useState, useRef, ReactElement } from "react";
 import { useAsync } from "react-use";
 import Link from "next/link";
 import moment from "moment";
@@ -29,7 +29,7 @@ export default function ClaimPage() {
   const [ claimingHistory, setClaimingHistory ] = useState<ClaimHistoryItem[]>([]);
 
   const [inputDateString, setInputDateString] = useState<string | undefined>("");
-  const hintRef = useRef<string>("");
+  const hintRef = useRef<ReactElement>(<></>);
   const etherscanLinkOfToken = formatEtherscanLink("Token", [chainId, TheDate?.address]);
   const contractLinkToRead = ((s: string) => 
     <a target="_blank" rel="noreferrer" href={`${etherscanLinkOfToken}#readContract`}><i>{`${s}`}</i></a>
@@ -64,16 +64,16 @@ export default function ClaimPage() {
     }
 
     if (inputDateString === "") {
-      hintRef.current = "";
+      hintRef.current = <></>;
     }
 
     const aDate = moment(inputDateString, 'YYYY-MM-DD', true);
 
     if (!inputDateString.match(/^\d{4}[\-]\d{2}[\-]\d{2}$/)) {
-      hintRef.current = `The Date should be in format "yyyy-mm-dd", e.g. 2021-09-12`;
+      hintRef.current = (<span className="text-xs">The Date should be in format &quot;yyyy-mm-dd&quot;, e.g. 2021-09-12</span>);
       return;
     } else if (!aDate.isValid()) {
-      hintRef.current = "Invalid date";
+      hintRef.current = (<span className="text-xs">Invalid date</span>);
       return;
     }
 
@@ -82,15 +82,15 @@ export default function ClaimPage() {
       let currentDate = new Date(inputDateString);
       let currentISODate = currentDate.toISOString().slice(0, 10);
 
-      hintRef.current = `Checking if ${currentISODate} (Token #${tokenId}) is available...`;
+      hintRef.current = (<span className="text-xs">{`Checking if ${currentISODate} (Token #${tokenId}) is available...`}</span>);
       const available = await TheDate?.available(tokenId);
       if (available) {
-        hintRef.current = `${currentISODate} (Token #${tokenId}) is available. `;
+        hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId})`} is available. <br/>Copy the tokenId <span className="text-neutral-base">&quot;{`${tokenId}`}&quot;</span> and paste it in {contractLinkToWrite("claim(tokenId)")} function in the contract on Etherscan.</span>);
       } else {
-        hintRef.current = `${currentISODate} (Token #${tokenId}) is unavailable.`;
+        hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId}) is unavailable.`}</span>);
       }
     } else {
-      hintRef.current = `Wrong date range. It should be from 1970-01-01 to ${tokenIdToISODateString(currentAuctionTokenId)}.`;
+      hintRef.current = (<span className="text-xs">{`Wrong date range. It should be from 1970-01-01 to ${tokenIdToISODateString(currentAuctionTokenId)}.`}</span>);
     }
   }, [TheDate, inputDateString, currentAuctionTokenId]);
 
