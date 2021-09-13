@@ -4,6 +4,9 @@ import Link from "next/link";
 import ArtworkSVGOnChain from "@/components/ArtworkSVGOnChain";
 import { ISODateToTokenId } from "@/utils/thedate";
 import { Swiper, SwiperSlide } from "swiper/react";
+import useTheDateContract from "@/hooks/useTheDateContract";
+import useActiveWeb3React from "@/hooks/useActiveWeb3React";
+import { formatOpenSeaLink } from "@/utils/ethers";
 
 // Import Swiper styles
 import "swiper/css";
@@ -11,38 +14,30 @@ import "swiper/css/pagination"
 import SwiperCore, {
   Pagination, Autoplay
 } from 'swiper';
+import { PROJECT_INFO } from "@/utils/constants";
 SwiperCore.use([Pagination, Autoplay]);
 
 export default function HomePage() {
+  const TheDate = useTheDateContract();
+  const {chainId} = useActiveWeb3React();
+
+  const displayTokenDates = ["2001-09-11", "2021-08-27", "2013-12-06", "2009-01-03", "2020-01-26"];
   return (
     <Layout>
         <div className="content">
           <Swiper loop={true} autoplay={{delay: 3000}} pagination={{"clickable": true, "type": "custom"}}>
-            <SwiperSlide>
-              <figure className="swiper-slide">
-                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2001-09-11")} />
-              </figure>
-            </SwiperSlide>
-            <SwiperSlide>
-              <figure className="swiper-slide">
-                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2021-08-27")} />
-              </figure>
-            </SwiperSlide>
-            <SwiperSlide>
-              <figure className="swiper-slide">
-                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2013-12-06")} />
-              </figure>
-            </SwiperSlide>
-            <SwiperSlide>
-              <figure className="swiper-slide">
-                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2009-01-03")} />
-              </figure>
-            </SwiperSlide>
-            <SwiperSlide>
-              <figure className="swiper-slide">
-                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2020-01-26")} />
-              </figure>
-            </SwiperSlide>
+            {
+              displayTokenDates.map((tokenDate) => 
+                <SwiperSlide key={tokenDate}>
+                  <figure className="swiper-slide">
+                    <a target="_blank" rel="noreferrer" href={formatOpenSeaLink("Asset", chainId, 
+                      PROJECT_INFO.contract_address, ISODateToTokenId(tokenDate))}>
+                      <ArtworkSVGOnChain tokenId={ISODateToTokenId(tokenDate)} />
+                    </a>
+                  </figure>
+                </SwiperSlide>
+                )
+            }
           </Swiper>
 
           <div className="flex flex-row justify-center gap-10 text-lg">

@@ -152,11 +152,11 @@ export default function FAQPage() {
             It could be a building block for stories, experiements, and metaverses. 
           </p>
           <p>
-            To inspire you, based on the metadata of the Date, we make this <Link href={`/model/${ISODateToTokenId("2017-06-23")}`}><a target="_blank" rel="noreferrer">
+            To inspire you, based on the metadata of the Date, we make this <Link href={`/model/${ISODateToTokenId("2021-08-27")}`}><a target="_blank" rel="noreferrer">
               3D artwork</a></Link> as an sample artwork.
           </p>
           <div className="artwork-3d">
-            <ArtworkModelViewer tokenId={18883} noteString="The Date was launched." fov={30} />
+            <ArtworkModelViewer tokenId={ISODateToTokenId("2021-08-27")} noteString="The Loot was launched." fov={30} />
           </div>
         </div>
 

@@ -3,12 +3,8 @@ import { formatEtherscanLink, formatOpenSeaLink, parseBalance, shortenHex, toPri
 import { blockTimestampToUTC, ISODateToTokenId, SECONDS_IN_A_DAY, tokenIdToDateString, tokenIdToISODateString } from "@/utils/thedate";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
-import { NETWORK_CHAIN_ID } from "@/utils/connectors";
-import ArtworkSVG from "@/components/ArtworkSVG";
-import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import { useState, useRef, ReactElement } from "react";
 import { useAsync } from "react-use";
-import Link from "next/link";
 import moment from "moment";
 
 import { PROJECT_INFO } from "@/utils/constants";
@@ -109,7 +105,6 @@ export default function ClaimPage() {
             at {contractLinkToRead("claimingPrice")} Ξ0.01. 
           </p>
 
-
           <h3>Check availability</h3> 
           <p>
             Since <a target="_blank" rel="noreferrer" href="https://en.wikipedia.org/wiki/Unix_time">Unix Epoch</a>, 
@@ -150,7 +145,7 @@ export default function ClaimPage() {
                       <tr key={i}>
                         <td>
                           <a target="_blank" rel="noreferrer" href={formatOpenSeaLink("Asset", chainId, PROJECT_INFO.contract_address, x.tokenId)}>
-                          { `${tokenIdToISODateString(x.tokenId)} (Token #${x.tokenId})` }
+                            { `${tokenIdToISODateString(x.tokenId)} (Token #${x.tokenId})` }
                           </a>
                         </td>
                         <td>
