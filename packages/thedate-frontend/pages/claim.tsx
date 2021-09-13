@@ -69,7 +69,7 @@ export default function ClaimPage() {
 
     const aDate = moment(inputDateString, 'YYYY-MM-DD', true);
 
-    if (!inputDateString.match(/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/)) {
+    if (!inputDateString.match(/^\d{4}[\-]\d{2}[\-]\d{2}$/)) {
       hintRef.current = `The Date should be in format "yyyy-mm-dd", e.g. 2021-09-12`;
       return;
     } else if (!aDate.isValid()) {

@@ -7,7 +7,7 @@ export const PROJECT_INFO = {
   description: "The Date is an interactable on-chain metadata NFT project about time and meaning. ",
   website_url: "https://thedate.art",
   twitter_account: "thedate_nft",
-  twitter_url: "https://twitter.com/@thedate_nft",
+  twitter_url: "https://twitter.com/thedate_nft",
   discord_url: "https://discord.gg/CZQdyvuKwj",
   opensea_url: formatOpenSeaLink("Collection", NETWORK_CHAIN_ID, "the-date-project"),
   contract_address: getTheDateContractAddress(NETWORK_CHAIN_ID),

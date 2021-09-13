@@ -64,7 +64,7 @@ export default function FAQPage() {
             </p>
             <p>
               The Date is <span className="text-neutral-focus">purely on-chain metadata</span>. 
-              Images, apperances, and other functionality are intentionally omitted for others to interpret.
+              Images, appearances, and other functionality are intentionally omitted for others to interpret.
               Feel free to create something with The Date. 
               To inspire you, we build a <Link href={`/model/${ISODateToTokenId("2017-06-23")}`}><a target="_blank" rel="noreferrer">
               3D artwork</a></Link> based on the metadata. 
