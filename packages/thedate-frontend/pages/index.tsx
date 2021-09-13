@@ -25,22 +25,22 @@ export default function HomePage() {
             </SwiperSlide>
             <SwiperSlide>
               <figure className="swiper-slide">
+                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2021-08-27")} />
+              </figure>
+            </SwiperSlide>
+            <SwiperSlide>
+              <figure className="swiper-slide">
                 <ArtworkSVGOnChain tokenId={ISODateToTokenId("2013-12-06")} />
               </figure>
             </SwiperSlide>
             <SwiperSlide>
               <figure className="swiper-slide">
+                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2009-01-03")} />
+              </figure>
+            </SwiperSlide>
+            <SwiperSlide>
+              <figure className="swiper-slide">
                 <ArtworkSVGOnChain tokenId={ISODateToTokenId("2020-01-26")} />
-              </figure>
-            </SwiperSlide>
-            <SwiperSlide>
-              <figure className="swiper-slide">
-                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2015-07-30")} />
-              </figure>
-            </SwiperSlide>
-            <SwiperSlide>
-              <figure className="swiper-slide">
-                <ArtworkSVGOnChain tokenId={ISODateToTokenId("2017-06-23")} />
               </figure>
             </SwiperSlide>
           </Swiper>

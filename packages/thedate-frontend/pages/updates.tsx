@@ -23,12 +23,12 @@ export default function UpdatesPage() {
 
 
         <div className="content_item">
-          <h3>2021-09-12</h3>
+          <h3>2021-09-13</h3>
           <p>
             The Date was launched today.
           </p>
           <figure>
-            <ArtworkSVG dateString="2021-09-12" noteString="The Date was launched." />
+            <ArtworkSVG dateString="2021-09-13" noteString="The Date was launched." />
           </figure>
         </div>
 
