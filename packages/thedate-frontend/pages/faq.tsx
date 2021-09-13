@@ -39,7 +39,7 @@ export default function FAQPage() {
     <Layout>
       <div className="content">
         <figure>
-          <ArtworkSVG dateString="2021-09-12" noteString="The Date was launched." />
+          <ArtworkSVG dateString="2021-09-13" noteString="The Date was launched." />
         </figure>
 
         <h2>Frequently Asked Questions</h2>
@@ -157,7 +157,7 @@ export default function FAQPage() {
               3D artwork</a></Link> as an sample artwork.
           </p>
           <div className="artwork-3d">
-            <ArtworkModelViewer tokenId={0} noteString="Unix Epoch" fov={30} />
+            <ArtworkModelViewer tokenId={18882} noteString="The Date was launched." fov={30} />
           </div>
         </div>
 
