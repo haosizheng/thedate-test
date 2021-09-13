@@ -85,7 +85,10 @@ export default function ClaimPage() {
       hintRef.current = (<span className="text-xs">{`Checking if ${currentISODate} (Token #${tokenId}) is available...`}</span>);
       const available = await TheDate?.available(tokenId);
       if (available) {
-        hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId})`} is available. <br/>Copy the tokenId <span className="text-neutral-base">&quot;{`${tokenId}`}&quot;</span> and paste it in {contractLinkToWrite("claim(tokenId)")} function in the contract on Etherscan.</span>);
+        hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId})`} is available. <br/>
+          Copy the tokenId <span className="text-neutral-base">&quot;{`${tokenId}`}&quot;</span> and 
+          paste it in {contractLinkToWrite("claim(tokenId)")} function in the contract on EtherScan with 
+          claiming price Ξ0.01.</span>);
       } else {
         hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId}) is unavailable.`}</span>);
       }
@@ -99,6 +102,13 @@ export default function ClaimPage() {
       <div className="content">
         <div className="content_item">
          
+          <h3>Claim The Date</h3> 
+           <p>
+            You could claim The Date of past via 
+            calling {contractLinkToWrite("claim(tokenId)")} in the contract 
+            at {contractLinkToRead("claimingPrice")} Ξ0.01. 
+          </p>
+
 
           <h3>Check availability</h3> 
           <p>
@@ -107,7 +117,7 @@ export default function ClaimPage() {
             {currentAuctionTokenId !== undefined && 
               <>
               The earliest one was <b>{tokenIdToISODateString(0)}</b> (Token #0).
-              The latest one (Today) is <b>{tokenIdToISODateString(currentAuctionTokenId)}</b> (Token #{currentAuctionTokenId - 1}). 
+              The latest one (Today) is <b>{tokenIdToISODateString(currentAuctionTokenId)}</b> (Token #{currentAuctionTokenId}). 
               </>
             }
           </p>
@@ -121,17 +131,7 @@ export default function ClaimPage() {
             <br/>
             <span className="text-xs">{hintRef.current}</span>
           </p>
-          <h3>Claim The Date</h3> 
-           <p>
-            You could claim The Date of past via 
-            calling {contractLinkToWrite("claim(tokenId)")} in the contract 
-            at {contractLinkToRead("claimingPrice")} Ξ0.01. 
-          </p>
-
-          <p>
-            Also, you can <Link href="/auction"><a>auction</a></Link> The Date of today.
-            However, you cannot claim The Date of future.
-          </p>
+          
         </div>
 
         { claimingHistory.length > 0 && (
