@@ -9,16 +9,16 @@ const SECONDS_IN_A_DAY = 86400;
 const reservedDateList = [
   //https://emojicombos.com/9%2F11
   {date:"2021-08-27", note:"Loot was launched."}, 
-  {date:"2001-09-11", note:"9️⃣1️⃣1️⃣     🛫✈️🛩🏢🏢😨😱😱‼️💥💥🔥"}, 
+  {date:"2001-09-11", note:"9️⃣1️⃣1️⃣  🛫✈️🛩🏢🏢😨😱😱❗❗💥💥🔥"}, 
   {date:"2015-07-30",note:"Ethereum 1.0 Released"}, 
   {date:"2007-06-29",note:"The first iPhone was released 📱"}, 
   {date:"2017-06-23",note:"CryptoPunks released"}, 
   {date:"2011-10-05",note:"RIP Steve Jobs"}, 
   {date:"2020-01-26",note:"RIP Kobe Bryant (1978-2020)"}, 
-  {date:"2009-01-03",note:"Genesis Block of Bitcoin"}, 
+  {date:"2009-01-03",note:"The Genesis Block of Bitcoin was mined."}, 
   {date:"2013-06-06",note:"Snowden Reveals Secrets"}, 
   {date:"2013-12-06",note:"#Dogecoin 💎🙌 #ToTheMoon 🚀🚀🚀🚀🌕"}, 
-  {date:"2010-05-22",note:"₿🛒🍕"},
+  {date:"2010-05-22",note:"Bitcoin Pizza ₿🛒🍕"},
 ];
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
