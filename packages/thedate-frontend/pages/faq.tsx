@@ -59,7 +59,7 @@ export default function FAQPage() {
             </p>
             <p>
               The Date is <span className="text-neutral-focus">user-interactable</span>. 
-              The owner can interact with The Date by engraving or erasing a note attached as an additional metadata.
+              The owner can interact with The Date by engraving or erasing a note attached as additional metadata.
               As an interactable on-chain pure metadata NFT, it&apos;s the first of its kind. 
             </p>
             <p>
