@@ -40,7 +40,7 @@ export default function HomePage() {
             }
           </Swiper>
 
-          <div className="flex flex-row justify-center gap-10 text-lg">
+          <div className="flex flex-row justify-center gap-4 sm:gap-10 text-sm sm:text-lg">
             <Link href="/claim"><a className="hover:underline">Claim the Date of Past</a></Link>
             <Link href="/auction"><a className="hover:underline">Auction the Date of Today</a></Link>
           </div> 
