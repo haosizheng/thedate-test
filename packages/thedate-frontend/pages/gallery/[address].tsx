@@ -11,7 +11,7 @@ export default function GalleryPage() {
   if (!address) {
     return (
       <Layout>
-        <div className="hero">Error - Wrong Address</div>
+        <div className="content">Error - Wrong Address</div>
       </Layout>
     );
   }

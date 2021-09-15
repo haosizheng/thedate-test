@@ -7,6 +7,7 @@ import { ethers } from "ethers";
 import Link from "next/link";
 import { useState } from "react";
 import { useAsync } from "react-use";
+import ArtworkSVGOnChain from "./ArtworkSVGOnChain";
 
 export default function Gallery({ owner }: { owner?: string }) {
   const { library, chainId, account, active } = useActiveWeb3React();
@@ -60,33 +61,17 @@ export default function Gallery({ owner }: { owner?: string }) {
           :
           <p className="">No artworks exist</p>
         ) :
-        <table className="mx-auto"> 
-          <tbody>
+        <div className="mx-auto flex gap-4 flex-wrap"> 
               {tokenIdList.map(tokenId => (
-                <tr key={tokenId}>
-                  <td>
+                <div key={tokenId} className="w-80 h-80">
                   <Link href={`/artwork/${tokenId}`}>
-                    <a className="hover:underline">#{tokenId}</a>
+                  <a><figure><ArtworkSVGOnChain tokenId={tokenId} />
+                  </figure>
+                  </a>
                   </Link>
-                  </td>
-                  <td className="pl-10">
-                  <Link href={`/artwork/${tokenId}`}>
-                    <a className="hover:underline">{tokenIdToISODateString(tokenId)}</a>
-                  </Link>
-                  </td>
-                  
-                {/* <div key={tokenId} className="flex flex-col items-center">
-                  <div className="flex-none w-96 h-96" key={tokenId}>
-                    <ArtworkImageViewer tokenId={tokenId} />
-                  </div>
-                  <div className="flex-grow">
-                    <ArtworkCatalogue tokenId={tokenId} />
-                  </div>
-                 */}
-                </tr>
+                </div>
               ))}          
-          </tbody>
-         </table>
+         </div>
          }
        </div>
     </div>
