@@ -75,7 +75,7 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
             <p>
               {noteString.length == 0 && (
                   <>
-                    Note to engrave on The Date: 
+                    Input a note to engrave on The Date: 
                     <br/>
                     <input ref={noteInputBox} type="text" maxLength={100} 
                       className="user-input w-96 sm:w-120" placeholder="(printable characters at max 100 bytes)" 

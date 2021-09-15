@@ -26,6 +26,8 @@ export default function ClaimPage() {
   const TheDate = useTheDateContract();
   const Loot = useLootContract();
 
+  const [ isLootUser, setIsLootUser ] = useState<boolean | undefined>(undefined);
+
   const [ currentAuctionTokenId, setCurrentAuctionTokenId ] = useState<number | undefined>(undefined);
   const [ totalSupply, setTotalSupply ] = useState<number | undefined>(undefined);
   const [ claimingHistory, setClaimingHistory ] = useState<ClaimHistoryItem[]>([]);
@@ -60,6 +62,14 @@ export default function ClaimPage() {
 
   }, [TheDate]);
 
+  useAsync(async() => {
+    if (account === undefined || account === null || !Loot)  {
+      return; 
+    }
+    
+    setIsLootUser((await Loot.balanceOf(account)).gt(0));
+  }, [account, Loot]);
+
   useAsync(async () => {
     if (inputDateString === undefined || !TheDate || !currentAuctionTokenId) {
       return;
@@ -85,14 +95,14 @@ export default function ClaimPage() {
       
       hintRef.current = (<span className="text-xs">{`Checking if ${currentISODate} (Token #${tokenId}) is available...`}</span>);
       const available = await TheDate?.available(tokenId);
+      const claimingPrice = await TheDate?.claimingPrice();
       if (available) {
         hintRef.current = (<><span className="text-xs">{`${currentISODate} (Token #${tokenId})`} is available. </span><br/><br/>
           { account ?
           <span><button className="text-neutral-focus hover:underline" onClick={async () => {
             await TheDate?.claim(tokenId, {value: 
-              ((await Loot?.balanceOf(account) || ethers.constants.Zero).gt(0) ) ? ethers.constants.Zero :
-              await TheDate?.claimingPrice() });
-          }}>Click here to claim {`${currentISODate} (Token #${tokenId})`}</button></span>
+              isLootUser ? ethers.constants.Zero : claimingPrice });
+          }}>Click here to claim {`${currentISODate} (Token #${tokenId})`} {isLootUser ? " at Ξ0.00 because you are Loot owner." : " at Ξ0.01" }  </button></span>
           : <span className="wallet"><button onClick={() => { activate(injected) }} >
           Connect your Metamask
         </button> before claiming. </span>}</>);
