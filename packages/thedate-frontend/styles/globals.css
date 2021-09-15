@@ -126,7 +126,7 @@ a {
 }
 
 button {
-  @apply text-neutral-base;
+  @apply text-neutral-focus;
   @apply focus:outline-none;
   @apply hover:underline;
 }

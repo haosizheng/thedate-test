@@ -2,11 +2,12 @@ import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import { shortenHex } from "@/utils/ethers";
-import { tokenIdToISODateString } from "@/utils/thedate";
+import { tokenIdToISODateString, ISODateToTokenId} from "@/utils/thedate";
 import Link from "next/link";
 import { useRef } from "react";
 import { injected, NETWORK_CHAIN_ID } from "@/utils/connectors";
 import { useWeb3React } from '@web3-react/core';
+import ArtworkModelViewer from '@/components/ArtworkModelViewer';
 
 export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
   const {account, activate} = useWeb3React();
@@ -57,9 +58,9 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
             Note: {noteString.length > 0 ? <span className="text-neutral-focus">{noteString}</span> : "(unengraved)"}
           </p>
           { editable && <>
-          <h3>
+          <h3 className="pt-10">
               Interact with The Date: 
-            </h3>
+          </h3>
           {account === undefined ?
             <p>
               <span className="wallet"><button onClick={() => { activate(injected) }} >
@@ -94,6 +95,19 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
             </p>
           }
           </> }
+          <h3 className="pt-10">
+            Artworks based on The Date metadata
+          </h3>
+          <div className="artwork-3d">
+          <ArtworkModelViewer tokenId={tokenId} noteString={noteString} fov={30} />
+          </div>
+          <p>
+            <Link href={`/model/${tokenId}`}>
+            <a>
+              Click here to open the 3D Model. 
+            </a>
+            </Link>
+          </p>
         </div>
     ))
     } </>
