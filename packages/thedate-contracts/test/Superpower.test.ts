@@ -7,6 +7,7 @@ import { Foundation, Foundation__factory,
   Superpower, Superpower__factory } from "../typechain";
 import type { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { BigNumber } from "@ethersproject/bignumber";
+import fs from "fs";
 
 type Address = string;
 const expect = chai.expect;
@@ -45,7 +46,7 @@ context("Superpower contract", () => {
       await expect(mainContract.setRoyaltyBps(50000))
         .to.be.revertedWith("royaltyBps should be within [0, 10000]");
       await expect(mainContract.connect(user1).setRoyaltyBps(500))
-        .to.be.revertedWith(`AccessControl: account ${user1.address.toLowerCase()} is missing role ${await mainContract.DEFAULT_ADMIN_ROLE()}`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
     });
       
     it("Royalty splits correctly", async () => {
@@ -85,23 +86,38 @@ context("Superpower contract", () => {
     });
 
     it("setTokenDescription", async () => {
-      expect(await mainContract.tokenDescription()).to.eq("The Superpower is a metadata-based NFT art experiment. " +
-        "Feel free to use the Superpower in any way you want.");
+      // expect(await mainContract.tokenDescription()).to.eq("The Superpower is a metadata-based NFT art experiment. " +
+      //   "Feel free to use the Superpower in any way you want.");
       
       await mainContract.connect(deployer).setTokenDescription("I love Superpower!");
       await expect(mainContract.connect(user1).setTokenDescription("I love Superpower!!"))
-        .to.be.revertedWith(`AccessControl: account`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
       expect(await mainContract.tokenDescription()).to.eq("I love Superpower!");
     });
 
     it("setSVGImageTemplate", async () => {
       // No permission
       await expect(mainContract.connect(user1).setSVGImageTemplate(["<svg></svg>"]))
-        .to.be.revertedWith(`AccessControl: account`);
+        .to.be.revertedWith("Ownable: caller is not the owner");
       
       // Set 
       await mainContract.connect(deployer).setSVGImageTemplate(["<svg></svg>"]);
       expect(await mainContract.generateSVGImage(1)).to.eq("<svg></svg>");
+    });
+  });
+
+  describe("Stats", async () => {
+    it.only("Stat", async () => {
+
+      for (let i = 1; i <= 11111; i++) {
+        const superpowerSet = await mainContract.getSuperpowerSet(i + 1);
+        const svgImage = await mainContract.generateSVGImage(i + 1);
+        console.log(superpowerSet);
+        console.log(svgImage);
+        console.log(JSON.stringify(superpowerSet));
+        fs.writeFileSync(`/tmp/superpower/${i}.json`, JSON.stringify(superpowerSet), {flag: 'w'});
+        fs.writeFileSync(`/tmp/superpower/${i}.svg`, svgImage, {flag: 'w'});
+      }
     });
   });
 
@@ -111,6 +127,7 @@ context("Superpower contract", () => {
         expect(await mainContract.getCurrentClaimingPrice()).to.eq(BigNumber.from(0));
         await expect(mainContract.connect(user1).claim({value: await mainContract.getCurrentClaimingPrice()}))
           .to.emit(mainContract, "Transfer").withArgs(ethers.constants.AddressZero, user1.address, i + 1)
+        console.log(await mainContract.getSuperpowerSet(i + 1));
       }
     });
   });

@@ -2,7 +2,7 @@
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import { shortenHex } from "@/utils/ethers";
-import { tokenIdToDateString } from "@/utils/thedate";
+import { tokenIdToDateString, tokenIdToISODateString } from "@/utils/thedate";
 import { ethers } from "ethers";
 import Link from "next/link";
 import { useState } from "react";
@@ -11,7 +11,7 @@ import { useAsync } from "react-use";
 export default function Gallery({ owner }: { owner?: string }) {
   const { library, chainId, account, active } = useActiveWeb3React();
   const TheDate = useTheDateContract();
-  const [tokenIdList, setTokenIdList] = useState<number[]>([]);
+  const [tokenIdList, setTokenIdList] = useState<number[] | undefined>(undefined);
 
   const range = (start: number, end: number, length = end - start) => Array.from({ length }, (_, i) => start + i);
 
@@ -41,8 +41,8 @@ export default function Gallery({ owner }: { owner?: string }) {
 
   return (
     <>
-    <div className="hero">
-      <div className="hero-content">
+    <div className="content">
+      <div className="text-center">
         { owner ? 
           <p>Owned by {shortenHex(owner)}:</p>
           :
@@ -50,27 +50,28 @@ export default function Gallery({ owner }: { owner?: string }) {
         }
       </div>
     </div>
-    <div className="hero pt-20">
-      <div className="hero-content">
-        { tokenIdList.length == 0 ? 
-            (owner ? 
-              <p className="text-xs">No artworks owned by {shortenHex(owner)} </p>
-              :
-              <p className="text-xs">No artworks exist </p>
-            )
-        : 
-        <table> 
+    <div className="content">
+      <div className="text-center">
+        { tokenIdList === undefined ? 
+           <p className="">Loading...</p>
+        : tokenIdList.length === 0 ?
+        (owner ? 
+          <p className="">No artworks owned by {shortenHex(owner)} </p>
+          :
+          <p className="">No artworks exist</p>
+        ) :
+        <table className="mx-auto"> 
           <tbody>
               {tokenIdList.map(tokenId => (
                 <tr key={tokenId}>
                   <td>
                   <Link href={`/artwork/${tokenId}`}>
-                    <a className="hover:link">#{tokenId}</a>
+                    <a className="hover:underline">#{tokenId}</a>
                   </Link>
                   </td>
                   <td className="pl-10">
                   <Link href={`/artwork/${tokenId}`}>
-                    <a className="hover:link">{tokenIdToDateString(tokenId)}</a>
+                    <a className="hover:underline">{tokenIdToISODateString(tokenId)}</a>
                   </Link>
                   </td>
                   

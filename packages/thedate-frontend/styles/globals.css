@@ -110,3 +110,20 @@ p a {
   @apply text-neutral-focus;
   @apply hover:underline;
 }
+
+content a {
+  @apply text-neutral-focus;
+  @apply hover:underline;
+}
+
+button {
+  @apply focus:outline-none;
+}
+
+a {
+  @apply focus:outline-none;
+}
+.wallet button {
+  @apply text-neutral-focus;
+  @apply hover:underline;
+}

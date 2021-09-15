@@ -14,25 +14,27 @@ export default function Wallet() {
   }
 
   return (
-      <div id="#wallet">
-        {active ? (
+      <div className="wallet">
+        {active && account ? (
           !!chainId && chainId == NETWORK_CHAIN_ID ? 
-            <div>
+            <p>
               Connected as {" "}
+              <Link href={`/gallery/${account}`} >
                 <a className="hover:link">
                   {ensName || `${shortenHex(account, 4)}`}
                 </a>
-            </div>
+              </Link>
+            </p>
           :
-            <div className="text-xs">Please switch your Metamask network to {NETWORK_NAMES[Number(process.env.NETWORK_CHAIN_ID || "1")]}!
-            </div>
+            <p className="">Please switch your Metamask network to {NETWORK_NAMES[Number(process.env.NETWORK_CHAIN_ID || "1")]}!
+            </p>
         ) : (
-          <div>
+          <p>
             Connect via {" "}
-            <button type="button" className="link" onClick={() => { activate(injected) }} >
+            <button onClick={() => { activate(injected) }} >
               Metamask
             </button>
-          </div>
+          </p>
         )}
       </div> 
   )

@@ -6,11 +6,13 @@ import { blockTimestampToUTC, SECONDS_IN_A_DAY, tokenIdToDateString, tokenIdToIS
 import { BigNumber } from "@ethersproject/bignumber";
 import { formatEther } from "@ethersproject/units";
 import { ethers } from "ethers";
-import { useRef, useState } from 'react';
+import { useRef, useState, ReactElement } from 'react';
 import Countdown from "react-countdown";
 import { useAsync } from "react-use";
 import { PROJECT_INFO } from "@/utils/constants";
 import Layout from "@/components/Layout";
+import { useWeb3React } from '@web3-react/core';
+import { injected, NETWORK_CHAIN_ID } from "@/utils/connectors";
 
 interface BidHistoryItem {
   tokenId: number;
@@ -22,7 +24,8 @@ interface BidHistoryItem {
 }
 
 export default function AuctionPage() {
-  const { library, chainId, account, active, error} = useActiveWeb3React();
+  const {account, activate} = useWeb3React();
+  const { library, chainId, error} = useActiveWeb3React();
   const TheDate = useTheDateContract();  
   const [ tokenId, setTokenId ] = useState<number | undefined>(undefined);
   const [ exists, setExists ] = useState<boolean | undefined>(undefined);
@@ -33,6 +36,8 @@ export default function AuctionPage() {
   const [ minBidIncrementBps, setMinBidIncrementBps] = useState<BigNumber | undefined>(undefined);
   const [ bidHistory, setBidHistory ] = useState<BidHistoryItem[]>([]);
   const [ auctionHistory, setAuctionHistory ] = useState<BidHistoryItem[]>([]);
+  const [inputPriceString, setInputPriceString] = useState<string | undefined>("");
+  const hintRef = useRef<ReactElement>(<></>);
 
   useAsync(async () => {
     if (!library || !TheDate) {
@@ -83,12 +88,35 @@ export default function AuctionPage() {
     }
   }, [library, TheDate]);
 
-  const errorMessageRef = useRef<HTMLDivElement>(null!);
-  const bidPriceRef = useRef<HTMLInputElement>(null!);
+  useAsync(async () => {
+    if (inputPriceString === undefined || tokenId === undefined || !TheDate || !minBidPrice) {
+      return;
+    }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  }
+    if (inputPriceString === "") {
+      hintRef.current = <></>;
+    }
+
+    if (!inputPriceString.match(/^\d+(\.\d+)?$/) || isNaN(Number.parseFloat(inputPriceString))) {
+      hintRef.current = (<span className="text-xs">The price should be a number.</span>);
+      return;
+    } else if (ethers.utils.parseEther(inputPriceString).lt(minBidPrice)) {
+      hintRef.current = (<span className="text-xs">The price should be a number more than {parseBalance
+        (minBidPrice)}</span>);
+      return;
+    }
+
+  hintRef.current = (<>
+      { account ? <>
+      <br/>
+      <button className="text-neutral-focus hover:underline" onClick={async() => {
+        TheDate?.placeBid({value: !!inputPriceString ? ethers.utils.parseEther(inputPriceString) : minBidPrice })
+      }}>Click here to place your bid for {`${tokenIdToISODateString(tokenId)} (Token #${tokenId})`}</button></>
+      : <span className="wallet">Connect your <button onClick={() => { activate(injected) }} >
+      Metamask
+    </button> before claiming. </span>}</>);
+
+  }, [TheDate, inputPriceString, minBidPrice, tokenId]);
 
   return (<Layout>
     {
@@ -120,6 +148,7 @@ export default function AuctionPage() {
             </span>. The winner will own The Date of Today.
           </p>
           
+          <h3>Place your bid</h3>
           <p>
               { bidHistory.length == 0 ?
                <> No bid is placed yet. 
@@ -131,7 +160,13 @@ export default function AuctionPage() {
                 </>
               }
               <br/>
-              Place your bid via calling <a target="_blank" rel="noreferrer" href={`${PROJECT_INFO.etherscan_url}#writeContract`}><i>placeBid()</i></a> function in the contract.
+              <label>Your bidding price: Ξ </label>
+              <input autoFocus className="bg-neutral w-32 border-b placeholder-neutral-content border-neutral-content apperance-none focus:outline-none text-neutral-base" 
+                placeholder={!!minBidPrice ? parseBalance(minBidPrice) : ""} type="text"
+                onChange={(event) => { setInputPriceString(event.target.value); }}
+                />
+              <br/>
+              {hintRef.current}
           </p>
         </div>
         

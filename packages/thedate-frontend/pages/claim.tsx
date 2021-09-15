@@ -6,8 +6,10 @@ import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import { useState, useRef, ReactElement } from "react";
 import { useAsync } from "react-use";
 import moment from "moment";
-
+import { injected, NETWORK_CHAIN_ID } from "@/utils/connectors";
+import { useWeb3React } from '@web3-react/core';
 import { PROJECT_INFO } from "@/utils/constants";
+import { ethers } from "ethers";
 
 interface ClaimHistoryItem {
   tokenId: number;
@@ -18,6 +20,7 @@ interface ClaimHistoryItem {
 }
 
 export default function ClaimPage() {
+  const {account, activate} = useWeb3React();
   const {chainId} = useActiveWeb3React();
   const TheDate = useTheDateContract();
   const [ currentAuctionTokenId, setCurrentAuctionTokenId ] = useState<number | undefined>(undefined);
@@ -41,16 +44,16 @@ export default function ClaimPage() {
     setCurrentAuctionTokenId((await TheDate?.getCurrentAuctionTokenId()).toNumber());
     setTotalSupply((await TheDate?.totalSupply()).toNumber());
 
-    const claimingFilter = TheDate.filters.ArtworkClaimed(null, null);
-    const claimingHistory_ = await Promise.all((await TheDate.queryFilter(claimingFilter)).map(async (x) => ({
-      tokenId: x.args.tokenId.toNumber(),
-      owner: x.args.owner,
-      transactionHash: x.transactionHash,
-      blockNumber: x.blockNumber,
-      timestamp: (await x.getBlock()).timestamp
-    })));
-    claimingHistory_.sort((a, b) => (b.blockNumber - a.blockNumber));
-    setClaimingHistory(claimingHistory_);
+    // const claimingFilter = TheDate.filters.ArtworkClaimed(null, null);
+    // const claimingHistory_ = await Promise.all((await TheDate.queryFilter(claimingFilter)).map(async (x) => ({
+    //   tokenId: x.args.tokenId.toNumber(),
+    //   owner: x.args.owner,
+    //   transactionHash: x.transactionHash,
+    //   blockNumber: x.blockNumber,
+    //   timestamp: (await x.getBlock()).timestamp
+    // })));
+    // claimingHistory_.sort((a, b) => (b.blockNumber - a.blockNumber));
+    // setClaimingHistory(claimingHistory_);
 
   }, [TheDate]);
 
@@ -72,19 +75,22 @@ export default function ClaimPage() {
       hintRef.current = (<span className="text-xs">Invalid date</span>);
       return;
     }
-
+    
     const tokenId = ISODateToTokenId(inputDateString);
     if (0 <= tokenId && tokenId < currentAuctionTokenId) {
-      let currentDate = new Date(inputDateString);
-      let currentISODate = currentDate.toISOString().slice(0, 10);
-
+      let currentISODate = tokenIdToISODateString(tokenId);
+      
       hintRef.current = (<span className="text-xs">{`Checking if ${currentISODate} (Token #${tokenId}) is available...`}</span>);
       const available = await TheDate?.available(tokenId);
       if (available) {
-        hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId})`} is available. <br/>
-          Copy the tokenId <span className="text-neutral-base">&quot;{`${tokenId}`}&quot;</span> and 
-          paste it in {contractLinkToWrite("claim(tokenId)")} function in the contract on EtherScan with 
-          claiming price Ξ0.01.</span>);
+        hintRef.current = (<><span className="text-xs">{`${currentISODate} (Token #${tokenId})`} is available. </span><br/><br/>
+          { account ?
+          <span><button className="text-neutral-focus hover:underline" onClick={async () => {
+            await TheDate?.claim(tokenId, {value: await TheDate?.claimingPrice()});
+          }}>Click here to claim {`${currentISODate} (Token #${tokenId})`}</button></span>
+          : <span className="wallet">Connect your <button onClick={() => { activate(injected) }} >
+          Metamask
+        </button> before claiming. </span>}</>);
       } else {
         hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId}) is unavailable.`}</span>);
       }
@@ -102,7 +108,7 @@ export default function ClaimPage() {
            <p>
             You could claim The Date of past via 
             calling {contractLinkToWrite("claim(tokenId)")} in the contract 
-            at {contractLinkToRead("claimingPrice")} Ξ0.01. 
+            at {contractLinkToRead("claimingPrice")} Ξ0.01. Loot holders are free to claim.
           </p>
 
           <h3>Check availability</h3> 
@@ -124,7 +130,7 @@ export default function ClaimPage() {
               onChange={(event) => { setInputDateString(event.target.value); }}
               />
             <br/>
-            <span className="text-xs">{hintRef.current}</span>
+            <span>{hintRef.current}</span>
           </p>
           
         </div>

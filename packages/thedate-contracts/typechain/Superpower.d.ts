@@ -38,6 +38,7 @@ interface SuperpowerInterface extends ethers.utils.Interface {
     "getOrganicMimicry(uint256)": FunctionFragment;
     "getPersonalPhysicalPower(uint256)": FunctionFragment;
     "getRealityManipulation(uint256)": FunctionFragment;
+    "getSuperpowerSet(uint256)": FunctionFragment;
     "getTravel(uint256)": FunctionFragment;
     "getVision(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
@@ -120,6 +121,10 @@ interface SuperpowerInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getRealityManipulation",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getSuperpowerSet",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -263,6 +268,10 @@ interface SuperpowerInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getRealityManipulation",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getSuperpowerSet",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getTravel", data: BytesLike): Result;
@@ -417,7 +426,7 @@ export class Superpower extends BaseContract {
     generateSVGImage(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<[string] & { output: string }>;
 
     getAdaptation(
       tokenId: BigNumberish,
@@ -465,6 +474,39 @@ export class Superpower extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    getSuperpowerSet(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string
+        ]
+      ] & {
+        output: [
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string,
+          string
+        ];
+      }
+    >;
 
     getTravel(
       tokenId: BigNumberish,
@@ -657,6 +699,24 @@ export class Superpower extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getSuperpowerSet(
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string
+    ]
+  >;
+
   getTravel(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   getVision(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
@@ -833,6 +893,24 @@ export class Superpower extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getSuperpowerSet(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string
+      ]
+    >;
 
     getTravel(
       tokenId: BigNumberish,
@@ -1055,6 +1133,11 @@ export class Superpower extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getSuperpowerSet(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getTravel(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1246,6 +1329,11 @@ export class Superpower extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getRealityManipulation(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getSuperpowerSet(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

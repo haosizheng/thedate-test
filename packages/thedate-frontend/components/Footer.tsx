@@ -6,6 +6,9 @@ export default function Footer() {
   return (
     <div className="footer">
       <div className="footer__row">
+        <Wallet/>
+      </div>    
+      <div className="footer__row">
         <Link href="/faq"><a>FAQ</a></Link>
         <Link href="/claim"><a>Claim</a></Link>
         <Link href="/auction"><a>Auction</a></Link>
