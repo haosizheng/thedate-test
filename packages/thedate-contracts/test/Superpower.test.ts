@@ -40,7 +40,7 @@ context("Superpower contract", () => {
       .deploy(foundationContract.address)).deployed();
   });
 
-  describe("Royalty", async () => {
+  describe.only("Royalty", async () => {
     it("Get/Set Royalty Bps", async () => {
       expect(await mainContract.royaltyBps()).to.eq(1000);
       await expect(mainContract.setRoyaltyBps(50000))
@@ -107,7 +107,7 @@ context("Superpower contract", () => {
   });
 
   describe("Stats", async () => {
-    it.only("Stat", async () => {
+    it("Stat", async () => {
 
       for (let i = 1; i <= 11111; i++) {
         const superpowerSet = await mainContract.getSuperpowerSet(i + 1);

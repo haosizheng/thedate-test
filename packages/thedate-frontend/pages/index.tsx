@@ -30,10 +30,11 @@ export default function HomePage() {
               displayTokenDates.map((tokenDate) => 
                 <SwiperSlide key={tokenDate}>
                   <figure className="swiper-slide">
-                    <a target="_blank" rel="noreferrer" href={formatOpenSeaLink("Asset", chainId, 
-                      PROJECT_INFO.contract_address, ISODateToTokenId(tokenDate))}>
-                      <ArtworkSVGOnChain tokenId={ISODateToTokenId(tokenDate)} />
-                    </a>
+                    <Link href={`/artwork/${ISODateToTokenId(tokenDate)}`}>
+                      <a>
+                        <ArtworkSVGOnChain tokenId={ISODateToTokenId(tokenDate)} />
+                      </a>
+                    </Link>
                   </figure>
                 </SwiperSlide>
                 )

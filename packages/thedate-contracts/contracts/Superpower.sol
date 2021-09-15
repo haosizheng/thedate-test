@@ -351,6 +351,34 @@ contract Superpower is ERC721Enumerable, Ownable, IERC2981, ReentrancyGuard {
         return uint256(keccak256(abi.encodePacked(input)));
     }
     
+    function distribution(uint256 tokenId) internal pure returns (uint256) {
+        uint256 rand = random(string(abi.encodePacked("distribution", Strings.toString(tokenId))));
+        uint256 rarity = (rand % 11111);
+        if (rarity < 10) {
+            return 0;
+        } else if (rarity < 2000) {
+            return 1;
+        } else if (rarity < 3000) {
+            return 2;
+        } else if (rarity < 4000) {
+            return 3;
+        } else if (rarity < 5000) {
+            return 4;
+        } else if (rarity < 6000) {
+            return 5;
+        } else if (rarity < 7000) {
+            return 6;
+        } else if (rarity < 8000) {
+            return 7;
+        } else if (rarity < 9000) {
+            return 8;
+        } else if (rarity < 11000) {
+            return 9;
+        } else if (rarity < 11100) {
+            return 10;
+        }
+    }
+
     function pluck(uint256 tokenId, string memory keyPrefix, string[] memory sourceArray, uint256 thresholdBps) internal pure returns (string memory) {
         uint256 rand = random(string(abi.encodePacked(keyPrefix, Strings.toString(tokenId))));
         string memory output = "";

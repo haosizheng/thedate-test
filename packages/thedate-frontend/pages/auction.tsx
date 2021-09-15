@@ -97,24 +97,21 @@ export default function AuctionPage() {
       hintRef.current = <></>;
     }
 
-    if (!inputPriceString.match(/^\d+(\.\d+)?$/) || isNaN(Number.parseFloat(inputPriceString))) {
-      hintRef.current = (<span className="text-xs">The price should be a number.</span>);
-      return;
-    } else if (ethers.utils.parseEther(inputPriceString).lt(minBidPrice)) {
+    if (!inputPriceString.match(/^\d+(\.\d+)?$/) || isNaN(Number.parseFloat(inputPriceString)) || ethers.utils.parseEther(inputPriceString).lt(minBidPrice)) {
       hintRef.current = (<span className="text-xs">The price should be a number more than {parseBalance
         (minBidPrice)}</span>);
-      return;
-    }
-
-  hintRef.current = (<>
+          return;
+    } 
+    
+    hintRef.current = (<>
       { account ? <>
       <br/>
       <button className="text-neutral-focus hover:underline" onClick={async() => {
         TheDate?.placeBid({value: !!inputPriceString ? ethers.utils.parseEther(inputPriceString) : minBidPrice })
       }}>Click here to place your bid for {`${tokenIdToISODateString(tokenId)} (Token #${tokenId})`}</button></>
-      : <span className="wallet">Connect your <button onClick={() => { activate(injected) }} >
-      Metamask
-    </button> before claiming. </span>}</>);
+      : <span className="wallet"><br/><button onClick={() => { activate(injected) }} >
+      Connect your Metamask
+    </button> before bidding. </span>}</>);
 
   }, [TheDate, inputPriceString, minBidPrice, tokenId]);
 
@@ -161,7 +158,7 @@ export default function AuctionPage() {
               }
               <br/>
               <label>Your bidding price: Ξ </label>
-              <input autoFocus className="bg-neutral w-32 border-b placeholder-neutral-content border-neutral-content apperance-none focus:outline-none text-neutral-base" 
+              <input autoFocus className="user-input w-32" 
                 placeholder={!!minBidPrice ? parseBalance(minBidPrice) : ""} type="text"
                 onChange={(event) => { setInputPriceString(event.target.value); }}
                 />

@@ -15,6 +15,10 @@ module.exports = {
       "neutral-focus": "#cbcbcb",
     },
     extend: {
+      width: {
+        '120': '30rem',
+        '160': '40rem',
+      },
       height: {
         '120': '30rem',
         '160': '40rem',

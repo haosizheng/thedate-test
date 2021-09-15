@@ -40,8 +40,8 @@ export default function FAQPage() {
       <div className="content">
         <figure>
           <ArtworkSVG dateString="2021-09-13" noteString="The Date was launched." />
-        </figure>
-
+      </figure>
+                
         <h2>Frequently Asked Questions</h2>
         <div className="content_item">
           <h3>What’s The Date?</h3>

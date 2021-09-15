@@ -4,7 +4,7 @@ import { formatEtherscanLink, formatOpenSeaLink } from "@/utils/ethers";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import ArtworkSVGOnChain from "@/components/ArtworkSVGOnChain";
-import { tokenIdToISODateString, jsDateToDate } from "@/utils/thedate";
+import { tokenIdToISODateString, jsDateToDate, ISODateToTokenId } from "@/utils/thedate";
 import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import { useState } from "react";
 import { useAsync } from "react-use";
@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import ArtworkCatalogue from "@/components/ArtworkCatalogue";
 import ArtworkHistory from "@/components/ArtworkHistory";
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
+import { PROJECT_INFO } from "@/utils/constants";
 
 export default function ArtworkPage() {
   const router = useRouter();
@@ -46,12 +47,15 @@ export default function ArtworkPage() {
       <Layout>
         <div className="content">
           <figure>
-            <ArtworkSVGOnChain tokenId={tokenId} />
+            <a target="_blank" rel="noreferrer" href={formatOpenSeaLink("Asset", chainId, 
+                        PROJECT_INFO.contract_address, tokenId)}>
+              <ArtworkSVGOnChain tokenId={tokenId} />
+            </a>
           </figure>
-          {/* <div className="content-item">
+          <div className="content-item text-left max-w-md mx-auto">
             <ArtworkCatalogue tokenId={tokenId} editable />
           </div>
-          <div className="content-item">
+          {/* <div className="content-item">
             <ArtworkHistory tokenId={tokenId} />
           </div> */}
         </div>

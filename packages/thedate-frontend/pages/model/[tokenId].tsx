@@ -28,13 +28,13 @@ export default function ArtworkRenderingPage() {
   if (tokenId === undefined || exists === undefined ) {
     return (
       <Layout>
-        <div className="static absolute inset-0 bg-neutral font-mono text-sm text-center">Loading...</div>
+        <div className="static absolute inset-0 bg-neutral font-mono text-center">Loading...</div>
       </Layout>
     );
   } else if (!exists) {
     return (
       <Layout>
-        <div className="static absolute inset-0 bg-neutral font-mono text-sm text-center">Error - Token ID does not exist.</div>
+        <div className="static absolute inset-0 bg-neutral font-mono text-center">Error - Token ID does not exist.</div>
       </Layout>
     )
   } else {

@@ -116,14 +116,17 @@ content a {
   @apply hover:underline;
 }
 
-button {
-  @apply focus:outline-none;
+.user-input {
+  @apply bg-neutral border-b placeholder-neutral-content;
+  @apply border-neutral-content focus:outline-none text-neutral-base;
 }
 
 a {
   @apply focus:outline-none;
 }
-.wallet button {
-  @apply text-neutral-focus;
+
+button {
+  @apply text-neutral-base;
+  @apply focus:outline-none;
   @apply hover:underline;
 }

@@ -2,6 +2,7 @@ import Layout from "@/components/Layout";
 import { formatEtherscanLink, formatOpenSeaLink, parseBalance, shortenHex, toPriceFormat } from '@/utils/ethers';
 import { blockTimestampToUTC, ISODateToTokenId, SECONDS_IN_A_DAY, tokenIdToDateString, tokenIdToISODateString } from "@/utils/thedate";
 import useTheDateContract from "@/hooks/useTheDateContract";
+import useLootContract from "@/hooks/useLootContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import { useState, useRef, ReactElement } from "react";
 import { useAsync } from "react-use";
@@ -23,6 +24,8 @@ export default function ClaimPage() {
   const {account, activate} = useWeb3React();
   const {chainId} = useActiveWeb3React();
   const TheDate = useTheDateContract();
+  const Loot = useLootContract();
+
   const [ currentAuctionTokenId, setCurrentAuctionTokenId ] = useState<number | undefined>(undefined);
   const [ totalSupply, setTotalSupply ] = useState<number | undefined>(undefined);
   const [ claimingHistory, setClaimingHistory ] = useState<ClaimHistoryItem[]>([]);
@@ -86,10 +89,12 @@ export default function ClaimPage() {
         hintRef.current = (<><span className="text-xs">{`${currentISODate} (Token #${tokenId})`} is available. </span><br/><br/>
           { account ?
           <span><button className="text-neutral-focus hover:underline" onClick={async () => {
-            await TheDate?.claim(tokenId, {value: await TheDate?.claimingPrice()});
+            await TheDate?.claim(tokenId, {value: 
+              ((await Loot?.balanceOf(account) || ethers.constants.Zero).gt(0) ) ? ethers.constants.Zero :
+              await TheDate?.claimingPrice() });
           }}>Click here to claim {`${currentISODate} (Token #${tokenId})`}</button></span>
-          : <span className="wallet">Connect your <button onClick={() => { activate(injected) }} >
-          Metamask
+          : <span className="wallet"><button onClick={() => { activate(injected) }} >
+          Connect your Metamask
         </button> before claiming. </span>}</>);
       } else {
         hintRef.current = (<span className="text-xs">{`${currentISODate} (Token #${tokenId}) is unavailable.`}</span>);
@@ -97,7 +102,7 @@ export default function ClaimPage() {
     } else {
       hintRef.current = (<span className="text-xs">{`Wrong date range. It should be from 1970-01-01 to ${tokenIdToISODateString(currentAuctionTokenId)}.`}</span>);
     }
-  }, [TheDate, inputDateString, currentAuctionTokenId]);
+  }, [TheDate, Loot, inputDateString, currentAuctionTokenId]);
 
   return (
     <Layout>
@@ -125,7 +130,7 @@ export default function ClaimPage() {
 
           <p>
             <label>Check if the Date you want is available: </label>
-            <input autoFocus className="bg-neutral w-32 border-b placeholder-neutral-content border-neutral-content apperance-none focus:outline-none text-neutral-base" 
+            <input autoFocus className="user-input w-32" 
               placeholder="" type="text"
               onChange={(event) => { setInputDateString(event.target.value); }}
               />

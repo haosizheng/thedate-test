@@ -2,11 +2,14 @@ import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import useTheDateArtwork from "@/hooks/useTheDateArtwork";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import { shortenHex } from "@/utils/ethers";
+import { tokenIdToISODateString } from "@/utils/thedate";
 import Link from "next/link";
 import { useRef } from "react";
+import { injected, NETWORK_CHAIN_ID } from "@/utils/connectors";
+import { useWeb3React } from '@web3-react/core';
 
 export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenId: number, editable?: boolean}) {
-  const {library, account} = useActiveWeb3React();
+  const {account, activate} = useWeb3React();
   const TheDate = useTheDateContract();
   const {exists, owner, dateString, noteString, highestBidder, auctionEnded } = useTheDateArtwork(tokenId);
   
@@ -20,33 +23,19 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
         </div>
       : (
         <div>
+          <h3>
+            Profile of The Date:
+          </h3>
           <p>Token ID: {" "}
             <Link href={`/artwork/${tokenId}`}>
               <a className="hover:link">#{tokenId}</a>
             </Link>
-          </p>
-          <p>
+            <br/>
             Date:{" "}
             <Link href={`/artwork/${tokenId}`}>
-              <a className="hover:link">{dateString}</a>
+              <a className="hover:link">{tokenIdToISODateString(tokenId)}</a>
             </Link>
-          </p>
-          <p>
-            Note: {noteString.length > 0 ? `"${noteString}"` : "(unengraved)"}
-            {account === owner && editable && noteString.length == 0 && (
-              <>
-                <input ref={noteInputBox} type="text" maxLength={100} 
-                  className="border-none focus:border-black-300 w-96 
-                  focus:outline-none outline-none focus:border-black focus:underline bg-transparent" placeholder="(unset)" />
-                  <br></br>
-                <button className="link" >Engrave</button>
-              </>
-            )}
-            {account === owner && editable && noteString.length > 0 && (
-              <button className="link" >Erase</button>
-            )}
-          </p>
-          <p>
+            <br/>
             Owner:{" "}
               { owner === TheDate?.address ? (
                 !auctionEnded ? 
@@ -64,7 +53,47 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
                   </a>
                 </Link>
             }
+            <br/>
+            Note: {noteString.length > 0 ? <span className="text-neutral-focus">{noteString}</span> : "(unengraved)"}
           </p>
+          { editable && <>
+          <h3>
+              Interact with The Date: 
+            </h3>
+          {account === undefined ?
+            <p>
+              <span className="wallet"><button onClick={() => { activate(injected) }} >
+                Connect your Metamask
+              </button> before engraving or erasing note. </span>
+            </p>
+          : account !== owner ? 
+            <p>
+             Only owner can interact with The Date.
+            </p>
+          :
+            <p>
+              {noteString.length == 0 && (
+                  <>
+                    Note to engrave on The Date: 
+                    <br/>
+                    <input ref={noteInputBox} type="text" maxLength={100} 
+                      className="user-input w-96 sm:w-120" placeholder="(printable characters at max 100 bytes)" 
+                      />
+                      <br></br>
+                    <br></br>
+                    <button onClick={ async () => {
+                      TheDate?.engraveNote(tokenId, noteInputBox.current.value, {value: await TheDate?.engravingPrice()})
+                    }}>Click here to engrave note at price Ξ0.05</button>
+                  </>
+                )}
+              {noteString.length > 0 && (
+                <button onClick={ async () => {
+                  TheDate?.eraseNote(tokenId, {value: await TheDate?.erasingPrice()})
+                }}>Click here to erase note at price Ξ0.1</button>
+              )}
+            </p>
+          }
+          </> }
         </div>
     ))
     } </>

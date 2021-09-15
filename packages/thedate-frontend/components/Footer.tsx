@@ -13,6 +13,7 @@ export default function Footer() {
         <Link href="/claim"><a>Claim</a></Link>
         <Link href="/auction"><a>Auction</a></Link>
         <Link href="/updates"><a>Updates</a></Link>
+        <Link href="/gallery"><a>Gallery</a></Link>
       </div> 
       <div className="footer__row">
         <a href={PROJECT_INFO.etherscan_url}>Contract</a> 
