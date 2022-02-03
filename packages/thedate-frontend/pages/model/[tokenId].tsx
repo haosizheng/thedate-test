@@ -1,7 +1,6 @@
 import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
-import useTheDateArtwork from "@/hooks/useTheDateArtwork";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import { useState } from "react";

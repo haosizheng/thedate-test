@@ -128,7 +128,7 @@ export default function AuctionPage() {
         <div className="content_item">
           <p className="pb-10">
             The Date of Today &quot;<span className="text-neutral-base">{ tokenIdToISODateString(tokenId) }</span>&quot; (Token #{tokenId}) is 
-            available to be auctioned and minted into Ethernum network immutably in remaining {" "}
+            available to be auctioned and minted into Ethereum network immutably in remaining {" "}
             <span className="text-neutral-base"> 
             <Countdown intervalDelay={1000} 
               date={new Date((tokenId + 1) * SECONDS_IN_A_DAY * 1000)}

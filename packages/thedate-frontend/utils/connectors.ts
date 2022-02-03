@@ -29,7 +29,6 @@ export const walletconnect = new WalletConnectConnector({
   rpc: NETWORK_URLS,
   bridge: WALLETCONNECT_BRIDGE_URL,
   qrcode: true,
-  pollingInterval: 15000,
 })
 
 export const NetworkContextName: string = "NETWORK";

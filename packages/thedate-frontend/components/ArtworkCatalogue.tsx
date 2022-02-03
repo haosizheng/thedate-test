@@ -96,7 +96,7 @@ export default function ArtworkCatalogue({ tokenId, editable = false }: { tokenI
           }
           </> }
           <h3 className="pt-10">
-            Artworks based on metadata of The Date
+            Artworks based on The Date
           </h3>
           <div className="artwork-3d">
           <ArtworkModelViewer tokenId={tokenId} noteString={noteString} fov={30} />

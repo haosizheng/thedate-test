@@ -1,17 +1,12 @@
 import Layout from "@/components/Layout";
-import Link from "next/link";
-import { formatEtherscanLink, formatOpenSeaLink } from "@/utils/ethers";
+import { formatOpenSeaLink } from "@/utils/ethers";
 import useTheDateContract from "@/hooks/useTheDateContract";
 import useActiveWeb3React from "@/hooks/useActiveWeb3React";
 import ArtworkSVGOnChain from "@/components/ArtworkSVGOnChain";
-import { tokenIdToISODateString, jsDateToDate, ISODateToTokenId } from "@/utils/thedate";
-import ArtworkModelViewer from "@/components/ArtworkModelViewer";
 import { useState } from "react";
 import { useAsync } from "react-use";
 import { useRouter } from "next/router";
 import ArtworkCatalogue from "@/components/ArtworkCatalogue";
-import ArtworkHistory from "@/components/ArtworkHistory";
-import useTheDateArtwork from "@/hooks/useTheDateArtwork";
 import { PROJECT_INFO } from "@/utils/constants";
 
 export default function ArtworkPage() {

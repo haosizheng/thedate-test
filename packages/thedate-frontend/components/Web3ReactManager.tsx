@@ -47,12 +47,12 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
 
   // if the account context isn't active, and there's an error on the network context, it's an irrecoverable error
   if (!active && networkError) {
-    return <>no connection to ethernum</>;
+    return <>no connection to ethereum</>;
   }
 
   // if neither context is active, spin
   if (!active && !networkActive) {
-    return <>no connection to ethernum</>;
+    return <>no connection to ethereum</>;
   }
 
   return children
